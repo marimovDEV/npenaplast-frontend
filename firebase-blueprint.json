@@ -1,0 +1,159 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile and role information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["SuperAdmin", "Admin", "WarehouseOperator", "ProductionOperator", "CNCOperator", "Salesperson"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "RawMaterial": {
+      "title": "Raw Material",
+      "description": "Raw material (Granula) entry in Sklad 1",
+      "type": "object",
+      "properties": {
+        "batch": { "type": "string" },
+        "type": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string", "enum": ["kg", "ton"] },
+        "supplier": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "operatorId": { "type": "string" }
+      },
+      "required": ["batch", "type", "quantity", "unit", "date"]
+    },
+    "ProductionLog": {
+      "title": "Production Log",
+      "description": "Log for mixing, bunker storage, and block forming",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["Mixing", "Bunker", "Forming"] },
+        "batch": { "type": "string" },
+        "density": { "type": "string" },
+        "quantity": { "type": "number" },
+        "bunkerId": { "type": "string" },
+        "status": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "operatorId": { "type": "string" }
+      },
+      "required": ["type", "batch", "date"]
+    },
+    "Sklad2Block": {
+      "title": "Sklad 2 Block",
+      "description": "Finished block in Sklad 2",
+      "type": "object",
+      "properties": {
+        "batch": { "type": "string" },
+        "density": { "type": "string" },
+        "size": { "type": "string" },
+        "quantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["Ready", "Drying"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["batch", "density", "size", "quantity", "status", "date"]
+    },
+    "CNCTask": {
+      "title": "CNC Task",
+      "description": "CNC cutting task",
+      "type": "object",
+      "properties": {
+        "order": { "type": "string" },
+        "program": { "type": "string" },
+        "volume": { "type": "number" },
+        "waste": { "type": "number" },
+        "operatorId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Running", "Completed"] },
+        "progress": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["order", "program", "volume", "status", "date"]
+    },
+    "FinishingProduct": {
+      "title": "Finishing Product",
+      "description": "Product in finishing stages (Armirlash, Shpaklyovka, Drying)",
+      "type": "object",
+      "properties": {
+        "order": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["Armirlash", "Shpaklyovka", "Drying", "Ready"] },
+        "progress": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["order", "name", "quantity", "status", "date"]
+    },
+    "Sklad4Product": {
+      "title": "Sklad 4 Product",
+      "description": "Finished decorative product in Sklad 4",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "order": { "type": "string" },
+        "quantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["InStock", "Sold"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "order", "quantity", "status", "date"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Sales transaction record",
+      "type": "object",
+      "properties": {
+        "invoice": { "type": "string" },
+        "customer": { "type": "string" },
+        "amount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Paid", "Pending"] },
+        "type": { "type": "string", "enum": ["Wholesale", "Retail"] },
+        "date": { "type": "string", "format": "date-time" },
+        "items": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["invoice", "customer", "amount", "status", "date"]
+    },
+    "WasteLog": {
+      "title": "Waste Log",
+      "description": "Production waste tracking",
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number" },
+        "result": { "type": "string" },
+        "operatorId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Processed"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["amount", "status", "date"]
+    },
+    "TransferLog": {
+      "title": "Transfer Log",
+      "description": "Internal inventory transfers (Sklad 3)",
+      "type": "object",
+      "properties": {
+        "batch": { "type": "string" },
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "quantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["In Transit", "Completed"] },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["batch", "from", "to", "quantity", "status", "date"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/rawMaterials/{materialId}": { "schema": "RawMaterial", "description": "Raw material inventory" },
+    "/productionLogs/{logId}": { "schema": "ProductionLog", "description": "Production process logs" },
+    "/sklad2Blocks/{blockId}": { "schema": "Sklad2Block", "description": "Finished blocks in Sklad 2" },
+    "/cncTasks/{taskId}": { "schema": "CNCTask", "description": "CNC cutting tasks" },
+    "/finishingProducts/{productId}": { "schema": "FinishingProduct", "description": "Products in finishing" },
+    "/sklad4Products/{productId}": { "schema": "Sklad4Product", "description": "Finished decorative products" },
+    "/sales/{saleId}": { "schema": "Sale", "description": "Sales records" },
+    "/wasteLogs/{logId}": { "schema": "WasteLog", "description": "Waste tracking logs" },
+    "/transfers/{transferId}": { "schema": "TransferLog", "description": "Internal transfers" }
+  }
+}

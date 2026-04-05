@@ -1,0 +1,192 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (Auth UID)
+    // Fields:
+    //   - uid: string (required, immutable)
+    //   - email: string (required, format: email)
+    //   - name: string (optional)
+    //   - role: string (required, enum: SuperAdmin, Admin, WarehouseOperator, ProductionOperator, CNCOperator, Salesperson)
+    //   - createdAt: timestamp (required, immutable)
+    //
+    // Collection: rawMaterials
+    // Fields: batch, type, quantity, unit, supplier, date, operatorId
+    //
+    // Collection: productionLogs
+    // Fields: type, batch, density, quantity, bunkerId, status, date, operatorId
+    //
+    // Collection: sklad2Blocks
+    // Fields: batch, density, size, quantity, status, date
+    //
+    // Collection: cncTasks
+    // Fields: order, program, volume, waste, operatorId, status, progress, date
+    //
+    // Collection: finishingProducts
+    // Fields: order, name, quantity, status, progress, date
+    //
+    // Collection: sklad4Products
+    // Fields: name, order, quantity, status, date
+    //
+    // Collection: sales
+    // Fields: invoice, customer, amount, status, type, date, items
+    //
+    // Collection: wasteLogs
+    // Fields: amount, result, operatorId, status, date
+    //
+    // Collection: transfers
+    // Fields: batch, from, to, quantity, status, date
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['SuperAdmin', 'Admin'] ||
+          (request.auth.token.email == "kingmarimov07@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches(".+@.+\\..+");
+    }
+
+    function isRecent(timestamp) {
+      return timestamp is timestamp && 
+        timestamp > request.time - duration.value(300, 's') &&
+        timestamp < request.time + duration.value(300, 's');
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'email', 'role', 'createdAt']) &&
+        data.uid == request.auth.uid &&
+        isValidEmail(data.email) &&
+        data.role in ['SuperAdmin', 'Admin', 'WarehouseOperator', 'ProductionOperator', 'CNCOperator', 'Salesperson'] &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidRawMaterial(data) {
+      return hasRequiredFields(['batch', 'type', 'quantity', 'unit', 'date']) &&
+        data.batch is string && data.batch.size() < 100 &&
+        data.type is string &&
+        data.quantity is number && data.quantity >= 0 &&
+        data.unit in ['kg', 'ton'] &&
+        data.date is timestamp;
+    }
+
+    function isValidProductionLog(data) {
+      return hasRequiredFields(['type', 'batch', 'date']) &&
+        data.type in ['Mixing', 'Bunker', 'Forming'] &&
+        data.batch is string &&
+        data.date is timestamp;
+    }
+
+    function isValidSale(data) {
+      return hasRequiredFields(['invoice', 'customer', 'amount', 'status', 'date']) &&
+        data.invoice is string &&
+        data.customer is string &&
+        data.amount is number && data.amount >= 0 &&
+        data.status in ['Paid', 'Pending'] &&
+        data.date is timestamp;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    // Default deny
+    match /{path=**} {
+      allow read, write: if false;
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && 
+                      (request.resource.data.role == 'WarehouseOperator' || isAdmin()); // Default role or admin
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin()) && 
+                      isValidUser(request.resource.data) &&
+                      (isOwner(userId) ? request.resource.data.role == resource.data.role : true); // Owner can't change role
+    }
+
+    match /rawMaterials/{materialId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isValidRawMaterial(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /productionLogs/{logId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isValidProductionLog(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /sklad2Blocks/{blockId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    match /cncTasks/{taskId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    match /finishingProducts/{productId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    match /sklad4Products/{productId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    match /sales/{saleId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isValidSale(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /wasteLogs/{logId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+
+    match /transfers/{transferId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+  }
+}

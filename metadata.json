@@ -1,0 +1,5 @@
+{
+  "name": "SalesPulse AI",
+  "description": "Sales coaching intelligence platform that analyzes calls for diarized transcripts, engagement sentiment, and actionable coaching insights.",
+  "requestFramePermissions": ["microphone"]
+}
