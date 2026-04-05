@@ -617,31 +617,36 @@ export default function App() {
         
         {/* ===== MOBILE HEADER (app-style greeting) ===== */}
         {isMobile ? (
-          <header className="bg-white px-4 pt-3 pb-2 sticky top-0 z-40 safe-area-top border-b border-slate-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-black text-slate-900">
-                  {user.name.split(' ')[0]} 👋
-                </h2>
-                <p className="text-xs text-slate-500 font-medium">
-                  {navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli'}
-                </p>
+          <header className="bg-white/80 backdrop-blur-md px-4 py-3 sticky top-0 z-40 safe-area-top border-b border-slate-100/50">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 flex-none group active:scale-90 transition-transform">
+                  <Factory className="text-white w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-base font-black text-slate-900 truncate tracking-tight">
+                    {user.name.split(' ')[0]} 👋
+                  </h2>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest truncate">
+                    {navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli'}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <button 
                   onClick={() => setIsScannerOpen(true)}
-                  className="p-2 bg-blue-50 text-blue-600 rounded-xl"
+                  className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-600 rounded-xl active:bg-blue-50 active:text-blue-600 transition-colors"
                 >
                   <QrCode className="w-5 h-5" />
                 </button>
                 <div className="relative">
                   <button 
                     onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="p-2 text-slate-500 rounded-xl relative"
+                    className="w-10 h-10 flex items-center justify-center text-slate-400 rounded-xl relative active:bg-slate-100 transition-colors"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 rounded-full border border-white text-[8px] flex items-center justify-center text-white font-black animate-pulse">
+                      <span className="absolute top-2.5 right-2.5 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-white text-[7px] flex items-center justify-center text-white font-black animate-pulse">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -738,8 +743,8 @@ export default function App() {
 
       {/* =========== MOBILE BOTTOM NAVIGATION =========== */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 safe-area-bottom">
-          <div className="flex items-center justify-around h-16 px-1">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-slate-100 safe-area-bottom shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+          <div className="flex items-center justify-around h-16 px-2">
             {getBottomNavItems().map((item) => {
               const isActive = item.id === '__more__' ? isMoreOpen : activeTab === item.id;
               return (
@@ -753,16 +758,22 @@ export default function App() {
                       setIsMoreOpen(false);
                     }
                   }}
-                  className={`flex flex-col items-center justify-center gap-0.5 flex-1 py-1 transition-colors ${
+                  className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative ${
                     isActive ? 'text-blue-600' : 'text-slate-400'
                   }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
-                  <span className={`text-[10px] font-bold ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>
+                  <div className={`p-1 rounded-lg transition-colors ${isActive ? 'bg-blue-50/50' : 'bg-transparent'}`}>
+                    <item.icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : 'scale-100'}`} />
+                  </div>
+                  <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-70'}`}>
                     {item.name}
                   </span>
                   {isActive && item.id !== '__more__' && (
-                    <motion.div layoutId="bottomnav" className="w-4 h-0.5 bg-blue-600 rounded-full mt-0.5" />
+                    <motion.div 
+                      layoutId="bottomnav" 
+                      className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-1 bg-blue-600 rounded-b-full" 
+                      transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                    />
                   )}
                 </button>
               );

@@ -104,8 +104,8 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
 
   if (isSales) {
     return (
-      <div className="space-y-4 md:space-y-8 pb-10">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="responsive-py space-y-6 md:space-y-8 pb-20 animate-slide-up">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Xayrli kun, {user.name.split(' ')[0]}!</h2>
             <p className="text-slate-500 text-sm font-medium">Sotuvlar paneli va mijozlar nazorati</p>
@@ -113,22 +113,22 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
           <div className="flex gap-3">
              <button 
               onClick={() => onAction?.('sales')}
-              className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
                 <Plus className="w-4 h-4" />
                 <span>Yangi Buyurtma</span>
              </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-          <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
-            <div className="flex items-center gap-5 relative z-10">
-              <div className="bg-blue-600 w-14 h-14 rounded-[22px] flex items-center justify-center shadow-lg shadow-blue-100">
-                <ShoppingCart className="text-white w-7 h-7" />
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="card-responsive p-5 md:p-6 hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative">
+            <div className="flex items-center gap-4 md:gap-5 relative z-10">
+              <div className="bg-blue-600 w-12 h-12 md:w-14 md:h-14 rounded-2xl md:rounded-[22px] flex items-center justify-center shadow-lg shadow-blue-100">
+                <ShoppingCart className="text-white w-6 h-6 md:w-7 md:h-7" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Bugungi Sotuv</p>
-                <p className="text-2xl font-black text-slate-900 tracking-tight">{todayStats.sales_count}</p>
+                <p className="text-xs-bold text-slate-400 mb-1">Bugungi Sotuv</p>
+                <p className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{todayStats.sales_count}</p>
               </div>
             </div>
           </div>
@@ -494,17 +494,17 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
         )}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {stats.map((stat) => (
-          <div key={stat.name} className="bg-white p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group overflow-hidden relative">
+          <div key={stat.name} className="card-responsive p-5 md:p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 group overflow-hidden relative">
             <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-all duration-700 opacity-50" />
-            <div className="flex items-center gap-5 relative z-10">
-              <div className={`${stat.color} w-14 h-14 rounded-[22px] flex items-center justify-center shadow-lg shadow-blue-100 group-hover:scale-110 transition-all duration-500`}>
-                <stat.icon className="text-white w-7 h-7" />
+            <div className="flex items-center gap-4 md:gap-5 relative z-10">
+              <div className={`${stat.color} w-12 h-12 md:w-14 md:h-14 rounded-2xl md:rounded-[22px] flex items-center justify-center shadow-lg shadow-blue-100 group-hover:scale-110 transition-all duration-500`}>
+                <stat.icon className="text-white w-6 h-6 md:w-7 md:h-7" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">{stat.name}</p>
-                <p className="text-2xl font-black text-slate-900 tracking-tight truncate">{stat.value}</p>
+                <p className="text-xs-bold text-slate-400 mb-1">{stat.name}</p>
+                <p className="text-xl md:text-2xl font-black text-slate-900 tracking-tight truncate">{stat.value}</p>
               </div>
             </div>
           </div>
@@ -557,14 +557,14 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
         </div>
       </div>
 
-      <div className="bg-white p-4 md:p-8 rounded-[28px] md:rounded-[40px] border border-slate-100 shadow-sm overflow-hidden">
+      <div className="card-responsive p-6 md:p-8 overflow-hidden">
         <h3 className="text-lg md:text-xl font-black text-slate-900 mb-6 md:mb-10 flex items-center gap-3">
           <div className="p-2 bg-indigo-50 rounded-xl">
             <Factory className="w-6 h-6 text-indigo-600" />
           </div>
           Ishlab Chiqarish Zanjiri (Pipeline)
         </h3>
-        <div className={`flex ${isMobile ? 'flex-row snap-x snap-mandatory pb-2' : 'flex-col lg:flex-row items-center'} justify-between gap-4 py-2 md:py-4 overflow-x-auto min-w-full`}>
+        <div className="flex flex-row snap-x-mandatory pb-4 gap-4 overflow-x-auto no-scrollbar">
           {[
             { name: 'Zames', val: pipelineData.zames, icon: Zap, color: 'blue' },
             { name: 'Quritish', val: pipelineData.bunkers.filter((b:any) => b.status === 'Drying').length, icon: Activity, color: 'amber' },
@@ -575,18 +575,13 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
             { name: 'Dekor', val: pipelineData.finishing, icon: Brush, color: 'rose' }
           ].map((step, i, arr) => (
             <React.Fragment key={step.name}>
-              <div className={`flex flex-col items-center gap-3 flex-none ${isMobile ? 'w-32 snap-start rounded-3xl border border-slate-100 bg-slate-50 px-4 py-5' : 'w-28'}`}>
-                <div className={`w-14 h-14 rounded-[20px] bg-${step.color}-500 flex items-center justify-center text-white shadow-lg shadow-${step.color}-100`}>
+              <div className="flex flex-col items-center gap-3 flex-none w-32 snap-center rounded-3xl border border-slate-100 bg-slate-50 px-4 py-6 hover:bg-white hover:shadow-xl transition-all group">
+                <div className={`w-14 h-14 rounded-[20px] bg-${step.color}-500 flex items-center justify-center text-white shadow-lg shadow-${step.color}-100 group-hover:scale-110 transition-transform`}>
                   <step.icon className="w-6 h-6" />
                 </div>
                 <p className="text-[9px] font-black text-slate-900 uppercase tracking-widest text-center">{step.name}</p>
-                <span className="bg-slate-100 px-2 py-0.5 rounded-full text-[8px] font-black text-slate-500">{step.val}</span>
+                <span className="bg-white px-2 py-0.5 rounded-full text-[8px] font-black text-slate-500 shadow-sm">{step.val}</span>
               </div>
-              {i < arr.length - 1 && (
-                <div className={`flex-1 h-px bg-slate-100 relative min-w-[20px] ${isMobile ? 'hidden' : 'hidden lg:block'}`}>
-                  <ArrowRight className="w-3 h-3 text-slate-300 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                </div>
-              )}
             </React.Fragment>
           ))}
         </div>

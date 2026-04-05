@@ -27,6 +27,7 @@ import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
 import QRLabel from './QRLabel';
 import DocumentTemplate from './DocumentTemplate';
+import MobileCard from './common/MobileCard';
 
 const ScannerModal = lazy(() => import('./ScannerModal'));
 
@@ -350,52 +351,57 @@ export default function Sklad1({ user }: { user: any }) {
 
           <div className="min-h-[400px]">
             {isMobile ? (
-              <div className="space-y-3 p-4">
+              <div className="p-3 space-y-1 animate-slide-up">
                 {filteredMaterials.map((m) => {
                   const available = (m as any).remaining_quantity - ((m as any).reserved_quantity || 0);
                   return (
-                    <div key={m.id} className="rounded-[28px] border border-slate-100 bg-white p-4 shadow-sm">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="text-sm font-black text-slate-900 break-words">{(m as any).name}</p>
-                          <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{m.code}</p>
-                        </div>
-                        <span className="rounded-xl border border-blue-100 bg-blue-50 px-2 py-1 text-[9px] font-black text-blue-600">{m.batchNumber}</span>
-                      </div>
-                      <div className="mt-4 grid grid-cols-2 gap-3">
-                        <div className="rounded-2xl bg-slate-50 p-3">
-                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Reserved</p>
-                          <p className="mt-1 text-sm font-black text-amber-500">{((m as any).reserved_quantity || 0).toLocaleString()} kg</p>
-                        </div>
-                        <div className="rounded-2xl bg-slate-50 p-3">
-                          <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Mavjud</p>
-                          <p className="mt-1 text-sm font-black text-slate-900">{available.toLocaleString()} kg</p>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                          m.status === 'IN_STOCK' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-                        }`}>
-                          {m.status === 'IN_STOCK' ? 'Omborda' : 'Tugatilgan'}
+                    <MobileCard
+                      key={m.id}
+                      title={(m as any).name}
+                      subtitle={m.code}
+                      icon={Database}
+                      iconBg="bg-blue-50"
+                      iconColor="text-blue-600"
+                      status={{
+                        label: m.status === 'IN_STOCK' ? 'Omborda' : 'Tugatilgan',
+                        variant: m.status === 'IN_STOCK' ? 'success' : 'error'
+                      }}
+                      rightElement={
+                        <span className="text-[10px] font-mono font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                          {m.batchNumber}
                         </span>
-                        <div className="flex items-center gap-2">
-                          <button 
-                            onClick={() => setIsPrintingLabel(m)}
-                            className="rounded-xl border border-slate-100 bg-white p-2.5 text-slate-400 shadow-sm transition-all"
-                          >
-                            <Printer className="w-4 h-4" />
-                          </button>
-                          {available > 0 && (
-                            <button 
-                              onClick={() => { setSelectedBatch(m); setIsTransferModalOpen(true); }}
-                              className="rounded-2xl border border-blue-100 bg-blue-50 p-3 text-blue-600 transition-all"
-                            >
-                              <Activity className="w-5 h-5" />
-                            </button>
-                          )}
+                      }
+                      footer={
+                        <div className="flex items-center justify-between w-full">
+                           <div className="flex gap-4">
+                              <div className="flex flex-col">
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Reserved</span>
+                                <span className="text-xs font-black text-amber-500 leading-none">{((m as any).reserved_quantity || 0).toLocaleString()} kg</span>
+                              </div>
+                              <div className="flex flex-col border-l border-slate-100 pl-4">
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Mavjud</span>
+                                <span className="text-xs font-black text-slate-900 leading-none">{available.toLocaleString()} kg</span>
+                              </div>
+                           </div>
+                           <div className="flex gap-2">
+                              <button 
+                                onClick={() => setIsPrintingLabel(m)}
+                                className="touch-target w-10 h-10 bg-slate-50 text-slate-400 rounded-xl"
+                              >
+                                <Printer className="w-4.5 h-4.5" />
+                              </button>
+                              {available > 0 && (
+                                <button 
+                                  onClick={() => { setSelectedBatch(m); setIsTransferModalOpen(true); }}
+                                  className="touch-target w-10 h-10 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100"
+                                >
+                                  <Activity className="w-4.5 h-4.5" />
+                                </button>
+                              )}
+                           </div>
                         </div>
-                      </div>
-                    </div>
+                      }
+                    />
                   );
                 })}
               </div>

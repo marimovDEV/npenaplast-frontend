@@ -27,6 +27,7 @@ import { User, Invoice, Product, Client } from '../types';
 import api from '../lib/api';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
+import MobileCard from './common/MobileCard';
 
 type ViewMode = 'KANBAN' | 'LIST';
 
@@ -231,15 +232,15 @@ export default function Sales({ user }: { user: User }) {
   return (
     <div className="space-y-4 md:space-y-8 pb-10">
       {/* Premium Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-center gap-3 md:gap-6">
-          <div className="w-10 h-10 md:w-16 md:h-16 bg-blue-600 rounded-2xl md:rounded-[28px] flex items-center justify-center shadow-2xl shadow-blue-200">
-            <Target className="w-5 h-5 md:w-8 md:h-8 text-white" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 animate-slide-up">
+        <div className="flex items-center gap-4 md:gap-6">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-600 rounded-2xl md:rounded-[28px] flex items-center justify-center shadow-2xl shadow-blue-200 flex-none">
+            <Target className="w-6 h-6 md:w-8 md:h-8 text-white" />
           </div>
-          <div>
-            <h1 className="text-xl md:text-4xl font-black text-slate-900 tracking-tight">Savdo & CRM</h1>
-            <p className="text-slate-500 text-sm font-medium flex items-center gap-2">
-              <Users className="w-4 h-4 text-blue-500" />
+          <div className="min-w-0">
+            <h1 className="text-xl md:text-4xl font-black text-slate-900 tracking-tight truncate">Savdo & CRM</h1>
+            <p className="text-slate-500 text-[10px] md:text-sm font-medium flex items-center gap-2 truncate">
+              <Users className="w-3.5 h-3.5 text-blue-500" />
               Savdo voronkasi va mijozlar nazorati
             </p>
           </div>
@@ -279,20 +280,20 @@ export default function Sales({ user }: { user: User }) {
       </div>
 
       {/* KPI Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
         {[
           { label: 'Bugungi Savdo', value: kpi ? new Intl.NumberFormat('uz-UZ').format(kpi.today_sum) + ' UZS' : '...', icon: TrendingUp, color: 'blue' },
           { label: 'Aktiv Buyurtmalar', value: kpi ? kpi.active_orders : '...', icon: Target, color: 'emerald' },
           { label: 'Oylik Reja', value: kpi ? `${kpi.monthly_progress}%` : '...', icon: Activity, color: 'amber' },
           { label: 'Konversiya', value: kpi ? `${kpi.conversion_rate}%` : '...', icon: Users, color: 'indigo' },
         ].map((kpiItem, i) => (
-          <div key={i} className="bg-white p-4 md:p-8 rounded-2xl md:rounded-[40px] border border-slate-100 shadow-sm flex items-center gap-3 md:gap-6">
+          <div key={i} className="card-responsive p-5 md:p-8 flex items-center gap-4 md:gap-6 hover:shadow-lg transition-all">
             <div className={`w-10 h-10 md:w-14 md:h-14 bg-${kpiItem.color}-50 rounded-xl md:rounded-2xl flex items-center justify-center text-${kpiItem.color}-600 shrink-0`}>
               <kpiItem.icon className="w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 truncate">{kpiItem.label}</p>
-              <p className="text-base md:text-xl font-black text-slate-900 truncate">{kpiItem.value}</p>
+            <div className="min-w-0">
+              <p className="text-xs-bold text-slate-400 mb-1 truncate">{kpiItem.label}</p>
+              <p className="text-base md:text-xl font-black text-slate-900 truncate leading-none">{kpiItem.value}</p>
             </div>
           </div>
         ))}
@@ -424,31 +425,41 @@ export default function Sales({ user }: { user: User }) {
             </div>
           )}
           {isMobile && (
-            <div className="space-y-3">
+            <div className="space-y-1 animate-slide-up">
               {filteredInvoices.map((inv) => (
-                <div key={inv.id} className="rounded-[24px] border border-slate-100 bg-white p-4 shadow-sm">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-black text-slate-900">{inv.invoice_number}</p>
-                      <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{inv.customer_name}</p>
+                <MobileCard
+                  key={inv.id}
+                  title={inv.invoice_number}
+                  subtitle={inv.customer_name}
+                  icon={ShoppingCart}
+                  iconBg="bg-blue-50"
+                  iconColor="text-blue-600"
+                  status={{
+                    label: inv.status_display,
+                    variant: inv.status === 'NEW' ? 'info' :
+                             inv.status === 'CONFIRMED' ? 'warning' :
+                             inv.status === 'COMPLETED' ? 'success' : 'default'
+                  }}
+                  rightElement={
+                    <span className="text-xs font-black text-blue-600 whitespace-nowrap">{inv.total_amount.toLocaleString()} UZS</span>
+                  }
+                  footer={
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{inv.payment_method_display}</span>
+                      <div className="flex gap-2">
+                        {inv.status === 'NEW' && (
+                          <button onClick={() => handleStatusTransition(inv.id, 'CONFIRMED')} className="touch-target px-4 bg-amber-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-amber-100">Tasdiq</button>
+                        )}
+                        {inv.status === 'CONFIRMED' && (
+                          <button onClick={() => handleStatusTransition(inv.id, 'SHIPPED')} className="touch-target px-4 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100">Jo'natish</button>
+                        )}
+                        {inv.status === 'SHIPPED' && (
+                          <button onClick={() => handleStatusTransition(inv.id, 'COMPLETED')} className="touch-target px-4 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100">Yakunlash</button>
+                        )}
+                      </div>
                     </div>
-                    <span className="text-sm font-black text-blue-600">{inv.total_amount.toLocaleString()} UZS</span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="rounded-xl bg-slate-50 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-500">{inv.status_display}</span>
-                    <div className="flex gap-2">
-                      {inv.status === 'NEW' && (
-                        <button onClick={() => handleStatusTransition(inv.id, 'CONFIRMED')} className="rounded-xl bg-amber-500 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-white">Tasdiq</button>
-                      )}
-                      {inv.status === 'CONFIRMED' && (
-                        <button onClick={() => handleStatusTransition(inv.id, 'SHIPPED')} className="rounded-xl bg-indigo-600 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-white">Jonatish</button>
-                      )}
-                      {inv.status === 'SHIPPED' && (
-                        <button onClick={() => handleStatusTransition(inv.id, 'COMPLETED')} className="rounded-xl bg-emerald-600 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-white">Yakunlash</button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  }
+                />
               ))}
             </div>
           )}
