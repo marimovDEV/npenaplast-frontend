@@ -4,9 +4,9 @@ const isLocalhost = window.location.hostname === 'localhost' ||
                    window.location.hostname === '127.0.0.1' || 
                    window.location.hostname.endsWith('.localhost');
 
-const API_URL = isLocalhost 
+export const API_URL = isLocalhost 
   ? 'http://localhost:8000/api/' 
-  : `http://${window.location.hostname}:8000/api/`;
+  : 'https://penaplast.api.yolyolakayt.uz/api/';
 
 const api = axios.create({
   baseURL: API_URL,
