@@ -3,6 +3,7 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { X, Camera, AlertCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import api from '../lib/api';
+import { useI18n } from '../i18n';
 
 interface ScannerModalProps {
   onScan: (data: any) => void;
@@ -11,6 +12,7 @@ interface ScannerModalProps {
 }
 
 export default function ScannerModal({ onScan, onClose, type = 'BATCH' }: ScannerModalProps) {
+  const { locale } = useI18n();
   const [scannedData, setScannedData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -125,7 +127,7 @@ export default function ScannerModal({ onScan, onClose, type = 'BATCH' }: Scanne
                       </div>
                       <div className="text-left sm:text-right">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Yaratilgan sana</p>
-                        <p className="text-sm font-black text-slate-900">{displayDate ? new Date(displayDate).toLocaleDateString() : '-'}</p>
+                        <p className="text-sm font-black text-slate-900">{displayDate ? new Date(displayDate).toLocaleDateString(locale) : '-'}</p>
                       </div>
                     </div>
                   </div>
@@ -149,7 +151,7 @@ export default function ScannerModal({ onScan, onClose, type = 'BATCH' }: Scanne
                       </div>
                       <div className="text-right">
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kirim sanasi</p>
-                        <p className="text-sm font-black text-slate-900">{displayDate ? new Date(displayDate).toLocaleDateString() : '-'}</p>
+                        <p className="text-sm font-black text-slate-900">{displayDate ? new Date(displayDate).toLocaleDateString(locale) : '-'}</p>
                       </div>
                     </div>
                   </div>

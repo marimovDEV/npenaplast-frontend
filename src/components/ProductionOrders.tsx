@@ -29,8 +29,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ProductionOrder, ProductionStage, User } from '../types';
 import { uiStore, authStore } from '../lib/store';
 import api from '../lib/api';
+import { useI18n } from '../i18n';
 
 export default function ProductionOrders() {
+  const { locale, t } = useI18n();
   const [productionOrders, setProductionOrders] = useState<ProductionOrder[]>([]);
   const [kpiSummary, setKpiSummary] = useState<any>(null);
   const [operators, setOperators] = useState<User[]>([]);
@@ -131,8 +133,8 @@ export default function ProductionOrders() {
     let waste_amount = 0;
 
     if (stage.stage_type === 'ZAMES') {
-      const qty = prompt("Ishlatilgan xom ashyo miqdori (kg):", order.quantity.toString());
-      const waste = prompt("Brak (chiqindi) miqdori (kg):", "0");
+      const qty = prompt(t("Ishlatilgan xom ashyo miqdori (kg):"), order.quantity.toString());
+      const waste = prompt(t("Brak (chiqindi) miqdori (kg):"), "0");
       if (qty === null) return;
       actual_quantity = parseFloat(qty);
       waste_amount = parseFloat(waste || "0");
@@ -351,7 +353,7 @@ export default function ProductionOrders() {
                           <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Muddat</div>
                           <div className="text-xs font-black text-slate-700 flex items-center gap-2">
                             <Clock className="w-3 h-3 text-rose-500" />
-                            {po.deadline ? new Date(po.deadline).toLocaleDateString() : 'Belgilanmagan'}
+                            {po.deadline ? new Date(po.deadline).toLocaleDateString(locale) : 'Belgilanmagan'}
                           </div>
                         </div>
 

@@ -39,12 +39,14 @@ import {
 } from '../types';
 import api from '../lib/api';
 import { uiStore } from '../lib/store';
+import { useI18n } from '../i18n';
 
 interface FinanceProps {
   user: User;
 }
 
 export default function Finance({ user }: FinanceProps) {
+  const { locale } = useI18n();
   const currentRole = user.effective_role || user.role_display || user.role;
   const canManageTransfers = ['Bosh Admin', 'Admin'].includes(currentRole) || !!user.is_superuser;
   const [cashboxes, setCashboxes] = useState<Cashbox[]>([]);
@@ -252,7 +254,7 @@ export default function Finance({ user }: FinanceProps) {
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-700" />
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-3">Umumiy Qoldiq</p>
           <h3 className="text-2xl font-black tracking-tight mb-4">
-            {totalBalance.toLocaleString()} <span className="text-sm font-bold opacity-50 ml-1 text-blue-400">UZS</span>
+            {totalBalance.toLocaleString(locale)} <span className="text-sm font-bold opacity-50 ml-1 text-blue-400">UZS</span>
           </h3>
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-full w-fit">
             <TrendingUp className="w-3.5 h-3.5" />
@@ -263,7 +265,7 @@ export default function Finance({ user }: FinanceProps) {
         <div className="bg-white rounded-[32px] p-7 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-3">30 kunlik Kirim</p>
           <h3 className="text-2xl font-black text-emerald-600 tracking-tight mb-4">
-            +{totalIncome.toLocaleString()} <span className="text-sm font-bold opacity-50 ml-1">UZS</span>
+            +{totalIncome.toLocaleString(locale)} <span className="text-sm font-bold opacity-50 ml-1">UZS</span>
           </h3>
           <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
                 <div className="h-full bg-emerald-500 rounded-full" style={{ width: '70%' }} />
@@ -273,7 +275,7 @@ export default function Finance({ user }: FinanceProps) {
         <div className="bg-white rounded-[32px] p-7 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-3">30 kunlik Chiqim</p>
           <h3 className="text-2xl font-black text-rose-600 tracking-tight mb-4">
-            -{totalExpense.toLocaleString()} <span className="text-sm font-bold opacity-50 ml-1">UZS</span>
+            -{totalExpense.toLocaleString(locale)} <span className="text-sm font-bold opacity-50 ml-1">UZS</span>
           </h3>
           <div className="w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
                 <div className="h-full bg-rose-500 rounded-full" style={{ width: '45%' }} />
@@ -283,7 +285,7 @@ export default function Finance({ user }: FinanceProps) {
         <div className="bg-white rounded-[32px] p-7 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-3">Umumiy Qarzdorlik</p>
           <h3 className="text-2xl font-black text-amber-600 tracking-tight mb-4">
-            {analytics?.summary?.total_debt?.toLocaleString() || '0'} <span className="text-sm font-bold opacity-50 ml-1">UZS</span>
+            {analytics?.summary?.total_debt?.toLocaleString(locale) || '0'} <span className="text-sm font-bold opacity-50 ml-1">UZS</span>
           </h3>
           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-amber-500">
             <AlertCircle className="w-3.5 h-3.5" />
@@ -412,7 +414,7 @@ export default function Finance({ user }: FinanceProps) {
                         <div className="flex items-end justify-between">
                             <div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Mavjud Qoldiq</p>
-                                <h3 className="text-2xl font-black text-blue-600 tracking-tight">{parseFloat(String(cb.balance)).toLocaleString()} UZS</h3>
+                                <h3 className="text-2xl font-black text-blue-600 tracking-tight">{parseFloat(String(cb.balance)).toLocaleString(locale)} UZS</h3>
                             </div>
                             <button className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all">
                                 <History className="w-5 h-5" />
@@ -468,7 +470,7 @@ export default function Finance({ user }: FinanceProps) {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-black text-slate-900 leading-none mb-1.5">{t.description || 'Izohsiz'}</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase">{new Date(t.created_at).toLocaleString()}</p>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase">{new Date(t.created_at).toLocaleString(locale)}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -486,7 +488,7 @@ export default function Finance({ user }: FinanceProps) {
                                     </td>
                                     <td className="px-8 py-5 text-right">
                                         <p className={`text-base font-black tracking-tight ${t.type === 'INCOME' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                            {t.type === 'INCOME' ? '+' : '-'}{parseFloat(String(t.amount)).toLocaleString()}
+                                            {t.type === 'INCOME' ? '+' : '-'}{parseFloat(String(t.amount)).toLocaleString(locale)}
                                         </p>
                                         <p className="text-[10px] font-bold text-slate-300 uppercase mt-1">UZS</p>
                                     </td>
@@ -506,9 +508,9 @@ export default function Finance({ user }: FinanceProps) {
                         <p className="text-sm font-black text-slate-900">{t.description || 'Izohsiz'}</p>
                         <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{t.cashbox_name} • {t.department_display}</p>
                       </div>
-                      <span className={`text-sm font-black ${t.type === 'INCOME' ? 'text-emerald-600' : 'text-rose-600'}`}>{t.type === 'INCOME' ? '+' : '-'}{parseFloat(String(t.amount)).toLocaleString()}</span>
+                      <span className={`text-sm font-black ${t.type === 'INCOME' ? 'text-emerald-600' : 'text-rose-600'}`}>{t.type === 'INCOME' ? '+' : '-'}{parseFloat(String(t.amount)).toLocaleString(locale)}</span>
                     </div>
-                    <div className="mt-3 text-[10px] font-bold text-slate-500">{new Date(t.created_at).toLocaleString()}</div>
+                    <div className="mt-3 text-[10px] font-bold text-slate-500">{new Date(t.created_at).toLocaleString(locale)}</div>
                   </div>
                 ))}
               </div>
@@ -538,13 +540,13 @@ export default function Finance({ user }: FinanceProps) {
                             {transfers.map((tr) => (
                                 <tr key={tr.id} className="hover:bg-slate-50/50 transition-all">
                                     <td className="px-8 py-5">
-                                        <p className="text-sm font-black text-slate-900 mb-1">{new Date(tr.created_at).toLocaleDateString()}</p>
+                                        <p className="text-sm font-black text-slate-900 mb-1">{new Date(tr.created_at).toLocaleDateString(locale)}</p>
                                         <p className="text-[10px] font-black text-slate-400 uppercase">{tr.performed_by_name}</p>
                                     </td>
                                     <td className="px-8 py-5 text-sm font-bold text-slate-600">{tr.from_cashbox_name}</td>
                                     <td className="px-8 py-5 text-sm font-bold text-slate-600">{tr.to_cashbox_name}</td>
                                     <td className="px-8 py-5 text-right font-black text-slate-900">
-                                        {parseFloat(String(tr.amount)).toLocaleString()} UZS
+                                        {parseFloat(String(tr.amount)).toLocaleString(locale)} UZS
                                     </td>
                                 </tr>
                             ))}
@@ -558,8 +560,8 @@ export default function Finance({ user }: FinanceProps) {
                  {transfers.map((tr) => (
                    <div key={tr.id} className="rounded-[24px] border border-slate-100 bg-white p-4 shadow-sm">
                      <p className="text-sm font-black text-slate-900">{tr.from_cashbox_name} {'->'} {tr.to_cashbox_name}</p>
-                     <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{tr.performed_by_name} • {new Date(tr.created_at).toLocaleDateString()}</p>
-                     <p className="mt-3 text-base font-black text-blue-600">{parseFloat(String(tr.amount)).toLocaleString()} UZS</p>
+                     <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{tr.performed_by_name} • {new Date(tr.created_at).toLocaleDateString(locale)}</p>
+                     <p className="mt-3 text-base font-black text-blue-600">{parseFloat(String(tr.amount)).toLocaleString(locale)} UZS</p>
                    </div>
                  ))}
                </div>
@@ -595,11 +597,11 @@ export default function Finance({ user }: FinanceProps) {
                           </div>
                         </td>
                         <td className="px-8 py-5 text-xs font-bold text-slate-400">
-                          {new Date(b.last_updated).toLocaleString()}
+                          {new Date(b.last_updated).toLocaleString(locale)}
                         </td>
                         <td className="px-8 py-5 text-right">
                           <span className={`text-lg font-black tracking-tight ${parseFloat(String(b.total_debt)) > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                            {parseFloat(String(b.total_debt)).toLocaleString()} UZS
+                            {parseFloat(String(b.total_debt)).toLocaleString(locale)} UZS
                           </span>
                         </td>
                       </tr>
@@ -614,8 +616,8 @@ export default function Finance({ user }: FinanceProps) {
                 {balances.map((b) => (
                   <div key={b.id} className="rounded-[24px] border border-slate-100 bg-white p-4 shadow-sm">
                     <p className="text-sm font-black text-slate-900">{b.customer_name}</p>
-                    <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{new Date(b.last_updated).toLocaleString()}</p>
-                    <p className={`mt-3 text-base font-black ${parseFloat(String(b.total_debt)) > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{parseFloat(String(b.total_debt)).toLocaleString()} UZS</p>
+                    <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400">{new Date(b.last_updated).toLocaleString(locale)}</p>
+                    <p className={`mt-3 text-base font-black ${parseFloat(String(b.total_debt)) > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>{parseFloat(String(b.total_debt)).toLocaleString(locale)} UZS</p>
                   </div>
                 ))}
               </div>
@@ -819,7 +821,7 @@ export default function Finance({ user }: FinanceProps) {
                         >
                             <option value="">Tanlang...</option>
                             {cashboxes.map(cb => (
-                                <option key={cb.id} value={cb.id}>{cb.name} ({parseFloat(String(cb.balance)).toLocaleString()} UZS)</option>
+                                <option key={cb.id} value={cb.id}>{cb.name} ({parseFloat(String(cb.balance)).toLocaleString(locale)} UZS)</option>
                             ))}
                         </select>
                     </div>

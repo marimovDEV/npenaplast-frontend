@@ -28,10 +28,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import QRLabel from './QRLabel';
 import DocumentTemplate from './DocumentTemplate';
 import MobileCard from './common/MobileCard';
+import { useI18n } from '../i18n';
 
 const ScannerModal = lazy(() => import('./ScannerModal'));
 
 export default function Sklad1({ user }: { user: any }) {
+  const { locale } = useI18n();
   const assignedWarehouses = (user.assignedWarehouses || user.assigned_warehouses || []).map(String);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [materials, setMaterials] = useState<RawMaterial[]>([]);
@@ -76,7 +78,7 @@ export default function Sklad1({ user }: { user: any }) {
           id: b.id,
           batchNumber: b.batch_number,
           supplier: b.supplier_name,
-          date: new Date(b.date).toLocaleDateString(),
+          date: new Date(b.date).toLocaleDateString(locale),
           quantity_kg: b.quantity_kg,
           remaining_quantity: b.remaining_quantity,
           reserved_quantity: b.reserved_quantity,
@@ -125,7 +127,7 @@ export default function Sklad1({ user }: { user: any }) {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);

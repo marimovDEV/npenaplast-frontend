@@ -20,10 +20,12 @@ import api from '../lib/api';
 import { uiStore } from '../lib/store';
 import { ERPDocument, User as UserType } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../i18n';
 
 const ScannerModal = lazy(() => import('./ScannerModal'));
 
 export default function CourierDashboard({ user }: { user: UserType }) {
+  const { locale } = useI18n();
   const [documents, setDocuments] = useState<ERPDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDoc, setSelectedDoc] = useState<ERPDocument | null>(null);
@@ -187,7 +189,7 @@ export default function CourierDashboard({ user }: { user: UserType }) {
                          </div>
                          <div className="flex-1 min-w-0">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Yaratilgan vaqt</p>
-                            <p className="text-sm font-black text-slate-900">{new Date(selectedDoc.created_at || '').toLocaleString()}</p>
+                            <p className="text-sm font-black text-slate-900">{new Date(selectedDoc.created_at || '').toLocaleString(locale)}</p>
                          </div>
                       </div>
                    </div>

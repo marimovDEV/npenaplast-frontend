@@ -26,8 +26,10 @@ import api from '../lib/api';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
 import { User } from '../types';
+import { useI18n } from '../i18n';
 
 export default function Documents({ user }: { user: User }) {
+  const { locale } = useI18n();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [docs, setDocs] = useState<ERPDocument[]>([]);
   const [loading, setLoading] = useState(true);
@@ -283,7 +285,7 @@ export default function Documents({ user }: { user: User }) {
                     </div>
                     <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-slate-500">
                       <span>{doc.created_by_name || 'Noma’lum'}</span>
-                      <span>{new Date(doc.created_at || '').toLocaleDateString()}</span>
+                      <span>{new Date(doc.created_at || '').toLocaleDateString(locale)}</span>
                     </div>
                   </button>
                 );
@@ -317,7 +319,7 @@ export default function Documents({ user }: { user: User }) {
                           </div>
                           <div>
                             <span className="font-black text-slate-900 block text-xs">{doc.number}</span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{new Date(doc.created_at || '').toLocaleDateString()}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{new Date(doc.created_at || '').toLocaleDateString(locale)}</span>
                           </div>
                         </div>
                       </td>
@@ -424,7 +426,7 @@ export default function Documents({ user }: { user: User }) {
                    </div>
                    <div className="space-y-1">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Yaratilgan Sana</p>
-                      <p className="text-xs font-black text-slate-900">{new Date(selectedDoc.created_at || '').toLocaleString()}</p>
+                      <p className="text-xs font-black text-slate-900">{new Date(selectedDoc.created_at || '').toLocaleString(locale)}</p>
                    </div>
                    <div className="space-y-1">
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mas'ul Xodim</p>
@@ -482,7 +484,7 @@ export default function Documents({ user }: { user: User }) {
                                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{item.batch_number || 'Batch yo\'q'}</p>
                                   </td>
                                   <td className="px-8 py-5 text-right">
-                                     <span className="text-xs font-black text-emerald-400">{item.quantity.toLocaleString()} {item.unit || 'dona'}</span>
+                                     <span className="text-xs font-black text-emerald-400">{item.quantity.toLocaleString(locale)} {item.unit || 'dona'}</span>
                                   </td>
                                 </tr>
                             ))}

@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, BarChart, Bar, PieChart as RePieChart, 
   Pie, Cell 
 } from 'recharts';
+import { useI18n } from '../i18n';
 
 interface Report {
   id: number;
@@ -29,6 +30,7 @@ interface Report {
 }
 
 export default function Reports({ user }: { user: User }) {
+  const { locale } = useI18n();
   const [analytics, setAnalytics] = useState<any>(null);
   const [history, setHistory] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,7 +78,7 @@ export default function Reports({ user }: { user: User }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const name = `${genForm.type} Hisoboti - ${new Date().toLocaleDateString()}`;
+      const name = `${genForm.type} Hisoboti - ${new Date().toLocaleDateString(locale)}`;
       const response = await api.post('reports/history/', {
         name,
         report_type: genForm.type,
@@ -169,10 +171,10 @@ export default function Reports({ user }: { user: User }) {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { name: 'Umumiy Savdo', value: `${(analytics?.kpis?.total_sales || 0).toLocaleString()} UZS`, trend: '+12%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { name: 'Ishlab Chiqarish', value: `${(analytics?.kpis?.total_production || 0).toLocaleString()} dona`, trend: '+8%', icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { name: 'Chiqindi Miqdori', value: `${(analytics?.kpis?.waste_percent || 0).toLocaleString()}%`, trend: '-2%', icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50' },
-          { name: 'Ombor Qiymati', value: `${(analytics?.kpis?.stock_value || 0).toLocaleString()} UZS`, trend: '0%', icon: PieChart, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { name: 'Umumiy Savdo', value: `${(analytics?.kpis?.total_sales || 0).toLocaleString(locale)} UZS`, trend: '+12%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { name: 'Ishlab Chiqarish', value: `${(analytics?.kpis?.total_production || 0).toLocaleString(locale)} dona`, trend: '+8%', icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { name: 'Chiqindi Miqdori', value: `${(analytics?.kpis?.waste_percent || 0).toLocaleString(locale)}%`, trend: '-2%', icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50' },
+          { name: 'Ombor Qiymati', value: `${(analytics?.kpis?.stock_value || 0).toLocaleString(locale)} UZS`, trend: '0%', icon: PieChart, color: 'text-amber-600', bg: 'bg-amber-50' },
         ].map((kpi, i) => (
           <div key={i} className="bg-white p-7 rounded-[36px] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
             <div className="flex items-center justify-between mb-4">
@@ -321,7 +323,7 @@ export default function Reports({ user }: { user: User }) {
                      </span>
                   </td>
                   <td className="px-8 py-5">
-                     <p className="text-xs font-bold text-slate-900">{new Date(report.created_at).toLocaleDateString()}</p>
+                     <p className="text-xs font-bold text-slate-900">{new Date(report.created_at).toLocaleDateString(locale)}</p>
                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{report.created_by_name}</p>
                   </td>
                   <td className="px-8 py-5">
@@ -379,7 +381,7 @@ export default function Reports({ user }: { user: User }) {
                   <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${report.file_format === 'PDF' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>{report.file_format}</span>
                 </div>
                 <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-slate-500">
-                  <span>{new Date(report.created_at).toLocaleDateString()}</span>
+                  <span>{new Date(report.created_at).toLocaleDateString(locale)}</span>
                   <span>{report.created_by_name}</span>
                 </div>
                 <div className="mt-4 flex gap-2">
