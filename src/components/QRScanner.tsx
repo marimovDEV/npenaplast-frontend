@@ -14,8 +14,10 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { uiStore } from '../lib/store';
 import api from '../lib/api';
+import { useI18n } from '../i18n';
 
 export default function QRScanner({ onClose }: { onClose: () => void }) {
+  const { t } = useI18n();
   const [scanResult, setScanResult] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(true);
@@ -45,10 +47,10 @@ export default function QRScanner({ onClose }: { onClose: () => void }) {
         setScanResult(res.data[0]);
         setIsScanning(false);
       } else {
-        setError('Hujjat topilmadi yoki QR kod noto\'g\'ri');
+        setError(t('Hujjat topilmadi yoki QR kod noto\'g\'ri'));
       }
     } catch (err) {
-      setError('Qidiruvda xatolik yuz berdi');
+      setError(t('Qidiruvda xatolik yuz berdi'));
     }
   };
 
@@ -61,7 +63,7 @@ export default function QRScanner({ onClose }: { onClose: () => void }) {
         setScanResult(null);
         fetchRecentDocs();
       } catch (err) {
-        alert("Tasdiqlashda xatolik");
+        alert(t('Tasdiqlashda xatolik'));
       }
     }
   };

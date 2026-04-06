@@ -1,5 +1,6 @@
 import { Notification, User } from '../types';
 import api from './api';
+import { translateTextForCurrentLanguage } from '../i18n/translations';
 
 
 class UIStore {
@@ -27,7 +28,7 @@ class UIStore {
     const id = Math.random().toString(36).substr(2, 9);
     this.notifications.unshift({
       id,
-      message,
+      message: translateTextForCurrentLanguage(message),
       type,
       timestamp: new Date().toISOString()
     });

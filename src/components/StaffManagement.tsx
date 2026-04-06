@@ -18,12 +18,14 @@ import {
 import { User, UserAction, ERPRole, ERPPermission, Department } from '../types';
 import api from '../lib/api';
 import { uiStore } from '../lib/store';
+import { useI18n } from '../i18n';
 
 interface StaffManagementProps {
   user: User;
 }
 
 export default function StaffManagement({ user }: StaffManagementProps) {
+  const { locale, t } = useI18n();
   const [staff, setStaff] = useState<User[]>([]);
   const [roles, setRoles] = useState<ERPRole[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -104,7 +106,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
       setEditingUser(null);
       resetForm();
     } catch (err: any) {
-      alert(err.response?.data?.detail || "Xatolik yuz berdi");
+      alert(t(err.response?.data?.detail || 'Xatolik yuz berdi'));
     } finally {
       setLoading(false);
     }
@@ -187,13 +189,13 @@ export default function StaffManagement({ user }: StaffManagementProps) {
       return;
     }
     
-    if (window.confirm(`${staffName}ni tizimdan o'chirmoqchimisiz?`)) {
+    if (window.confirm(t(`${staffName}ni tizimdan o'chirmoqchimisiz?`))) {
       try {
         await api.delete(`users/${staffId}/`);
         uiStore.showNotification(`${staffName} o'chirildi`, 'info');
         fetchStaff();
       } catch (err) {
-        alert("Xodimni o'chirib bo'lmadi");
+        alert(t("Xodimni o'chirib bo'lmadi"));
       }
     }
   };
@@ -707,7 +709,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                         <div className="bg-slate-50 p-4 rounded-2xl border border-transparent hover:border-slate-100 transition-all hover:bg-white hover:shadow-sm">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">{log.action}</span>
-                            <span className="text-[9px] font-bold text-slate-400">{new Date(log.timestamp).toLocaleString('uz-UZ')}</span>
+                            <span className="text-[9px] font-bold text-slate-400">{new Date(log.timestamp).toLocaleString(locale)}</span>
                           </div>
                           <p className="text-xs font-bold text-slate-700 leading-relaxed mb-1">{log.description}</p>
                         </div>

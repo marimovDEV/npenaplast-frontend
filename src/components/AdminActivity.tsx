@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { User, UserAction } from '../types';
 import api from '../lib/api';
+import { useI18n } from '../i18n';
 
 const translateModule = (m: string) => {
   const mapping: Record<string, string> = {
@@ -55,6 +56,7 @@ const translateAction = (a: string) => {
 };
 
 export default function AdminActivity() {
+  const { locale } = useI18n();
   const [actions, setActions] = useState<UserAction[]>([]);
   const [stats, setStats] = useState({ active_count: 0, total_users: 0, status: 'Barqaror' });
   const [loading, setLoading] = useState(true);
@@ -121,7 +123,7 @@ export default function AdminActivity() {
   const handleExport = () => {
     const headers = ['Vaqt', 'Foydalanuvchi', 'Modul', 'Harakat', 'Tavsif', 'IP'];
     const csvData = actions.map(a => [
-      new Date(a.timestamp).toLocaleString('uz-UZ'),
+      new Date(a.timestamp).toLocaleString(locale),
       a.userName,
       translateModule(a.module || ''),
       translateAction(a.action),
@@ -143,12 +145,12 @@ export default function AdminActivity() {
 
   const formatTime = (isoString: string) => {
     const date = new Date(isoString);
-    return date.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
-    return date.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   return (

@@ -11,10 +11,12 @@ import api from '../lib/api';
 import { uiStore } from '../lib/store';
 import { Client, Invoice, Cashbox, ContactLog, User } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../i18n';
 
 type ModalType = 'ADD' | 'EDIT' | 'PAYMENT' | 'ORDERS' | 'CRM';
 
 export default function Clients({ user }: { user: User }) {
+  const { t } = useI18n();
   const [clients, setClients] = useState<Client[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'ALL' | 'WHOLESALE' | 'RETAIL' | 'DEBT' | 'LEAD'>('ALL');
@@ -132,7 +134,7 @@ export default function Clients({ user }: { user: User }) {
   };
 
   const handleDelete = async (id: number, name: string) => {
-    if (window.confirm(`${name}ni bazadan o'chirmoqchimisiz?`)) {
+    if (window.confirm(t(`${name}ni bazadan o'chirmoqchimisiz?`))) {
       try {
         await api.delete(`clients/${id}/`);
         uiStore.showNotification("Mijoz o'chirildi", "info");

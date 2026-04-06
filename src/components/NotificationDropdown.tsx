@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, X, Check, Trash2, Info, AlertTriangle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import api from '../lib/api';
+import { useI18n } from '../i18n';
 
 interface Notification {
   id: number;
@@ -19,6 +20,7 @@ interface NotificationDropdownProps {
 }
 
 export default function NotificationDropdown({ isOpen, onClose, onUnreadChange }: NotificationDropdownProps) {
+  const { locale, t } = useI18n();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -113,7 +115,7 @@ export default function NotificationDropdown({ isOpen, onClose, onUnreadChange }
                   <button 
                     onClick={markAllAsRead}
                     className="p-1.5 hover:bg-white rounded-lg text-blue-600 transition-colors"
-                    title="Hammasini o'qilgan deb belgilash"
+                    title={t("Hammasini o'qilgan deb belgilash")}
                   >
                     <CheckCircle2 className="w-4 h-4" />
                   </button>
@@ -131,14 +133,14 @@ export default function NotificationDropdown({ isOpen, onClose, onUnreadChange }
               {loading && notifications.length === 0 ? (
                 <div className="p-8 text-center">
                   <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-xs font-bold text-slate-400 italic">Yuklanmoqda...</p>
+                  <p className="text-xs font-bold text-slate-400 italic">{t('Yuklanmoqda...')}</p>
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="p-12 text-center">
                   <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Bell className="w-6 h-6 text-slate-300" />
                   </div>
-                  <p className="text-xs font-bold text-slate-400 italic uppercase tracking-widest">Bildirishnomalar yo'q</p>
+                  <p className="text-xs font-bold text-slate-400 italic uppercase tracking-widest">{t("Bildirishnomalar yo'q")}</p>
                 </div>
               ) : (
                 notifications.map((n) => (
@@ -168,7 +170,7 @@ export default function NotificationDropdown({ isOpen, onClose, onUnreadChange }
                           {n.message}
                         </p>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-tight">
-                          {new Date(n.created_at).toLocaleString('uz-UZ', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          {new Date(n.created_at).toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
@@ -178,7 +180,7 @@ export default function NotificationDropdown({ isOpen, onClose, onUnreadChange }
                         <button 
                           onClick={() => markAsRead(n.id)}
                           className="p-1.5 bg-white shadow-sm border border-slate-100 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors"
-                          title="O'qilgan deb belgilash"
+                          title={t("O'qilgan deb belgilash")}
                         >
                           <Check className="w-3 h-3" />
                         </button>
@@ -186,7 +188,7 @@ export default function NotificationDropdown({ isOpen, onClose, onUnreadChange }
                       <button 
                         onClick={() => deleteNotification(n.id)}
                         className="p-1.5 bg-white shadow-sm border border-slate-100 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors"
-                        title="O'chirish"
+                        title={t("O'chirish")}
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>

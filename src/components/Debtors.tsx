@@ -8,6 +8,7 @@ import { User } from '../types';
 import api from '../lib/api';
 import { uiStore } from '../lib/store';
 import { motion } from 'motion/react';
+import { useI18n } from '../i18n';
 
 interface Debtor {
   id: number;
@@ -37,6 +38,7 @@ const AGING_COLORS: Record<string, { bg: string; text: string; bar: string }> = 
 };
 
 export default function Debtors({ user }: { user: User }) {
+  const { locale } = useI18n();
   const [data, setData] = useState<DebtorsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,7 +60,7 @@ export default function Debtors({ user }: { user: User }) {
 
   useEffect(() => { fetchData(); }, []);
 
-  const formatMoney = (val: number) => new Intl.NumberFormat('uz-UZ').format(Math.round(val)) + ' UZS';
+  const formatMoney = (val: number) => new Intl.NumberFormat(locale).format(Math.round(val)) + ' UZS';
 
   const sendReminder = async (debtor: Debtor) => {
     try {

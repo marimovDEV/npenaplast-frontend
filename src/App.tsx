@@ -28,11 +28,13 @@ import {
   Wallet
 } from 'lucide-react';
 import { User, UserRole } from './types';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import Toast from './components/Toast';
 import NotificationDropdown from './components/NotificationDropdown';
 import { authService } from './lib/authService';
 import api from './lib/api';
 import { uiStore } from './lib/store';
+import { useI18n } from './i18n';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const Sklad1 = lazy(() => import('./components/Sklad1'));
@@ -59,6 +61,7 @@ const Contracts = lazy(() => import('./components/Contracts'));
 const Debtors = lazy(() => import('./components/Debtors'));
 
 export default function App() {
+  const { t } = useI18n();
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [globalLoading, setGlobalLoading] = useState(false);
@@ -166,7 +169,7 @@ export default function App() {
     } catch (err: any) {
       const errorData = err.response?.data;
       console.error("❌ Login Error Details:", errorData || err.message);
-      setAuthError(errorData?.detail || errorData?.message || 'Login yoki parol noto\'g\'ri');
+      setAuthError(t(errorData?.detail || errorData?.message || 'Login yoki parol noto\'g\'ri'));
     } finally {
       setGlobalLoading(false);
     }
@@ -350,7 +353,7 @@ export default function App() {
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Penoplast ERP</h1>
             <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-xl">
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
-                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sessiya tekshirilmoqda...</span>
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('Sessiya tekshirilmoqda...')}</span>
             </div>
         </div>
       </div>
@@ -365,29 +368,32 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-100"
         >
+          <div className="mb-6 flex justify-end">
+            <LanguageSwitcher />
+          </div>
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
               <Factory className="text-white w-8 h-8" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Penoplast ERP</h1>
-            <p className="text-slate-500 text-sm mt-1">Tizimga kirish</p>
+            <p className="text-slate-500 text-sm mt-1">{t('Tizimga kirish')}</p>
           </div>
           
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">Login</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">{t('Login')}</label>
               <input 
                 type="text" 
                 autoComplete="off"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-slate-50/50"
-                placeholder="Masalan: admin"
+                placeholder={t('Masalan: admin')}
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">Parol</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 ml-1">{t('Parol')}</label>
               <input 
                 type="password" 
                 autoComplete="new-password"
@@ -409,13 +415,13 @@ export default function App() {
               type="submit"
               className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 active:scale-[0.98] transition-all shadow-lg shadow-blue-200 mt-2"
             >
-              Kirish
+              {t('Kirish')}
             </button>
           </form>
 
           <div className="mt-8 pt-6 border-t border-slate-100 text-center">
             <p className="text-xs text-slate-400 font-medium">
-              Hisobingiz yo'qmi? Iltimos, administratorga murojaat qiling.
+              {t("Hisobingiz yo'qmi? Iltimos, administratorga murojaat qiling.")}
             </p>
           </div>
         </motion.div>
@@ -597,15 +603,18 @@ export default function App() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider truncate">{currentRole}</p>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider truncate">{t(currentRole)}</p>
                 </div>
+              </div>
+              <div className="mb-3 flex justify-center">
+                <LanguageSwitcher />
               </div>
               <button 
                 onClick={handleLogout}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 rounded-xl transition-all font-semibold text-sm"
               >
                 <LogOut className="w-4 h-4" />
-                <span>Chiqish</span>
+                <span>{t('Chiqish')}</span>
               </button>
             </div>
           </div>
@@ -628,11 +637,12 @@ export default function App() {
                     {user.name.split(' ')[0]} 👋
                   </h2>
                   <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest truncate">
-                    {navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli'}
+                    {t(navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli')}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
+                <LanguageSwitcher compact />
                 <button 
                   onClick={() => setIsScannerOpen(true)}
                   className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-600 rounded-xl active:bg-blue-50 active:text-blue-600 transition-colors"
@@ -664,19 +674,20 @@ export default function App() {
           /* ===== DESKTOP HEADER ===== */
           <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-6 sticky top-0 z-40">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-              {navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name}
+              {t(navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli')}
             </h2>
             <div className="flex items-center gap-3">
+              <LanguageSwitcher />
               <div className="flex items-center bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 focus-within:ring-2 focus-within:ring-blue-500 transition-all group">
                 <Search className="w-4 h-4 text-slate-400 mr-2 group-focus-within:text-blue-500 transition-colors" />
-                <input type="text" placeholder="Qidirish..." className="bg-transparent border-none outline-none text-sm w-48" />
+                <input type="text" placeholder={t('Qidirish...')} className="bg-transparent border-none outline-none text-sm w-48" />
               </div>
               <button 
                 onClick={() => setIsScannerOpen(true)}
                 className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl relative transition-all group shadow-sm flex items-center gap-2 px-4"
               >
                 <QrCode className="w-5 h-5 group-hover:rotate-12 transition-all" />
-                <span className="text-[10px] font-black uppercase tracking-widest">QR Skaner</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{t('QR Skaner')}</span>
               </button>
               <div className="relative">
                 <button 

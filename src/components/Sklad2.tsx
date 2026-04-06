@@ -22,8 +22,10 @@ import api from '../lib/api';
 import { User, BlockProduction } from '../types';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../i18n';
 
 export default function Sklad2({ user }: { user: User }) {
+  const { locale } = useI18n();
   const assignedWarehouses = (user.assignedWarehouses || user.assigned_warehouses || []).map(String);
   const [blocks, setBlocks] = useState<BlockProduction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -240,7 +242,7 @@ export default function Sklad2({ user }: { user: User }) {
                     <td className="px-6 py-6">
                       <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
                         <Clock className="w-3.5 h-3.5 opacity-50" />
-                        {new Date(block.date).toLocaleDateString('uz-UZ')}
+                        {new Date(block.date).toLocaleDateString(locale)}
                       </div>
                     </td>
                     <td className="px-6 py-6">

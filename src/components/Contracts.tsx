@@ -8,6 +8,7 @@ import { User, Client } from '../types';
 import api from '../lib/api';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../i18n';
 
 interface Contract {
   id: number;
@@ -34,6 +35,7 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: any }> = 
 };
 
 export default function Contracts({ user }: { user: User }) {
+  const { locale } = useI18n();
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -98,7 +100,7 @@ export default function Contracts({ user }: { user: User }) {
     totalValue: contracts.reduce((s, c) => s + Number(c.total_value), 0),
   };
 
-  const formatMoney = (val: number) => new Intl.NumberFormat('uz-UZ').format(val) + ' UZS';
+  const formatMoney = (val: number) => new Intl.NumberFormat(locale).format(val) + ' UZS';
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">

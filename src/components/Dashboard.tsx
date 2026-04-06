@@ -3,6 +3,7 @@ import { Database, Layers, ShoppingCart, Trash2, Truck, Factory, Package, BarCha
 import { User } from '../types';
 import api from '../lib/api';
 import { uiStore } from '../lib/store';
+import { useI18n } from '../i18n';
 
 const AreaTrendChart = lazy(() => import('./charts/AreaTrendChart'));
 
@@ -32,6 +33,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ user, onAction }: DashboardProps) {
+  const { locale } = useI18n();
   const [recentActions, setRecentActions] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [period, setPeriod] = useState<'day' | 'week' | 'month'>('week');
@@ -712,7 +714,7 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
                 <div className="min-w-0 pr-2">
                    <div className="flex items-center gap-2 mb-1">
                       <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{translateModule(action.module)}</span>
-                      <span className="text-[9px] font-bold text-slate-500">{new Date(action.timestamp).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="text-[9px] font-bold text-slate-500">{new Date(action.timestamp).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}</span>
                    </div>
                    <p className="text-xs font-bold text-slate-300 group-hover:text-white transition-colors leading-relaxed">
                      <span className="text-blue-400">@{action.user_name || 'tizim'}:</span> {action.description}

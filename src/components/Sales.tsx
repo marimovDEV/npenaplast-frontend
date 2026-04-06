@@ -28,10 +28,12 @@ import api from '../lib/api';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
 import MobileCard from './common/MobileCard';
+import { useI18n } from '../i18n';
 
 type ViewMode = 'KANBAN' | 'LIST';
 
 export default function Sales({ user }: { user: User }) {
+  const { locale } = useI18n();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [viewMode, setViewMode] = useState<ViewMode>(window.innerWidth < 768 ? 'LIST' : 'KANBAN');
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -282,7 +284,7 @@ export default function Sales({ user }: { user: User }) {
       {/* KPI Section */}
       <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
         {[
-          { label: 'Bugungi Savdo', value: kpi ? new Intl.NumberFormat('uz-UZ').format(kpi.today_sum) + ' UZS' : '...', icon: TrendingUp, color: 'blue' },
+          { label: 'Bugungi Savdo', value: kpi ? new Intl.NumberFormat(locale).format(kpi.today_sum) + ' UZS' : '...', icon: TrendingUp, color: 'blue' },
           { label: 'Aktiv Buyurtmalar', value: kpi ? kpi.active_orders : '...', icon: Target, color: 'emerald' },
           { label: 'Oylik Reja', value: kpi ? `${kpi.monthly_progress}%` : '...', icon: Activity, color: 'amber' },
           { label: 'Konversiya', value: kpi ? `${kpi.conversion_rate}%` : '...', icon: Users, color: 'indigo' },

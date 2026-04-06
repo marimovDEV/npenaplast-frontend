@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getStoredLanguage } from '../i18n/translations';
 
 const isLocalhost = window.location.hostname === 'localhost' || 
                    window.location.hostname === '127.0.0.1' || 
@@ -20,6 +21,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     const isAuthRequest = config.url?.includes('token/');
+    config.headers['Accept-Language'] = getStoredLanguage();
     
     // Check if token exists and is not a trap value like "null" or "undefined"
     const isValidToken = token && token !== 'null' && token !== 'undefined';
@@ -51,6 +53,10 @@ api.interceptors.response.use(
         try {
           const response = await axios.post(`${API_URL}token/refresh/`, {
             refresh: refreshToken,
+          }, {
+            headers: {
+              'Accept-Language': getStoredLanguage(),
+            },
           });
           const newAccess = response.data.access;
           localStorage.setItem('access_token', newAccess);

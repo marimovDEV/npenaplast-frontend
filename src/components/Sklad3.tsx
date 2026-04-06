@@ -17,8 +17,10 @@ import api from '../lib/api';
 import { User, Transfer, BlockProduction } from '../types';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../i18n';
 
 export default function Sklad3({ user }: { user: User }) {
+  const { locale } = useI18n();
   const assignedWarehouses = (user.assignedWarehouses || user.assigned_warehouses || []).map(String);
   const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,7 +136,7 @@ export default function Sklad3({ user }: { user: User }) {
     try {
       const d = new Date(dateStr);
       if (isNaN(d.getTime())) return "Noma'lum";
-      return d.toLocaleString('uz-UZ', { 
+      return d.toLocaleString(locale, { 
         day: '2-digit', 
         month: '2-digit', 
         year: 'numeric',

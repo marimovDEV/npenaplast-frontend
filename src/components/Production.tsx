@@ -21,8 +21,10 @@ import api from '../lib/api';
 import { User, Zames, Bunker, Recipe, RawMaterialBatch, Material, ProductionOrder, ProductionOrderStage, BlockProduction } from '../types';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
+import { useI18n } from '../i18n';
 
 export default function Production({ user }: { user: User }) {
+  const { t } = useI18n();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const currentRole = user.effective_role || user.role_display || user.role;
   const [subTab, setSubTab] = useState('zames');
@@ -188,7 +190,7 @@ export default function Production({ user }: { user: User }) {
   };
 
   const handleForceReleaseBunker = async (bunkerId: number) => {
-    if (!window.confirm("Bunkerni majburiy bo'shatishni xohlaysizmi?")) return;
+    if (!window.confirm(t("Bunkerni majburiy bo'shatishni xohlaysizmi?"))) return;
     try {
       await api.post(`production/bunkers/${bunkerId}/force-release/`);
       uiStore.showNotification("Bunker bo'shatildi", "success");
@@ -199,7 +201,7 @@ export default function Production({ user }: { user: User }) {
   };
 
   const handleForceComplete = async (orderId: number, stageId: number) => {
-    const reason = window.prompt("Majburiy tugatish sababini kiritng:");
+    const reason = window.prompt(t('Majburiy tugatish sababini kiritng:'));
     if (!reason) return;
     try {
       await api.post(`production/orders/${orderId}/force-complete/`, {
@@ -214,7 +216,7 @@ export default function Production({ user }: { user: User }) {
   };
 
   const handleResetStage = async (orderId: number, stageId: number) => {
-    const reason = window.prompt("Qayta kutilayotgan holatga qaytarish sababini kiriting:");
+    const reason = window.prompt(t('Qayta kutilayotgan holatga qaytarish sababini kiriting:'));
     if (!reason) return;
     try {
       await api.post(`production/orders/${orderId}/reset-stage/`, {
@@ -587,7 +589,7 @@ export default function Production({ user }: { user: User }) {
                   {b.status !== 'Empty' && (
                     <button 
                       onClick={async () => {
-                        if (window.confirm("Bunkerni majburiy bo'shatmoqchimisiz?")) {
+                        if (window.confirm(t("Bunkerni majburiy bo'shatmoqchimisiz?"))) {
                           try {
                             await api.post(`production/bunkers/${b.id}/force-release/`);
                             uiStore.showNotification("Bunker bo'shatildi", "info");
