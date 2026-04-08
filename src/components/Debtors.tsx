@@ -38,7 +38,7 @@ const AGING_COLORS: Record<string, { bg: string; text: string; bar: string }> = 
 };
 
 export default function Debtors({ user }: { user: User }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const [data, setData] = useState<DebtorsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,10 +69,10 @@ export default function Debtors({ user }: { user: User }) {
         message: `Hurmatli ${debtor.name}, sizning ${formatMoney(debtor.debt)} miqdordagi qarzingiz bor. Iltimos, to'lovni amalga oshiring.`,
         customer: debtor.id,
       });
-      uiStore.showNotification(`Eslatma yuborildi: ${debtor.name}`, "success");
+      uiStore.showNotification(t("Eslatma yuborildi") + `: ${debtor.name}`, "success");
     } catch (err) {
       // NotificationLog is read-only, let's just show a notification
-      uiStore.showNotification(`Eslatma yuborildi: ${debtor.name} 📩`, "success");
+      uiStore.showNotification(t("Eslatma yuborildi") + `: ${debtor.name} 📩`, "success");
     }
   };
 
@@ -98,10 +98,10 @@ export default function Debtors({ user }: { user: User }) {
       {/* KPI Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Umumiy Qarz', value: formatMoney(data.total_debt), icon: DollarSign, color: 'rose', accent: 'from-rose-500 to-pink-600' },
-          { label: 'Qarzdorlar Soni', value: data.debtors_count, icon: Users, color: 'amber' },
-          { label: 'O\'rtacha Qarz', value: formatMoney(data.avg_debt), icon: TrendingDown, color: 'orange' },
-          { label: 'Eng Katta', value: data.top_debtor?.name || '—', icon: AlertTriangle, color: 'red' },
+          { label: t('Umumiy Qarz'), value: formatMoney(data.total_debt), icon: DollarSign, color: 'rose', accent: 'from-rose-500 to-pink-600' },
+          { label: t('Qarzdorlar Soni'), value: data.debtors_count, icon: Users, color: 'amber' },
+          { label: t('O\'rtacha Qarz'), value: formatMoney(data.avg_debt), icon: TrendingDown, color: 'orange' },
+          { label: t('Eng Katta'), value: data.top_debtor?.name || '—', icon: AlertTriangle, color: 'red' },
         ].map((kpi, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
@@ -118,7 +118,7 @@ export default function Debtors({ user }: { user: User }) {
 
       {/* Debt Aging Chart */}
       <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-900 mb-4">📊 Qarz Yoshi Tahlili (Aging Analysis)</h3>
+        <h3 className="text-sm font-bold text-slate-900 mb-4">📊 {t('Qarz Yoshi Tahlili (Aging Analysis)')}</h3>
         <div className="grid grid-cols-4 gap-3">
           {Object.entries(data.aging_summary).map(([key, val]) => {
             const cfg = AGING_COLORS[key] || AGING_COLORS['0-30'];
@@ -132,7 +132,7 @@ export default function Debtors({ user }: { user: User }) {
                     className={`w-12 rounded-t-xl ${cfg.bar}`}
                   />
                 </div>
-                <p className={`text-xs font-bold ${cfg.text}`}>{key} kun</p>
+                <p className={`text-xs font-bold ${cfg.text}`}>{key} {t('kun')}</p>
                 <p className="text-xs text-slate-500 mt-1">{formatMoney(Number(val))}</p>
               </div>
             );
@@ -144,7 +144,7 @@ export default function Debtors({ user }: { user: User }) {
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <div className="flex items-center gap-2 bg-white rounded-xl border border-slate-100 px-3 py-2 w-full sm:w-auto">
           <Search className="w-4 h-4 text-slate-400" />
-          <input type="text" placeholder="Qarzdor qidirish..."
+          <input type="text" placeholder={t("Qarzdor qidirish") + "..."}
             value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
             className="bg-transparent border-none outline-none text-sm w-full"
           />
@@ -156,7 +156,7 @@ export default function Debtors({ user }: { user: User }) {
                 filterAging === a ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {a === 'ALL' ? 'Hammasi' : `${a} kun`}
+              {a === 'ALL' ? t('Hammasi') : `${a} ` + t('kun')}
             </button>
           ))}
         </div>
@@ -182,7 +182,7 @@ export default function Debtors({ user }: { user: User }) {
                     {debtor.company && <p className="text-xs text-slate-500 truncate">{debtor.company}</p>}
                     <div className="flex items-center gap-3 mt-1">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold ${cfg.bg} ${cfg.text}`}>
-                        <Clock className="w-3 h-3" /> {debtor.days_overdue} kun
+                        <Clock className="w-3 h-3" /> {debtor.days_overdue} {t('kun')}
                       </span>
                       {debtor.last_invoice && (
                         <span className="text-[10px] text-slate-400 font-mono">#{debtor.last_invoice}</span>
@@ -217,8 +217,8 @@ export default function Debtors({ user }: { user: User }) {
       {filtered.length === 0 && (
         <div className="text-center py-20 text-slate-400">
           <AlertTriangle className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="font-bold">Qarzdorlar topilmadi</p>
-          <p className="text-sm mt-1">Barcha mijozlar to'lovlarini amalga oshirgan 🎉</p>
+          <p className="font-bold">{t('Qarzdorlar topilmadi')}</p>
+          <p className="text-sm mt-1">{t('Barcha mijozlar to\'lovlarini amalga oshirgan')} 🎉</p>
         </div>
       )}
     </div>

@@ -105,16 +105,16 @@ export default function Clients({ user }: { user: User }) {
     try {
       if (modalType === 'ADD') {
         await api.post('clients/', formData);
-        uiStore.showNotification("Mijoz muvaffaqiyatli qo'shildi", "success");
+        uiStore.showNotification(t("Mijoz muvaffaqiyatli qo'shildi"), "success");
       } else {
         await api.put(`clients/${selectedClient?.id}/`, formData);
-        uiStore.showNotification("Mijoz ma'lumotlari yangilandi", "success");
+        uiStore.showNotification(t("Mijoz ma'lumotlari yangilandi"), "success");
       }
       fetchClients();
       setIsModalOpen(false);
       resetForm();
     } catch (err) {
-      uiStore.showNotification("Xatolik yuz berdi", "error");
+      uiStore.showNotification(t("Xatolik yuz berdi"), "error");
     } finally {
       setLoading(false);
     }
@@ -125,11 +125,11 @@ export default function Clients({ user }: { user: User }) {
     if (!selectedClient) return;
     try {
       await api.post(`clients/${selectedClient.id}/add-contact-log/`, crmLogData);
-      uiStore.showNotification("Muloqot tarixi saqlandi", "success");
+      uiStore.showNotification(t("Muloqot tarixi saqlandi"), "success");
       fetchClientData(selectedClient.id);
       setCrmLogData({ contact_type: 'CALL', notes: '', follow_up_date: '' });
     } catch (err) {
-      uiStore.showNotification("Xatolik", "error");
+      uiStore.showNotification(t("Xatolik"), "error");
     }
   };
 
@@ -137,10 +137,10 @@ export default function Clients({ user }: { user: User }) {
     if (window.confirm(t(`${name}ni bazadan o'chirmoqchimisiz?`))) {
       try {
         await api.delete(`clients/${id}/`);
-        uiStore.showNotification("Mijoz o'chirildi", "info");
+        uiStore.showNotification(t("Mijoz o'chirildi"), "info");
         fetchClients();
       } catch (err) {
-        uiStore.showNotification("Mijozni o'chirib bo'lmadi", "error");
+        uiStore.showNotification(t("Mijozni o'chirib bo'lmadi"), "error");
       }
     }
   };
@@ -183,10 +183,10 @@ export default function Clients({ user }: { user: User }) {
 
   const getStatusBadge = (status: string) => {
     switch(status) {
-      case 'LEAD': return { label: 'Yangi Lead', color: 'blue', icon: UserPlus };
-      case 'NEGOTIATION': return { label: 'Muzokara', color: 'amber', icon: MessageSquare };
-      case 'WON': return { label: 'Yutilgan (Mijoz)', color: 'emerald', icon: BadgeCheck };
-      case 'LOST': return { label: 'Boy berilgan', color: 'rose', icon: XCircle };
+      case 'LEAD': return { label: t('Yangi Lead'), color: 'blue', icon: UserPlus };
+      case 'NEGOTIATION': return { label: t('Muzokara'), color: 'amber', icon: MessageSquare };
+      case 'WON': return { label: t('Yutilgan (Mijoz)'), color: 'emerald', icon: BadgeCheck };
+      case 'LOST': return { label: t('Boy berilgan'), color: 'rose', icon: XCircle };
       default: return { label: status, color: 'slate', icon: Info };
     }
   };
@@ -198,8 +198,8 @@ export default function Clients({ user }: { user: User }) {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Mijozlar & CRM</h1>
-          <p className="text-slate-500 text-sm font-medium">Barcha hamkorlar, leadlar va aloqa tarixi</p>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t('Mijozlar & CRM')}</h1>
+          <p className="text-slate-500 text-sm font-medium">{t('Barcha hamkorlar, leadlar va aloqa tarixi')}</p>
         </div>
         
         <button 
@@ -207,7 +207,7 @@ export default function Clients({ user }: { user: User }) {
           className="flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-[28px] font-black text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all"
         >
           <Plus className="w-5 h-5" />
-          <span>Mijoz Qo'shish</span>
+          <span>{t('Mijoz Qo\'shish')}</span>
         </button>
       </div>
 
@@ -231,11 +231,11 @@ export default function Clients({ user }: { user: User }) {
                     </div>
                     <div>
                       <h4 className="text-lg font-black text-slate-900">{client.name}</h4>
-                      <p className="text-xs font-bold text-slate-400">{client.company_name || 'Shaxsiy mijoz'}</p>
+                      <p className="text-xs font-bold text-slate-400">{client.company_name || t('Shaxsiy mijoz')}</p>
                     </div>
                   </div>
                   <div className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest ${getInterestColor(client.interest_level)}`}>
-                    {client.interest_level === 'HIGH' ? '🔥 Yuqori' : client.interest_level === 'MEDIUM' ? '⚡ O\'rtacha' : '❄️ Past'}
+                    {client.interest_level === 'HIGH' ? '🔥 ' + t('Yuqori') : client.interest_level === 'MEDIUM' ? '⚡ ' + t('O\'rtacha') : '❄️ ' + t('Past')}
                   </div>
                 </div>
 
@@ -263,7 +263,7 @@ export default function Clients({ user }: { user: User }) {
                     className="flex items-center justify-center gap-2 py-4 bg-white border border-slate-100 text-slate-400 rounded-2xl hover:text-blue-600 hover:border-blue-100 transition-all"
                    >
                      <Edit2 className="w-4 h-4" />
-                     <span className="text-[10px] font-black uppercase">Edit</span>
+                     <span className="text-[10px] font-black uppercase">{t('Tahrirlash')}</span>
                    </button>
                 </div>
               </motion.div>
@@ -282,8 +282,8 @@ export default function Clients({ user }: { user: User }) {
             >
               <div className="p-10 border-b border-slate-50 flex items-center justify-between">
                 <div>
-                  <h2 className="text-3xl font-black text-slate-900">{selectedClient?.name || 'Mijoz'}</h2>
-                  <p className="text-slate-400 font-medium">{modalType === 'CRM' ? 'CRM Muloqot Markazi' : 'Ma\'lumotlarni tahrirlash'}</p>
+                  <h2 className="text-3xl font-black text-slate-900">{selectedClient?.name || t('Mijoz')}</h2>
+                  <p className="text-slate-400 font-medium">{modalType === 'CRM' ? t('CRM Muloqot Markazi') : t('Ma\'lumotlarni tahrirlash')}</p>
                 </div>
                 <button onClick={() => setIsModalOpen(false)} className="p-4 bg-slate-50 rounded-full hover:bg-rose-50 hover:text-rose-500 transition-all">
                   <X className="w-6 h-6" />
@@ -295,9 +295,9 @@ export default function Clients({ user }: { user: User }) {
                    {/* Left Side: Interaction History */}
                    <div className="col-span-7 p-10 overflow-y-auto space-y-6 bg-slate-50/30">
                       <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Muloqot Tarixi</h4>
+                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('Muloqot Tarixi')}</h4>
                         <div className="flex gap-2">
-                           <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black">{contactLogs.length} ta aloqa</span>
+                           <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black">{contactLogs.length} {t('ta aloqa')}</span>
                         </div>
                       </div>
                       
@@ -316,7 +316,7 @@ export default function Clients({ user }: { user: User }) {
                            {log.follow_up_date && (
                              <div className="mt-4 flex items-center gap-2 text-[10px] font-black text-rose-500 uppercase tracking-widest bg-rose-50 p-2 px-4 rounded-xl inline-flex">
                                 <Calendar className="w-3.5 h-3.5" />
-                                Keyingi aloqa: {log.follow_up_date}
+                                {t('Keyingi aloqa')}: {log.follow_up_date}
                              </div>
                            )}
                         </div>
@@ -325,7 +325,7 @@ export default function Clients({ user }: { user: User }) {
                    
                    {/* Right Side: Add Log Form */}
                    <div className="col-span-5 p-10 border-l border-slate-50">
-                      <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-8">Yangi muloqot kiritish</h4>
+                      <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-8">{t('Yangi muloqot kiritish')}</h4>
                       <form onSubmit={handleAddCRMLog} className="space-y-6">
                          <div className="space-y-3">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Aloqa turi</label>
@@ -334,24 +334,24 @@ export default function Clients({ user }: { user: User }) {
                               value={crmLogData.contact_type}
                               onChange={(e) => setCrmLogData({...crmLogData, contact_type: e.target.value})}
                             >
-                              <option value="CALL">📞 Telefon</option>
+                              <option value="CALL">📞 {t('Telefon')}</option>
                               <option value="TELEGRAM">✈️ Telegram</option>
-                              <option value="MEETING">🤝 Uchrashuv</option>
+                              <option value="MEETING">🤝 {t('Uchrashuv')}</option>
                               <option value="EMAIL">📧 Email</option>
                             </select>
                          </div>
                          <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Natija / Izoh</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Natija / Izoh')}</label>
                             <textarea 
                               rows={5}
                               className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 font-bold text-sm"
-                              placeholder="Mijoz nima dedi?.."
+                              placeholder={t("Mijoz nima dedi?") + "..."}
                               value={crmLogData.notes}
                               onChange={(e) => setCrmLogData({...crmLogData, notes: e.target.value})}
                             />
                          </div>
                          <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Keyingi aloqa sanasi</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Keyingi aloqa sanasi')}</label>
                             <input 
                               type="date" 
                               className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-blue-500 font-bold"
@@ -361,26 +361,25 @@ export default function Clients({ user }: { user: User }) {
                          </div>
                          <button type="submit" className="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-3">
                             <BadgeCheck className="w-5 h-5" />
-                            Saqlash
+                            {t('Saqlash')}
                          </button>
                       </form>
                    </div>
                 </div>
               ) : (
-                /* Edit/Add Form */
                 <form onSubmit={handleCreateOrUpdate} className="p-10 space-y-6">
                   <div className="grid grid-cols-2 gap-6">
-                    <input className="p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold" placeholder="FIO" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                    <input className="p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold" placeholder="Kompaniya" value={formData.company_name} onChange={(e) => setFormData({...formData, company_name: e.target.value})} />
-                    <input className="p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold" placeholder="Telefon" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                    <input className="p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold" placeholder={t("FIO")} value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                    <input className="p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold" placeholder={t("Kompaniya")} value={formData.company_name} onChange={(e) => setFormData({...formData, company_name: e.target.value})} />
+                    <input className="p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold" placeholder={t("Telefon")} value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
                     <select className="p-4 bg-slate-50 rounded-2xl border-none outline-none font-bold" value={formData.lead_status} onChange={(e) => setFormData({...formData, lead_status: e.target.value as any})}>
-                      <option value="LEAD">Yangi Lead</option>
-                      <option value="NEGOTIATION">Muzokara</option>
-                      <option value="WON">Yutilgan</option>
-                      <option value="LOST">Boy berilgan</option>
+                      <option value="LEAD">{t('Yangi Lead')}</option>
+                      <option value="NEGOTIATION">{t('Muzokara')}</option>
+                      <option value="WON">{t('Yutilgan')}</option>
+                      <option value="LOST">{t('Boy berilgan')}</option>
                     </select>
                   </div>
-                  <button type="submit" className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-widest text-[11px]">Mijozni Saqlash</button>
+                  <button type="submit" className="w-full py-5 bg-slate-900 text-white rounded-3xl font-black uppercase tracking-widest text-[11px]">{t('Mijozni Saqlash')}</button>
                 </form>
               )}
             </motion.div>

@@ -127,12 +127,12 @@ export default function StaffManagement({ user }: StaffManagementProps) {
 
   const translateAction = (action: string) => {
     const map: Record<string, string> = {
-      'CREATE': 'Yaratildi',
-      'UPDATE': 'Tahrirlandi',
-      'DELETE': 'O‘chirildi',
-      'LOGIN': 'Kirish',
-      'LOGOUT': 'Chiqish',
-      'TRANSFER': 'O‘tkazma'
+      'CREATE': t('Yaratildi'),
+      'UPDATE': t('Tahrirlandi'),
+      'DELETE': t('O‘chirildi'),
+      'LOGIN': t('Kirish'),
+      'LOGOUT': t('Chiqish'),
+      'TRANSFER': t('O‘tkazma')
     };
     return map[action] || action;
   };
@@ -208,15 +208,15 @@ export default function StaffManagement({ user }: StaffManagementProps) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Xodimlar Boshqaruvi</h1>
-          <p className="text-slate-500 text-sm font-medium">Tizim foydalanuvchilari va ruxsatlar</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">{t('Xodimlar Boshqaruvi')}</h1>
+          <p className="text-slate-500 text-sm font-medium">{t('Tizim foydalanuvchilari va ruxsatlar')}</p>
         </div>
         <button 
           onClick={() => setIsAdding(true)}
           className="flex items-center justify-center gap-2 bg-blue-600 text-white px-7 py-3.5 rounded-[20px] font-black hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 active:scale-95 text-sm uppercase tracking-widest"
         >
           <UserPlus className="w-5 h-5 text-blue-100" />
-          Xodim qo'shish
+          {t('Xodim qo\'shish')}
         </button>
       </div>
 
@@ -226,7 +226,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
             <Search className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
             <input 
               type="text" 
-              placeholder="Ism, login yoki telefon bo'yicha qidirish..." 
+              placeholder={t("Ism, login yoki telefon bo'yicha qidirish") + "..."}
               className="flex-1 bg-transparent border-none outline-none text-sm font-bold placeholder:text-slate-300"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -238,10 +238,10 @@ export default function StaffManagement({ user }: StaffManagementProps) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50 border-bottom border-slate-100">
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Xodim</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Lavozim / Bo'lim</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amallar</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Xodim')}</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Lavozim / Bo\'lim')}</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Status')}</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('Amallar')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -285,9 +285,9 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                             s.status === 'BLOCKED' ? 'text-rose-600' : 
                             'text-amber-600'
                           }`}>
-                            {s.status === 'ACTIVE' ? 'Faol' : 
-                             s.status === 'BLOCKED' ? 'Bloklangan' : 
-                             'Kutilmoqda'}
+                            {s.status === 'ACTIVE' ? t('Faol') : 
+                             s.status === 'BLOCKED' ? t('Bloklangan') : 
+                             t('Kutilmoqda')}
                           </span>
                         </div>
                       </td>
@@ -295,21 +295,21 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                         <button 
                           onClick={(e) => { e.stopPropagation(); fetchUserLogs(s); }}
                           className="p-3 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-2xl transition-all shadow-sm border border-transparent hover:border-blue-100 active:scale-95"
-                          title="Faoliyat tarixi"
+                          title={t('Faoliyat tarixi')}
                         >
                           <History className="w-5 h-5" />
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleEditClick(s); }}
                           className="p-3 text-amber-400 hover:text-amber-600 hover:bg-amber-50 rounded-2xl transition-all shadow-sm border border-transparent hover:border-amber-100 active:scale-95"
-                          title="Tahrirlash"
+                          title={t('Tahrirlash')}
                         >
                           <Edit2 className="w-5 h-5" />
                         </button>
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleDeleteStaff(s.id as string, s.name || s.full_name || s.username); }}
                           className="p-3 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-2xl transition-all shadow-sm border border-transparent hover:border-rose-100 active:scale-95"
-                          title="Xodimni o'chirish"
+                          title={t("Xodimni o'chirish")}
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -326,9 +326,9 @@ export default function StaffManagement({ user }: StaffManagementProps) {
           <div className="bg-slate-900 rounded-[36px] p-8 text-white shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-700" />
             <Shield className="w-12 h-12 mb-6 text-blue-400 opacity-80" />
-            <h3 className="text-2xl font-black mb-3 tracking-tight">Ruxsatlar Nazorati</h3>
+            <h3 className="text-2xl font-black mb-3 tracking-tight">{t('Ruxsatlar Nazorati')}</h3>
             <p className="text-slate-400 text-sm font-medium leading-relaxed">
-              Tizimda rollarga asoslangan kirish nazorati (RBAC) o'rnatilgan. Xodimlar faqat o'z bo'limlariga tegishli ma'lumotlarni ko'rish va boshqarish huquqiga ega.
+              {t('Tizimda rollarga asoslangan kirish nazorati (RBAC) o\'rnatilgan. Xodimlar faqat o\'z bo\'limlariga tegishli ma\'lumotlarni ko\'rish va boshqarish huquqiga ega.')}
             </p>
           </div>
 
@@ -337,7 +337,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
               <div className="w-10 h-10 bg-slate-50 rounded-1.5xl flex items-center justify-center">
                 <Briefcase className="w-5 h-5 text-blue-600" />
               </div>
-              <h3 className="font-black text-slate-900 uppercase tracking-widest text-xs">Bo'limlar Statistikasi</h3>
+              <h3 className="font-black text-slate-900 uppercase tracking-widest text-xs">{t('Bo\'limlar Statistikasi')}</h3>
             </div>
             <div className="space-y-4">
               {departments.map((dept, idx) => (
@@ -347,12 +347,12 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                     <span className="text-sm font-black text-slate-700 tracking-tight">{dept.name}</span>
                   </div>
                   <span className="text-[10px] font-black text-slate-400 bg-slate-50 px-2.5 py-1 rounded-lg">
-                    {staff.filter(s => s.department_id === dept.id).length} nafar
+                    {staff.filter(s => s.department_id === dept.id).length} {t('nafar')}
                   </span>
                 </div>
               ))}
               {departments.length === 0 && (
-                <p className="text-[10px] font-bold text-slate-400 italic">Bo'limlar mavjud emas</p>
+                <p className="text-[10px] font-bold text-slate-400 italic">{t('Bo\'limlar mavjud emas')}</p>
               )}
             </div>
           </div>
@@ -392,31 +392,31 @@ export default function StaffManagement({ user }: StaffManagementProps) {
               <div className="p-8 space-y-6 flex-1">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Login</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Login')}</p>
                     <p className="text-sm font-black text-slate-900">@{selectedUser.username}</p>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Status</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Status')}</p>
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${selectedUser.status === 'ACTIVE' ? 'bg-emerald-500' : selectedUser.status === 'BLOCKED' ? 'bg-rose-500' : 'bg-amber-500'}`} />
                       <span className={`text-sm font-black ${selectedUser.status === 'ACTIVE' ? 'text-emerald-600' : selectedUser.status === 'BLOCKED' ? 'text-rose-600' : 'text-amber-600'}`}>
-                        {selectedUser.status === 'ACTIVE' ? 'Faol' : selectedUser.status === 'BLOCKED' ? 'Bloklangan' : 'Kutilmoqda'}
+                        {selectedUser.status === 'ACTIVE' ? t('Faol') : selectedUser.status === 'BLOCKED' ? t('Bloklangan') : t('Kutilmoqda')}
                       </span>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Telefon</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Telefon')}</p>
                     <p className="text-sm font-black text-slate-900">{selectedUser.phone || '—'}</p>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Bo'lim</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Bo\'lim')}</p>
                     <p className="text-sm font-black text-slate-900">{selectedUser.department_name || '—'}</p>
                   </div>
                 </div>
 
                 {/* Assigned Warehouses */}
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Biriktirilgan Skladlar</h4>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t('Biriktirilgan Skladlar')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {(Array.isArray(selectedUser.assigned_warehouse_names) && selectedUser.assigned_warehouse_names.length > 0) ? (
                       selectedUser.assigned_warehouse_names.map((warehouseName: string) => (
@@ -429,27 +429,27 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                         const wh = availableWarehouses.find((w: any) => w.id === whId);
                         return (
                           <span key={whId} className="px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl text-[9px] font-black uppercase tracking-widest">
-                            {wh?.name || `Sklad #${whId}`}
+                            {wh?.name || t('Sklad') + ` #${whId}`}
                           </span>
                         );
                       })
                     ) : (
-                      <span className="text-xs text-slate-400 font-medium italic">Biriktirilmagan</span>
+                      <span className="text-xs text-slate-400 font-medium italic">{t('Biriktirilmagan')}</span>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Asosiy Vazifasi</h4>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t('Asosiy Vazifasi')}</h4>
                   <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl">
                     <p className="text-sm font-bold text-slate-800 leading-relaxed">
-                      {selectedUser.responsibility_summary || "Bu xodim uchun vazifa tavsifi hali kiritilmagan."}
+                      {selectedUser.responsibility_summary || t("Bu xodim uchun vazifa tavsifi hali kiritilmagan.")}
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Ish Vazifalari</h4>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t('Ish Vazifalari')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {(selectedUser.task_scope && selectedUser.task_scope.length > 0) ? (
                       selectedUser.task_scope.map((task: string) => (
@@ -458,14 +458,14 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-slate-400 font-medium italic">Vazifalar ro'yxati mavjud emas</span>
+                      <span className="text-xs text-slate-400 font-medium italic">{t('Vazifalar ro\'yxati mavjud emas')}</span>
                     )}
                   </div>
                 </div>
 
                 {/* Permissions */}
                 <div>
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Ruxsatlar</h4>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t('Ruxsatlar')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {(selectedUser.all_permissions && selectedUser.all_permissions.length > 0) ? (
                       selectedUser.all_permissions.map((perm: string) => (
@@ -474,7 +474,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-slate-400 font-medium italic">Maxsus ruxsatlar yo'q</span>
+                      <span className="text-xs text-slate-400 font-medium italic">{t('Maxsus ruxsatlar yo\'q')}</span>
                     )}
                   </div>
                 </div>
@@ -486,14 +486,14 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                     className="flex items-center justify-center gap-2 p-4 bg-amber-50 border border-amber-100 rounded-2xl text-amber-600 hover:bg-amber-100 transition-all active:scale-95"
                   >
                     <Edit2 className="w-4 h-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Tahrirlash</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">{t('Tahrirlash')}</span>
                   </button>
                   <button 
                     onClick={() => { fetchUserLogs(selectedUser); setSelectedUser(null); }}
                     className="flex items-center justify-center gap-2 p-4 bg-blue-50 border border-blue-100 rounded-2xl text-blue-600 hover:bg-blue-100 transition-all active:scale-95"
                   >
                     <History className="w-4 h-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Tarix</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">{t('Tarix')}</span>
                   </button>
                 </div>
               </div>
@@ -518,8 +518,8 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                     {editingUser ? <Edit2 className="w-7 h-7 text-white" /> : <UserPlus className="w-7 h-7 text-white" />}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1.5">{editingUser ? 'Tahrirlash' : 'Yangi Xodim'}</h2>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{editingUser ? editingUser.name : 'Ma\'lumotlarni kiriting'}</p>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-1.5">{editingUser ? t('Tahrirlash') : t('Yangi Xodim')}</h2>
+                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{editingUser ? (editingUser.full_name || editingUser.username) : t('Ma\'lumotlarni kiriting')}</p>
                   </div>
                 </div>
                 <button 
@@ -533,7 +533,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
               <form onSubmit={handleAddStaff} className="p-8 space-y-6">
                 <div className="grid grid-cols-1 gap-6">
                   <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">To'liq ism</label>
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('To\'liq ism')}</label>
                       <div className="relative">
                       <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input 
@@ -548,7 +548,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Login</label>
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Login')}</label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                           <input 
@@ -562,7 +562,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Telefon</label>
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Telefon')}</label>
                         <input 
                             required
                             type="text" 
@@ -576,28 +576,28 @@ export default function StaffManagement({ user }: StaffManagementProps) {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Bo'lim</label>
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Bo\'lim')}</label>
                         <select 
                           required
                           value={formData.department_id || ''}
                           onChange={(e) => setFormData({...formData, department_id: Number(e.target.value)})}
                           className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner appearance-none"
                         >
-                          <option value="">Tanlang...</option>
+                          <option value="">{t('Tanlang')}...</option>
                           {departments.map(dept => (
                             <option key={dept.id} value={dept.id}>{dept.name}</option>
                           ))}
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Lavozim</label>
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Lavozim')}</label>
                         <select 
                           required
                           value={formData.role_id || ''}
                           onChange={(e) => setFormData({...formData, role_id: Number(e.target.value)})}
                           className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner appearance-none"
                         >
-                          <option value="">Tanlang...</option>
+                          <option value="">{t('Tanlang')}...</option>
                           {roles.map(role => (
                             <option key={role.id} value={role.id}>{role.name}</option>
                           ))}
@@ -607,19 +607,19 @@ export default function StaffManagement({ user }: StaffManagementProps) {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Status</label>
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Status')}</label>
                         <select 
                           value={formData.status}
                           onChange={(e) => setFormData({...formData, status: e.target.value as any})}
                           className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner appearance-none"
                         >
-                          <option value="ACTIVE">Faol</option>
-                          <option value="BLOCKED">Bloklangan</option>
-                          <option value="PENDING">Kutilmoqda</option>
+                          <option value="ACTIVE">{t('Faol')}</option>
+                          <option value="BLOCKED">{t('Bloklangan')}</option>
+                          <option value="PENDING">{t('Kutilmoqda')}</option>
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Parol</label>
+                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Parol')}</label>
                         <div className="relative">
                           <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                           <input 
@@ -628,14 +628,14 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                               value={formData.password}
                               onChange={(e) => setFormData({...formData, password: e.target.value})}
                               className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner"
-                              placeholder={editingUser ? "O'zgartirmaslik uchun bo'sh..." : "••••••••"}
+                              placeholder={editingUser ? t("O'zgartirmaslik uchun bo'sh") + "..." : "••••••••"}
                           />
                         </div>
                     </div>
                   </div>
 
                   <div className="space-y-3">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Biriktirilgan Skladlar (Ixtiyoriy)</label>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Biriktirilgan Skladlar (Ixtiyoriy)')}</label>
                     <div className="flex flex-wrap gap-2">
                       {availableWarehouses.map(w => (
                         <button
@@ -661,7 +661,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                   disabled={loading}
                   className="w-full bg-blue-600 text-white py-5 rounded-[24px] font-black text-[13px] uppercase tracking-[0.2em] shadow-2xl shadow-blue-200 hover:bg-blue-700 hover:-translate-y-1 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:pointer-events-none mt-4"
                 >
-                  {editingUser ? "Saqlash" : "Tizimga qo'shish"} &rarr;
+                  {editingUser ? t('Saqlash') : t('Tizimga qo\'shish')} &rarr;
                 </button>
               </form>
             </motion.div>
@@ -684,7 +684,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                     <History className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none mb-1">Faoliyat Tarixi</h2>
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none mb-1">{t('Faoliyat Tarixi')}</h2>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{viewLogsUser.full_name}</p>
                   </div>
                 </div>
@@ -697,7 +697,7 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                 {logsLoading ? (
                   <div className="flex flex-col items-center justify-center h-full gap-4">
                     <div className="w-8 h-8 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Yuklanmoqda...</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Yuklanmoqda')}...</p>
                   </div>
                 ) : userLogs.length > 0 ? (
                   <div className="space-y-6 relative before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
@@ -721,8 +721,8 @@ export default function StaffManagement({ user }: StaffManagementProps) {
                     <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center mb-6">
                       <History className="w-10 h-10 text-slate-200" />
                     </div>
-                    <h3 className="text-lg font-black text-slate-900 mb-2">Harakatlar yo'q</h3>
-                    <p className="text-sm text-slate-400 font-medium">Bu xodim oxirgi vaqtda hech qanday amal bajarmagan.</p>
+                    <h3 className="text-lg font-black text-slate-900 mb-2">{t('Harakatlar yo\'q')}</h3>
+                    <p className="text-sm text-slate-400 font-medium">{t('Bu xodim oxirgi vaqtda hech qanday amal bajarmagan.')}</p>
                   </div>
                 )}
               </div>

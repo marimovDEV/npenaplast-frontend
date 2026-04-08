@@ -30,7 +30,7 @@ interface Report {
 }
 
 export default function Reports({ user }: { user: User }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const [analytics, setAnalytics] = useState<any>(null);
   const [history, setHistory] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,15 +50,19 @@ export default function Reports({ user }: { user: User }) {
     setLoading(true);
     setError(null);
     try {
-      const [anaRes, histRes] = await Promise.all([
-        api.get('reports/analytics/'),
-        api.get('reports/history/')
-      ]);
+      // Sequential fetching to avoid race conditions in token refresh if they both fail with 401
+      const anaRes = await api.get('reports/analytics/');
       setAnalytics(anaRes.data);
+
+      const histRes = await api.get('reports/history/');
       setHistory(histRes.data);
-    } catch (err) {
-      console.error("Failed to fetch reports data", err);
-      setError("Hisobot ma'lumotlarini yuklashda xatolik yuz berdi");
+    } catch (err: any) {
+      console.error("Failed to fetch reports data:", err.response?.status, err.message);
+      if (err.response?.status === 401) {
+        setError(t("Sessiya muddati tugagan yoki ruxsat yo'q. Iltimos qayta kiring."));
+      } else {
+        setError(t("Hisobot ma'lumotlarini yuklashda xatolik yuz berdi"));
+      }
     } finally {
       setLoading(false);
     }
@@ -85,7 +89,7 @@ export default function Reports({ user }: { user: User }) {
         period: genForm.period,
         file_format: genForm.format,
       });
-      uiStore.showNotification("Hisobot muvaffaqiyatli yaratildi", "success");
+      uiStore.showNotification(t("Hisobot muvaffaqiyatli yaratildi"), "success");
       const reportId = response.data.id;
       if (reportId) {
         await handleDownload(reportId, name, genForm.format);
@@ -93,7 +97,7 @@ export default function Reports({ user }: { user: User }) {
       fetchData();
       setIsGenerating(false);
     } catch (err) {
-      uiStore.showNotification("Hisobot yaratishda xatolik", "error");
+      uiStore.showNotification(t("Hisobot yaratishda xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -115,7 +119,7 @@ export default function Reports({ user }: { user: User }) {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      uiStore.showNotification("Faylni yuklashda xatolik", "error");
+      uiStore.showNotification(t("Faylni yuklashda xatolik"), "error");
     }
   };
 
@@ -123,7 +127,7 @@ export default function Reports({ user }: { user: User }) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <RefreshCcw className="w-10 h-10 text-blue-500 animate-spin" />
-        <p className="text-slate-400 font-black text-xs uppercase tracking-[0.2em]">Ma'lumotlar yuklanmoqda...</p>
+        <p className="text-slate-400 font-black text-xs uppercase tracking-[0.2em]">{t('Ma\'lumotlar yuklanmoqda')}...</p>
       </div>
     );
   }
@@ -136,13 +140,13 @@ export default function Reports({ user }: { user: User }) {
         </div>
         <div>
           <h2 className="text-xl font-black text-slate-900 mb-2">{error}</h2>
-          <p className="text-slate-500 text-sm max-w-xs mx-auto">Tizimga ulanishda xatolik yuz berdi. Iltimos qayta urunib ko'ring.</p>
+          <p className="text-slate-500 text-sm max-w-xs mx-auto">{t('Tizimga ulanishda xatolik yuz berdi. Iltimos qayta urunib ko\'ring.')}</p>
         </div>
         <button 
           onClick={fetchData}
           className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all"
         >
-          Qayta urunish
+          {t('Qayta urunish')}
         </button>
       </div>
     );
@@ -155,8 +159,8 @@ export default function Reports({ user }: { user: User }) {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Analitika & Hisobotlar</h1>
-          <p className="text-slate-500 text-sm font-medium">Korxona faoliyatining chuqur tahlili va natijalari</p>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t('Analitika & Hisobotlar')}</h1>
+          <p className="text-slate-500 text-sm font-medium">{t('Korxona faoliyatining chuqur tahlili va natijalari')}</p>
         </div>
         
         <button 
@@ -164,17 +168,17 @@ export default function Reports({ user }: { user: User }) {
           className="flex w-full md:w-auto items-center justify-center gap-2 bg-blue-600 text-white px-6 md:px-8 py-4 rounded-[24px] md:rounded-[28px] font-black text-[11px] md:text-xs uppercase tracking-widest hover:bg-blue-700 shadow-xl shadow-blue-100 active:scale-95 transition-all"
         >
           <Plus className="w-5 h-5" />
-          <span>Yangi Hisobot Yaratish</span>
+          <span>{t('Yangi Hisobot Yaratish')}</span>
         </button>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { name: 'Umumiy Savdo', value: `${(analytics?.kpis?.total_sales || 0).toLocaleString(locale)} UZS`, trend: '+12%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { name: 'Ishlab Chiqarish', value: `${(analytics?.kpis?.total_production || 0).toLocaleString(locale)} dona`, trend: '+8%', icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-          { name: 'Chiqindi Miqdori', value: `${(analytics?.kpis?.waste_percent || 0).toLocaleString(locale)}%`, trend: '-2%', icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50' },
-          { name: 'Ombor Qiymati', value: `${(analytics?.kpis?.stock_value || 0).toLocaleString(locale)} UZS`, trend: '0%', icon: PieChart, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { name: t('Umumiy Savdo'), value: `${(analytics?.kpis?.total_sales || 0).toLocaleString(locale)} UZS`, trend: '+12%', icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { name: t('Ishlab Chiqarish'), value: `${(analytics?.kpis?.total_production || 0).toLocaleString(locale)} dona`, trend: '+8%', icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { name: t('Chiqindi Miqdori'), value: `${(analytics?.kpis?.waste_percent || 0).toLocaleString(locale)}%`, trend: '-2%', icon: TrendingDown, color: 'text-rose-600', bg: 'bg-rose-50' },
+          { name: t('Ombor Qiymati'), value: `${(analytics?.kpis?.stock_value || 0).toLocaleString(locale)} UZS`, trend: '0%', icon: PieChart, color: 'text-amber-600', bg: 'bg-amber-50' },
         ].map((kpi, i) => (
           <div key={i} className="bg-white p-7 rounded-[36px] border border-slate-100 shadow-sm hover:shadow-xl transition-all group">
             <div className="flex items-center justify-between mb-4">
@@ -195,12 +199,12 @@ export default function Reports({ user }: { user: User }) {
         <div className="lg:col-span-2 bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
               <div>
-                 <h3 className="text-lg font-black text-slate-900 tracking-tight">Sotuvlar Dinamikasi</h3>
-                 <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Oxirgi 30 kunlik trend</p>
+                 <h3 className="text-lg font-black text-slate-900 tracking-tight">{t('Sotuvlar Dinamikasi')}</h3>
+                 <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{t('Oxirgi 30 kunlik trend')}</p>
               </div>
               <div className="flex gap-2">
                  {['Kunlik', 'Haftalik', 'Oylik'].map(period => (
-                    <button key={period} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${period === 'Kunlik' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:bg-slate-50'}`}>{period}</button>
+                    <button key={period} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${period === 'Kunlik' ? 'bg-slate-900 text-white' : 'text-slate-400 hover:bg-slate-50'}`}>{t(period)}</button>
                  ))}
               </div>
            </div>
@@ -229,8 +233,8 @@ export default function Reports({ user }: { user: User }) {
 
         {/* Pie Chart Distribution */}
         <div className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm">
-           <h3 className="text-lg font-black text-slate-900 tracking-tight mb-2">Chiqindi Manbalari</h3>
-           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-8">Bo'limlar kesimida</p>
+           <h3 className="text-lg font-black text-slate-900 tracking-tight mb-2">{t('Chiqindi Manbalari')}</h3>
+           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-8">{t('Bo\'limlar kesimida')}</p>
            
            <div className="w-full">
               <ResponsiveContainer width="99%" height={250} debounce={50}>
@@ -271,9 +275,9 @@ export default function Reports({ user }: { user: User }) {
            <div>
               <h3 className="text-xl font-black text-slate-900 flex items-center gap-3">
                  <FileText className="w-6 h-6 text-blue-500" />
-                 Hisobotlar Jurnali
+                 {t('Hisobotlar Jurnali')}
               </h3>
-              <p className="text-slate-500 text-sm font-medium">Ilgari yaratilgan barcha hisobotlar ro'yxati</p>
+              <p className="text-slate-500 text-sm font-medium">{t('Ilgari yaratilgan barcha hisobotlar ro\'yxati')}</p>
            </div>
            
            <div className="flex items-center gap-3">
@@ -281,7 +285,7 @@ export default function Reports({ user }: { user: User }) {
                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                  <input 
                     type="text" 
-                    placeholder="Hisobot nomi..." 
+                    placeholder={t("Hisobot nomi") + "..."} 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-11 pr-5 py-3.5 bg-slate-50 border border-transparent rounded-[20px] outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all text-xs font-bold text-slate-900 w-full md:w-64"
@@ -292,16 +296,16 @@ export default function Reports({ user }: { user: User }) {
 
         {!isMobile && (
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Hisobot Nomi</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Turi</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Davr</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Format</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Yaratilgan</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Holat</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amallar</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Hisobot Nomi')}</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Turi')}</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Davr')}</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Format')}</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Yaratilgan')}</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Holat')}</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('Amallar')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -331,17 +335,17 @@ export default function Reports({ user }: { user: User }) {
                        {report.status === 'READY' ? (
                           <div className="flex items-center gap-1.5 text-emerald-600">
                              <CheckCircle2 className="w-4 h-4" />
-                             <span className="text-[10px] font-black uppercase tracking-widest">Tayyor</span>
+                             <span className="text-[10px] font-black uppercase tracking-widest">{t('Tayyor')}</span>
                           </div>
                        ) : report.status === 'ERROR' ? (
                           <div className="flex items-center gap-1.5 text-rose-600">
                              <AlertCircle className="w-4 h-4" />
-                             <span className="text-[10px] font-black uppercase tracking-widest">Xato</span>
+                             <span className="text-[10px] font-black uppercase tracking-widest">{t('Xato')}</span>
                           </div>
                        ) : (
                           <div className="flex items-center gap-1.5 text-blue-600">
                              <RefreshCcw className="w-4 h-4 animate-spin" />
-                             <span className="text-[10px] font-black uppercase tracking-widest">Tayyorlanmoqda</span>
+                             <span className="text-[10px] font-black uppercase tracking-widest">{t('Tayyorlanmoqda')}</span>
                           </div>
                        )}
                     </div>
@@ -361,7 +365,7 @@ export default function Reports({ user }: { user: User }) {
                        <div className="w-20 h-20 bg-slate-50 rounded-[28px] flex items-center justify-center mx-auto mb-4 text-slate-300">
                           <BarChart3 className="w-10 h-10" />
                        </div>
-                       <p className="text-slate-400 font-black text-xs uppercase tracking-widest italic">Hozircha hisobotlar yaratilmagan</p>
+                       <p className="text-slate-400 font-black text-xs uppercase tracking-widest italic">{t('Hozircha hisobotlar yaratilmagan')}</p>
                     </td>
                  </tr>
               )}
@@ -390,7 +394,7 @@ export default function Reports({ user }: { user: User }) {
               </div>
             ))}
             {history.length === 0 && (
-              <div className="py-10 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">Hozircha hisobotlar yaratilmagan</div>
+              <div className="py-10 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">{t('Hozircha hisobotlar yaratilmagan')}</div>
             )}
           </div>
         )}
@@ -404,8 +408,8 @@ export default function Reports({ user }: { user: User }) {
                <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-white w-full max-w-lg rounded-[32px] md:rounded-[48px] shadow-2xl overflow-hidden p-5 md:p-10">
                   <div className="flex items-center justify-between mb-10">
                      <div>
-                        <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Yangi Hisobot</h2>
-                        <p className="text-slate-500 text-sm font-medium">Hisobot turini va davrini tanlang</p>
+                        <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t('Yangi Hisobot')}</h2>
+                        <p className="text-slate-500 text-sm font-medium">{t('Hisobot turini va davrini tanlang')}</p>
                      </div>
                      <button onClick={() => setIsGenerating(false)} className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 hover:text-rose-600 transition-all">
                         <X className="w-6 h-6" />
@@ -414,13 +418,13 @@ export default function Reports({ user }: { user: User }) {
 
                   <form onSubmit={handleGenerate} className="space-y-8">
                      <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Hisobot Turi</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Hisobot Turi')}</label>
                         <div className="grid grid-cols-2 gap-3">
                            {[
-                              { id: 'SALES', name: 'Sotuvlar', icon: TrendingUp },
-                              { id: 'INVENTORY', name: 'Ombor', icon: PieChart },
-                              { id: 'PRODUCTION', name: 'Ishlab chiqarish', icon: Activity },
-                              { id: 'WASTE', name: 'Chiqindilar', icon: TrendingDown },
+                              { id: 'SALES', name: t('Sotuvlar'), icon: TrendingUp },
+                              { id: 'INVENTORY', name: t('Ombor'), icon: PieChart },
+                              { id: 'PRODUCTION', name: t('Ishlab chiqarish'), icon: Activity },
+                              { id: 'WASTE', name: t('Chiqindilar'), icon: TrendingDown },
                            ].map(type => (
                               <button 
                                  key={type.id} 
@@ -437,20 +441,20 @@ export default function Reports({ user }: { user: User }) {
 
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
-                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Davr</label>
+                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Davr')}</label>
                            <select 
                               value={genForm.period} 
                               onChange={(e) => setGenForm({...genForm, period: e.target.value})}
                               className="w-full p-4 bg-slate-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-blue-500 font-bold text-sm"
                            >
-                              <option value="Today">Bugun</option>
-                              <option value="Last 7 Days">Oxirgi 7 kun</option>
-                              <option value="This Month">Shu oy</option>
-                              <option value="Custom">Boshqa davr...</option>
+                              <option value="Today">{t('Bugun')}</option>
+                              <option value="Last 7 Days">{t('Oxirgi 7 kun')}</option>
+                              <option value="This Month">{t('Shu oy')}</option>
+                              <option value="Custom">{t('Boshqa davr...')}</option>
                            </select>
                         </div>
                         <div className="space-y-3">
-                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Format</label>
+                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Format')}</label>
                            <div className="flex bg-slate-50 p-1 rounded-2xl gap-1">
                               <button type="button" onClick={() => setGenForm({...genForm, format: 'PDF'})} className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${genForm.format === 'PDF' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}>PDF</button>
                               <button type="button" onClick={() => setGenForm({...genForm, format: 'EXCEL'})} className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${genForm.format === 'EXCEL' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}>Excel</button>
@@ -460,7 +464,7 @@ export default function Reports({ user }: { user: User }) {
 
                      <button type="submit" className="w-full py-5 md:py-6 bg-blue-600 text-white rounded-[24px] md:rounded-[32px] font-black text-[11px] md:text-xs uppercase tracking-widest shadow-2xl shadow-blue-100 hover:bg-blue-700 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4">
                         <Plus className="w-5 h-5" />
-                        Hisobotni Yaratish
+                        {t('Hisobotni Yaratish')}
                      </button>
                   </form>
                </motion.div>

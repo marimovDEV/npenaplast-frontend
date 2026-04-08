@@ -33,7 +33,7 @@ import { useI18n } from '../i18n';
 const ScannerModal = lazy(() => import('./ScannerModal'));
 
 export default function Sklad1({ user }: { user: any }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const assignedWarehouses = (user.assignedWarehouses || user.assigned_warehouses || []).map(String);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [materials, setMaterials] = useState<RawMaterial[]>([]);
@@ -82,10 +82,10 @@ export default function Sklad1({ user }: { user: any }) {
           quantity_kg: b.quantity_kg,
           remaining_quantity: b.remaining_quantity,
           reserved_quantity: b.reserved_quantity,
-          responsiblePerson: b.responsible_user_name || 'System',
+          responsiblePerson: b.responsible_user_name || t('Tizim'),
           status: b.status,
           code: b.material_sku || 'RM-SKU',
-          name: b.material_name || 'Noma\'lum mahsulot',
+          name: t(b.material_name || "Noma'lum mahsulot"),
           productId: b.material,
           qr_code: b.qr_code
         })));
@@ -116,10 +116,10 @@ export default function Sklad1({ user }: { user: any }) {
     try {
       setLoading(true);
       await api.post(`documents/${id}/${action}/`);
-      uiStore.showNotification(`Hujjat ${action} qilindi`, "success");
+      uiStore.showNotification(t('Hujjat') + ' ' + t(action) + ' ' + t('qilindi'), "success");
       fetchData();
     } catch (err) {
-      uiStore.showNotification("Xatolik: " + (err as any).message, "error");
+      uiStore.showNotification(t("Xatolik") + ": " + (err as any).message, "error");
     } finally {
       setLoading(false);
     }
@@ -157,7 +157,7 @@ export default function Sklad1({ user }: { user: any }) {
         }))
       });
       
-      uiStore.showNotification("Kirim muvaffaqiyatli bajarildi", "success");
+      uiStore.showNotification(t("Kirim muvaffaqiyatli bajarildi"), "success");
       fetchData();
       setIsReceiveModalOpen(false);
       
@@ -165,7 +165,7 @@ export default function Sklad1({ user }: { user: any }) {
       setIsPrintingDocument(res.data);
       resetReceiveForm();
     } catch (err) {
-      uiStore.showNotification("Xatolik: " + (err as any).message, "error");
+      uiStore.showNotification(t("Xatolik") + ": " + (err as any).message, "error");
     } finally {
       setLoading(false);
     }
@@ -185,19 +185,19 @@ export default function Sklad1({ user }: { user: any }) {
         type: 'ICHKI_YUK_XATI',
         from_warehouse: warehouseId,
         to_warehouse: warehouseId, 
-        notes: `${targetShop} sexiga uzatish`,
+        notes: `${targetShop} ${t('sexiga uzatish')}`,
         items: [{ 
             product: (selectedBatch as any).productId, 
             quantity: Number(transferQty)
         }]
       });
 
-      uiStore.showNotification(`${targetShop} sexiga uzatildi`, "success");
+      uiStore.showNotification(t(`${targetShop} sexiga uzatildi`), "success");
       fetchData();
       setIsTransferModalOpen(false);
       setTransferQty('');
     } catch (err) {
-      uiStore.showNotification("Xatolik: " + (err as any).message, "error");
+      uiStore.showNotification(t("Xatolik") + ": " + (err as any).message, "error");
     } finally {
       setLoading(false);
     }
@@ -242,7 +242,7 @@ export default function Sklad1({ user }: { user: any }) {
   };
 
   if (!assignedWarehouses.includes('*') && !assignedWarehouses.includes('sklad1') && !assignedWarehouses.includes('1')) {
-     return <div className="p-10 text-center font-bold text-slate-400 italic">Ruxsat mavjud emas</div>;
+     return <div className="p-10 text-center font-bold text-slate-400 italic">{t('Ruxsat mavjud emas')}</div>;
   }
 
   return (
@@ -254,9 +254,9 @@ export default function Sklad1({ user }: { user: any }) {
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-indigo-100">
               <Database className="w-6 h-6" />
             </div>
-            Sklad №1 (Xom Ashyo)
+            {t('Sklad №1 (Xom Ashyo)')}
           </h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">Nomenklatura, partiyalar va ishlab chiqarishga uzatish</p>
+          <p className="text-slate-500 text-sm font-medium mt-1">{t('Nomenklatura, partiyalar va ishlab chiqarishga uzatish')}</p>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <button 
@@ -264,14 +264,14 @@ export default function Sklad1({ user }: { user: any }) {
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all"
           >
             <Camera className="w-4 h-4" />
-            <span>QR Skaynerlash</span>
+            <span>{t('QR Skaynerlash')}</span>
           </button>
           <button 
             onClick={() => setIsReceiveModalOpen(true)}
             className="flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
           >
             <Plus className="w-4 h-4" />
-            <span>Kirim (Faktura)</span>
+            <span>{t('Kirim (Faktura)')}</span>
           </button>
         </div>
       </div>
@@ -285,7 +285,7 @@ export default function Sklad1({ user }: { user: any }) {
               <TrendingUp className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Umumiy Qoldiq</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('Umumiy Qoldiq')}</p>
               <p className="text-2xl font-black text-slate-900 tracking-tight">{totals.total.toLocaleString()} <span className="text-xs text-slate-400">kg</span></p>
             </div>
           </div>
@@ -297,7 +297,7 @@ export default function Sklad1({ user }: { user: any }) {
               <Box className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">EPS Granula</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('EPS Granula')}</p>
               <p className="text-2xl font-black text-slate-900 tracking-tight">{totals.eps.toLocaleString()} <span className="text-xs text-slate-400">kg</span></p>
             </div>
           </div>
@@ -309,8 +309,8 @@ export default function Sklad1({ user }: { user: any }) {
               <AlertCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Kam Qolgan</p>
-              <p className="text-2xl font-black text-slate-900 tracking-tight">2 <span className="text-xs text-slate-400">turi</span></p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('Kam Qolgan')}</p>
+              <p className="text-2xl font-black text-slate-900 tracking-tight">2 <span className="text-xs text-slate-400">{t('turi')}</span></p>
             </div>
           </div>
         </div>
@@ -324,7 +324,7 @@ export default function Sklad1({ user }: { user: any }) {
             activeTab === 'INVENTORY' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
-          Ombor Qoldig'i
+          {t('Ombor Qoldig\'i')}
         </button>
         <button 
           onClick={() => setActiveTab('DOCUMENTS')}
@@ -332,7 +332,7 @@ export default function Sklad1({ user }: { user: any }) {
             activeTab === 'DOCUMENTS' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
           }`}
         >
-          Hujjatlar & Buyruqlar
+          {t('Hujjatlar & Buyruqlar')}
         </button>
       </div>
 
@@ -343,7 +343,7 @@ export default function Sklad1({ user }: { user: any }) {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
                 type="text" 
-                placeholder="Material yoki partiya qidirish..." 
+                placeholder={t('Material yoki partiya qidirish') + "..."} 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium"
@@ -365,7 +365,7 @@ export default function Sklad1({ user }: { user: any }) {
                       iconBg="bg-blue-50"
                       iconColor="text-blue-600"
                       status={{
-                        label: m.status === 'IN_STOCK' ? 'Omborda' : 'Tugatilgan',
+                        label: m.status === 'IN_STOCK' ? t('Omborda') : t('Tugatilgan'),
                         variant: m.status === 'IN_STOCK' ? 'success' : 'error'
                       }}
                       rightElement={
@@ -377,11 +377,11 @@ export default function Sklad1({ user }: { user: any }) {
                         <div className="flex items-center justify-between w-full">
                            <div className="flex gap-4">
                               <div className="flex flex-col">
-                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Reserved</span>
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('Reserved')}</span>
                                 <span className="text-xs font-black text-amber-500 leading-none">{((m as any).reserved_quantity || 0).toLocaleString()} kg</span>
                               </div>
                               <div className="flex flex-col border-l border-slate-100 pl-4">
-                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Mavjud</span>
+                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('Mavjud')}</span>
                                 <span className="text-xs font-black text-slate-900 leading-none">{available.toLocaleString()} kg</span>
                               </div>
                            </div>
@@ -412,12 +412,12 @@ export default function Sklad1({ user }: { user: any }) {
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">Material / Kod</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">Partiya ID</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Reserved (kg)</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Mavjud (Available)</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">Holati</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Amallar</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Material / Kod')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Partiya ID')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Reserved')} (kg)</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Mavjud')} (Available)</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">{t('Holati')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Amallar')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -442,14 +442,14 @@ export default function Sklad1({ user }: { user: any }) {
                       <td className="px-8 py-6 text-right">
                         <div className="flex flex-col items-end">
                           <p className="text-sm font-black text-slate-900">{available.toLocaleString()} kg</p>
-                          <p className="text-[10px] font-bold text-slate-300">{(m as any).remaining_quantity.toLocaleString()} jami</p>
+                          <p className="text-[10px] font-bold text-slate-300">{(m as any).remaining_quantity.toLocaleString()} {t('jami')}</p>
                         </div>
                       </td>
                       <td className="px-8 py-6 text-center">
                         <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
                           m.status === 'IN_STOCK' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
                         }`}>
-                          {m.status === 'IN_STOCK' ? 'Omborda' : 'Tugatilgan'}
+                          {m.status === 'IN_STOCK' ? t('Omborda') : t('Tugatilgan')}
                         </span>
                       </td>
                       <td className="px-8 py-6 text-right">
@@ -491,7 +491,7 @@ export default function Sklad1({ user }: { user: any }) {
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-sm font-black text-slate-900 break-words">{doc.number}</p>
-                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{doc.type}</p>
+                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{t(doc.type)}</p>
                       </div>
                       <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
                         doc.status === 'DONE' ? 'bg-emerald-50 text-emerald-600' :
@@ -499,13 +499,13 @@ export default function Sklad1({ user }: { user: any }) {
                         doc.status === 'CREATED' ? 'bg-blue-50 text-blue-600' :
                         'bg-amber-50 text-amber-600'
                       }`}>
-                        {doc.status}
+                        {t(doc.status)}
                       </span>
                     </div>
                     <div className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold text-slate-600">
-                      <span>{doc.from_entity_name || '---'}</span>
+                      <span>{t(doc.from_entity_name || '---')}</span>
                       <span className="mx-2 text-slate-300">{'->'}</span>
-                      <span>{doc.to_entity_name || '---'}</span>
+                      <span>{t(doc.to_entity_name || '---')}</span>
                     </div>
                     <div className="mt-3 flex items-center justify-between gap-3">
                       <p className="text-[10px] font-black uppercase text-slate-400">{new Date(doc.created_at).toLocaleDateString()}</p>
@@ -518,7 +518,7 @@ export default function Sklad1({ user }: { user: any }) {
                             onClick={() => handleDocumentAction(doc.id, doc.status === 'CREATED' ? 'confirm' : 'complete')}
                             className="rounded-xl bg-blue-600 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-white"
                           >
-                            {doc.status === 'CREATED' ? 'Tasdiqlash' : 'Yakunlash'}
+                            {doc.status === 'CREATED' ? t('Tasdiqlash') : t('Yakunlash')}
                           </button>
                         )}
                       </div>
@@ -531,11 +531,11 @@ export default function Sklad1({ user }: { user: any }) {
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">Hujjat № / Turi</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">Qayerdan / Qayerga</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">Sanasi</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">Holati</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Amallar</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Hujjat № / Turi')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Qayerdan / Qayerga')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">{t('Sanasi')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">{t('Holati')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Amallar')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -548,15 +548,15 @@ export default function Sklad1({ user }: { user: any }) {
                         }`} />
                         <div>
                           <p className="font-black text-slate-900 text-sm">{doc.number}</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{doc.type}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t(doc.type)}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-8 py-6">
                        <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-                          <span>{doc.from_entity_name || '---'}</span>
+                          <span>{t(doc.from_entity_name || '---')}</span>
                           <ArrowRight className="w-3 h-3 text-slate-300" />
-                          <span>{doc.to_entity_name || '---'}</span>
+                          <span>{t(doc.to_entity_name || '---')}</span>
                        </div>
                     </td>
                     <td className="px-8 py-6 text-center">
@@ -569,7 +569,7 @@ export default function Sklad1({ user }: { user: any }) {
                         doc.status === 'CREATED' ? 'bg-blue-50 text-blue-600' :
                         'bg-amber-50 text-amber-600'
                       }`}>
-                        {doc.status}
+                        {t(doc.status)}
                       </span>
                     </td>
                     <td className="px-8 py-6 text-right">
@@ -582,7 +582,7 @@ export default function Sklad1({ user }: { user: any }) {
                               onClick={() => handleDocumentAction(doc.id, 'confirm')}
                               className="px-3 py-1.5 bg-blue-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-blue-100"
                             >
-                              Tasdiqlash
+                              {t('Tasdiqlash')}
                             </button>
                           )}
                           {doc.status === 'CONFIRMED' && (
@@ -590,7 +590,7 @@ export default function Sklad1({ user }: { user: any }) {
                               onClick={() => handleDocumentAction(doc.id, 'complete')}
                               className="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-100"
                             >
-                              Yakunlash
+                              {t('Yakunlash')}
                             </button>
                           )}
                           {(doc.status === 'CREATED' || doc.status === 'CONFIRMED') && (
@@ -598,7 +598,7 @@ export default function Sklad1({ user }: { user: any }) {
                               onClick={() => handleDocumentAction(doc.id, 'cancel')}
                               className="px-3 py-1.5 border border-rose-100 text-rose-500 hover:bg-rose-50 rounded-xl font-black text-[9px] uppercase tracking-widest"
                             >
-                              Bekor
+                              {t('Bekor')}
                             </button>
                           )}
                        </div>
@@ -625,8 +625,8 @@ export default function Sklad1({ user }: { user: any }) {
                       <FileText className="w-8 h-8" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-slate-900 tracking-tight">Yangi Kirim (Faktura)</h3>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">Xom ashyo qabul qilish</p>
+                      <h3 className="text-xl font-black text-slate-900 tracking-tight">{t('Yangi Kirim (Faktura)')}</h3>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">{t('Xom ashyo qabul qilish')}</p>
                     </div>
                   </div>
                   <button onClick={() => setIsReceiveModalOpen(false)} className="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all">
@@ -637,11 +637,11 @@ export default function Sklad1({ user }: { user: any }) {
                <form onSubmit={handleReceive} className="p-5 md:p-8 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Faktura №</label>
-                      <input required value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} placeholder="m-n: F-12345" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold" />
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Faktura №')}</label>
+                      <input required value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} placeholder={t('m-n: F-12345')} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Yetkazib beruvchi</label>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Yetkazib beruvchi')}</label>
                       <div className="relative">
                         <Truck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <select 
@@ -658,14 +658,14 @@ export default function Sklad1({ user }: { user: any }) {
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mahsulotlar Ro'yxati</label>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Mahsulotlar Ro\'yxati')}</label>
                       <button 
                         type="button" 
                         onClick={addReceiveItem}
                         className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:text-blue-700"
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        Mahsulot qo'shish
+                        {t('Mahsulot qo\'shish')}
                       </button>
                     </div>
                     
@@ -682,7 +682,7 @@ export default function Sklad1({ user }: { user: any }) {
                         )}
                         
                         <div className="space-y-2">
-                          <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Mahsulot nomi</label>
+                          <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t('Mahsulot nomi')}</label>
                           <select 
                             value={item.productId} 
                             onChange={e => updateReceiveItem(index, 'productId', e.target.value)}
@@ -694,7 +694,7 @@ export default function Sklad1({ user }: { user: any }) {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Miqdor (kg)</label>
+                            <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t('Miqdor')} (kg)</label>
                             <input 
                               type="number" 
                               required 
@@ -705,7 +705,7 @@ export default function Sklad1({ user }: { user: any }) {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Narx (1kg uchun)</label>
+                            <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t('Narx (1kg uchun)')}</label>
                             <div className="relative">
                               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300" />
                               <input 
@@ -724,8 +724,8 @@ export default function Sklad1({ user }: { user: any }) {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <button type="button" onClick={() => setIsReceiveModalOpen(false)} className="flex-1 py-4 border border-slate-200 text-slate-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all">Bekor qilish</button>
-                    <button type="submit" className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">Muvaffaqiyatli Saqlash</button>
+                    <button type="button" onClick={() => setIsReceiveModalOpen(false)} className="flex-1 py-4 border border-slate-200 text-slate-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
+                    <button type="submit" className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">{t('Muvaffaqiyatli Saqlash')}</button>
                   </div>
                </form>
             </motion.div>
@@ -743,31 +743,31 @@ export default function Sklad1({ user }: { user: any }) {
                   <div className="w-20 h-20 bg-indigo-50 rounded-[30px] flex items-center justify-center text-indigo-600 mx-auto mb-6">
                     <Activity className="w-10 h-10" />
                   </div>
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Sexga Berish</h3>
-                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Ichki Nakladnoy yaratish</p>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">{t('Sexga Berish')}</h3>
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t('Ichki Nakladnoy yaratish')}</p>
                   
                   <div className="mt-8 p-6 bg-slate-50 rounded-[32px] border border-slate-100 text-left space-y-4">
-                     <div>
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Partiya ID</p>
-                       <p className="text-sm font-black text-blue-600">{selectedBatch.batchNumber}</p>
-                     </div>
-                     <div>
-                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Material</p>
-                       <p className="text-sm font-black text-slate-900">{(selectedBatch as any).name}</p>
-                     </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Partiya ID')}</p>
+                      <p className="text-sm font-black text-blue-600">{selectedBatch.batchNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Material')}</p>
+                      <p className="text-sm font-black text-slate-900">{t((selectedBatch as any).name)}</p>
+                    </div>
                   </div>
 
                   <form onSubmit={handleTransfer} className="mt-8 space-y-5">
                     <div className="space-y-2 text-left">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Yo'naltirilgan sex</label>
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Yo\'naltirilgan sex')}</label>
                        <select value={targetShop} onChange={e => setTargetShop(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold appearance-none text-sm">
-                          <option value="ZAMES">Zames (Qorishma)</option>
-                          <option value="CNC">CNC (Kesish)</option>
-                          <option value="FINISHING">Pardozlash</option>
+                          <option value="ZAMES">Zames ({t('Qorishma')})</option>
+                          <option value="CNC">CNC ({t('Kesish')})</option>
+                          <option value="FINISHING">{t('Pardozlash')}</option>
                        </select>
                     </div>
                     <div className="space-y-2 text-left">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Miqdor (kg)</label>
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Miqdor')} (kg)</label>
                        <div className="relative">
                           <ArrowRight className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                           <input type="number" required value={transferQty} onChange={e => setTransferQty(e.target.value)} placeholder="0.00" className="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold" />
@@ -775,8 +775,8 @@ export default function Sklad1({ user }: { user: any }) {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <button type="button" onClick={() => setIsTransferModalOpen(false)} className="flex-1 py-4 border border-slate-200 text-slate-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all">Bekor</button>
-                        <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">Tasdiqlash</button>
+                        <button type="button" onClick={() => setIsTransferModalOpen(false)} className="flex-1 py-4 border border-slate-200 text-slate-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all">{t('Bekor')}</button>
+                        <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">{t('Tasdiqlash')}</button>
                     </div>
                   </form>
                </div>

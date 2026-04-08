@@ -25,7 +25,7 @@ import { useI18n } from '../i18n';
 const ScannerModal = lazy(() => import('./ScannerModal'));
 
 export default function CourierDashboard({ user }: { user: UserType }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const [documents, setDocuments] = useState<ERPDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDoc, setSelectedDoc] = useState<ERPDocument | null>(null);
@@ -39,7 +39,7 @@ export default function CourierDashboard({ user }: { user: UserType }) {
       const res = await api.get('documents/', { params: { courier_id: user.id } });
       setDocuments(res.data);
     } catch (err) {
-      uiStore.showNotification("Ma'lumotlarni yuklashda xatolik", "error");
+      uiStore.showNotification(t("Ma'lumotlarni yuklashda xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -53,13 +53,13 @@ export default function CourierDashboard({ user }: { user: UserType }) {
     try {
       await api.post(`documents/${docId}/${action}/`);
       uiStore.showNotification(
-        action === 'start_delivery' ? "Yetkazib berish boshlandi" : "Muvaffaqiyatli yetkazildi", 
+        action === 'start_delivery' ? t("Yetkazib berish boshlandi") : t("Muvaffaqiyatli yetkazildi"), 
         "success"
       );
       setSelectedDoc(null);
       fetchData();
     } catch (err) {
-      uiStore.showNotification("Amalni bajarishda xatolik", "error");
+      uiStore.showNotification(t("Amalni bajarishda xatolik"), "error");
     }
   };
 
@@ -68,7 +68,7 @@ export default function CourierDashboard({ user }: { user: UserType }) {
     if (data.number || data.items) {
       setSelectedDoc(data);
     } else {
-      uiStore.showNotification("Noma'lum QR kod", "info");
+      uiStore.showNotification(t("Noma'lum QR kod"), "info");
     }
   };
 
@@ -76,8 +76,8 @@ export default function CourierDashboard({ user }: { user: UserType }) {
     <div className="space-y-8 pb-32 max-w-2xl mx-auto px-4 sm:px-0">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">Kuryer</h1>
-          <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Logistika nazorati</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight">{t('Kuryer')}</h1>
+          <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">{t('Logistika nazorati')}</p>
         </div>
         <button 
           onClick={() => setIsScannerOpen(true)}
@@ -89,11 +89,11 @@ export default function CourierDashboard({ user }: { user: UserType }) {
 
       <div className="flex gap-2 p-1.5 bg-slate-100 rounded-[24px]">
          <div className="flex-1 px-6 py-3 bg-white rounded-[20px] shadow-sm text-center">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Aktiv</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('Aktiv')}</p>
             <p className="text-xl font-black text-slate-900">{documents.filter(d => d.status === 'IN_TRANSIT').length}</p>
          </div>
          <div className="flex-1 px-6 py-3 rounded-[20px] text-center">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Kutilmoqda</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('Kutilmoqda')}</p>
             <p className="text-xl font-black text-slate-600">{documents.filter(d => d.status !== 'IN_TRANSIT' && d.status !== 'DONE').length}</p>
          </div>
       </div>
@@ -101,14 +101,14 @@ export default function CourierDashboard({ user }: { user: UserType }) {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-6">
            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin shadow-xl"></div>
-           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ma'lumotlar yuklanmoqda...</p>
+           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Ma\'lumotlar yuklanmoqda')}...</p>
         </div>
       ) : documents.length === 0 ? (
         <div className="bg-white rounded-[40px] p-24 text-center border border-slate-100 shadow-sm flex flex-col items-center gap-4">
            <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center text-slate-200">
               <Package className="w-10 h-10" />
            </div>
-           <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">Hozircha topshiriqlar yo'q</p>
+           <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">{t('Hozircha topshiriqlar yo\'q')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5">
@@ -168,8 +168,8 @@ export default function CourierDashboard({ user }: { user: UserType }) {
              >
                 <div className="p-10 space-y-10">
                    <div className="space-y-2">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Topshiriq ma'lumotlari</p>
-                      <h3 className="text-3xl font-black text-slate-900 text-center tracking-tight">{selectedDoc.number}</h3>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">{t('Topshiriq ma\'lumotlari')}</p>
+                       <h3 className="text-3xl font-black text-slate-900 text-center tracking-tight">{selectedDoc.number}</h3>
                    </div>
 
                    <div className="space-y-4">
@@ -178,7 +178,7 @@ export default function CourierDashboard({ user }: { user: UserType }) {
                             <MapPin className="w-6 h-6" />
                          </div>
                          <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Yetkazish manzili</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Yetkazish manzili')}</p>
                             <p className="text-sm font-black text-slate-900 leading-relaxed">{selectedDoc.to_entity_name}</p>
                          </div>
                       </div>
@@ -188,7 +188,7 @@ export default function CourierDashboard({ user }: { user: UserType }) {
                             <Clock className="w-6 h-6" />
                          </div>
                          <div className="flex-1 min-w-0">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Yaratilgan vaqt</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Yaratilgan vaqt')}</p>
                             <p className="text-sm font-black text-slate-900">{new Date(selectedDoc.created_at || '').toLocaleString(locale)}</p>
                          </div>
                       </div>
@@ -196,7 +196,7 @@ export default function CourierDashboard({ user }: { user: UserType }) {
 
                    <div className="border-t border-slate-100 pt-10">
                       <div className="flex items-center justify-between mb-6">
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hujjat holati</p>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Hujjat holati')}</p>
                          <span className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">{selectedDoc.status_label || selectedDoc.status}</span>
                       </div>
 
@@ -207,7 +207,7 @@ export default function CourierDashboard({ user }: { user: UserType }) {
                              className="w-full bg-blue-600 text-white p-7 rounded-[32px] font-black text-lg shadow-2xl shadow-blue-200 active:scale-95 transition-all flex items-center justify-center gap-4"
                            >
                               <Navigation className="w-7 h-7" />
-                              YUKNI QABUL QILISH
+                              {t('YUKNI QABUL QILISH')}
                            </button>
                          )}
                          {selectedDoc.status === 'IN_TRANSIT' && (
@@ -216,14 +216,14 @@ export default function CourierDashboard({ user }: { user: UserType }) {
                              className="w-full bg-emerald-500 text-white p-7 rounded-[32px] font-black text-lg shadow-2xl shadow-emerald-200 active:scale-95 transition-all flex items-center justify-center gap-4"
                            >
                               <CheckCircle2 className="w-7 h-7" />
-                              YETKAZILDI (YAKUNLASH)
+                              {t('YETKAZILDI (YAKUNLASH)')}
                            </button>
                          )}
                          <button 
                             onClick={() => setSelectedDoc(null)}
                             className="w-full py-6 bg-slate-50 text-slate-400 rounded-[28px] font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-100 transition-all font-mono"
                          >
-                            ORQAGA QAYTISH
+                            {t('ORQAGA QAYTISH')}
                          </button>
                       </div>
                    </div>

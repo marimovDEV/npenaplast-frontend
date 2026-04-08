@@ -9,6 +9,8 @@ import { User, Inventory, Client, Material } from '../types';
 import { uiStore } from '../lib/store';
 import { motion, AnimatePresence } from 'motion/react';
 import { format } from 'date-fns';
+import { useI18n } from '../i18n';
+
 
 const CATEGORIES = [
   { id: 'ALL', label: 'Barchasi' },
@@ -18,6 +20,7 @@ const CATEGORIES = [
 ];
 
 export default function Sklad4({ user }: { user: User }) {
+  const { t } = useI18n();
   const assignedWarehouses = (user.assignedWarehouses || user.assigned_warehouses || []).map(String);
   const [inventory, setInventory] = useState<Inventory[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -43,12 +46,30 @@ export default function Sklad4({ user }: { user: User }) {
       const [wRes, cRes, invRes, salesRes] = await Promise.all([
         api.get('warehouses/?name=Sklad №4'),
         api.get('clients/'),
-        api.get('inventory/?warehouse=3'), // Sklad 4 ID is 3
-        api.get('sales/invoices/') // We'll filter today's sales on frontend
+        api.get('stocks/', { params: { warehouse: 3 } }), // Sklad 4 ID is 3
+        api.get('sales/invoices/') 
       ]);
-
+      
       setClients(cRes.data);
-      setInventory(invRes.data);
+      
+      // Stock data mapping to Inventory interface
+      const mappedInventory = invRes.data.map((s: any) => ({
+        id: s.id,
+        product: s.material,
+        warehouse: s.warehouse,
+        quantity: s.quantity,
+        batch_number: t('Umumiy'),
+        supplier: 'N/A',
+        created_at: s.updated_at,
+        product_details: {
+          id: s.material,
+          name: s.material_name,
+          sku: '',
+          unit: s.material_unit || 'dona',
+          price: s.material_price || 0
+        }
+      }));
+      setInventory(mappedInventory);
       
       if (wRes.data.length > 0) {
         setWarehouseId(wRes.data[0].id);

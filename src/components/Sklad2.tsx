@@ -25,7 +25,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useI18n } from '../i18n';
 
 export default function Sklad2({ user }: { user: User }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const assignedWarehouses = (user.assignedWarehouses || user.assigned_warehouses || []).map(String);
   const [blocks, setBlocks] = useState<BlockProduction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,7 @@ export default function Sklad2({ user }: { user: User }) {
       setBlocks(res.data);
     } catch (err) {
       console.error("Failed to fetch blocks", err);
-      uiStore.showNotification("Ma'lumotlarni yuklashda xatolik", "error");
+      uiStore.showNotification(t("Ma'lumotlarni yuklashda xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -59,22 +59,22 @@ export default function Sklad2({ user }: { user: User }) {
       
       if (drying) {
         await api.post(`production/drying/${drying.id}/finish/`);
-        uiStore.showNotification("Quritish yakunlandi", "success");
+        uiStore.showNotification(t("Quritish yakunlandi"), "success");
         fetchData();
       }
     } catch (err) {
-      uiStore.showNotification("Xatolik yuz berdi", "error");
+      uiStore.showNotification(t("Xatolik yuz berdi"), "error");
     }
   };
 
   const handleTransferToCNC = async (id: number) => {
     try {
       await api.post(`production/blocks/${id}/transfer_to_cnc/`);
-      uiStore.showNotification("Blok CNC uchun rezerv qilindi", "success");
+      uiStore.showNotification(t("Blok CNC uchun rezerv qilindi"), "success");
       fetchData();
       setIsTransferModalOpen(false);
     } catch (err) {
-      uiStore.showNotification("Xatolik: " + (err as any).response?.data?.error || "Transfer amalga oshmadi", "error");
+      uiStore.showNotification(t("Xatolik") + ": " + ((err as any).response?.data?.error || t("Transfer amalga oshmadi")), "error");
     }
   };
 
@@ -98,8 +98,8 @@ export default function Sklad2({ user }: { user: User }) {
         <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mb-4">
           <X className="w-8 h-8 text-rose-500" />
         </div>
-        <h3 className="text-xl font-black text-slate-900 mb-1">Ruxsat yo'q</h3>
-        <p className="text-slate-400 text-sm font-medium">Sizga ushbu skladni boshqarish ruxsati berilmagan.</p>
+        <h3 className="text-xl font-black text-slate-900 mb-1">{t('Ruxsat yo\'q')}</h3>
+        <p className="text-slate-400 text-sm font-medium">{t('Sizga ushbu skladni boshqarish ruxsati berilmagan.')}</p>
       </div>
     );
   }
@@ -113,17 +113,17 @@ export default function Sklad2({ user }: { user: User }) {
             <div className="p-2 bg-blue-600 rounded-xl shadow-lg shadow-blue-200">
               <Layers className="w-6 h-6 text-white" />
             </div>
-            Sklad №2 (Bloklar)
+            {t('Sklad №2 (Bloklar)')}
           </h1>
-          <p className="text-slate-500 font-medium ml-12">Tayyor va quritilayotgan bloklar nazorati</p>
+          <p className="text-slate-500 font-medium ml-12">{t('Tayyor va quritilayotgan bloklar nazorati')}</p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 flex-1 max-w-4xl">
           {[
-            { label: 'Tayyor', value: kpis.totalReady, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', unit: 'dona' },
-            { label: 'Hajm', value: kpis.totalVolume.toFixed(1), icon: Maximize, color: 'text-blue-600', bg: 'bg-blue-50', unit: 'm³' },
-            { label: 'Quritilmoqda', value: kpis.inDrying, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', unit: 'dona' },
-            { label: 'Brak', value: kpis.defects, icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-50', unit: 'partiya' },
+            { label: t('Tayyor'), value: kpis.totalReady, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', unit: t('dona') },
+            { label: t('Hajm'), value: kpis.totalVolume.toFixed(1), icon: Maximize, color: 'text-blue-600', bg: 'bg-blue-50', unit: 'm³' },
+            { label: t('Quritilmoqda'), value: kpis.inDrying, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', unit: t('dona') },
+            { label: t('Brak'), value: kpis.defects, icon: AlertTriangle, color: 'text-rose-600', bg: 'bg-rose-50', unit: t('partiya') },
           ].map((kpi, i) => (
             <motion.div 
               key={i}
@@ -160,7 +160,7 @@ export default function Sklad2({ user }: { user: User }) {
                   : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              {tab === 'READY' ? 'Tayyor' : tab === 'DRYING' ? 'Quritishda' : 'Rezerv'}
+              {tab === 'READY' ? t('Tayyor') : tab === 'DRYING' ? t('Quritishda') : t('Rezerv')}
             </button>
           ))}
         </div>
@@ -169,7 +169,7 @@ export default function Sklad2({ user }: { user: User }) {
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
           <input 
             type="text" 
-            placeholder="Zames № yoki Form № bo'yicha qidirish..." 
+            placeholder={t('Zames № yoki Form № bo\'yicha qidirish') + "..."} 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-14 pr-6 py-4 bg-white border border-slate-200 rounded-[24px] outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-medium text-slate-700 shadow-sm"
@@ -192,12 +192,12 @@ export default function Sklad2({ user }: { user: User }) {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50">
-                  <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">Partiya / Zames</th>
-                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">O'lcham & Zichlik</th>
-                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">Hajm & Miqdor</th>
-                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">Sana</th>
-                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">Status</th>
-                  <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Amallar</th>
+                  <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('Partiya / Zames')}</th>
+                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('O\'lcham & Zichlik')}</th>
+                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('Hajm & Miqdor')}</th>
+                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('Sana')}</th>
+                  <th className="px-6 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('Status')}</th>
+                  <th className="px-8 py-6 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">{t('Amallar')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -216,8 +216,8 @@ export default function Sklad2({ user }: { user: User }) {
                           <Box className={`w-6 h-6 ${block.status === 'READY' ? 'text-emerald-600' : 'text-blue-600'}`} />
                         </div>
                         <div>
-                          <p className="text-sm font-black text-slate-900">Zames: {block.zames_number}</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase">Forma: {block.form_number}</p>
+                          <p className="text-sm font-black text-slate-900">{t('Zames')}: {block.zames_number}</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">{t('Forma')}: {block.form_number}</p>
                         </div>
                       </div>
                     </td>
@@ -235,7 +235,7 @@ export default function Sklad2({ user }: { user: User }) {
                     </td>
                     <td className="px-6 py-6">
                       <div className="space-y-0.5">
-                        <p className="text-sm font-black text-slate-900">{block.block_count} dona</p>
+                        <p className="text-sm font-black text-slate-900">{block.block_count} {t('dona')}</p>
                         <p className="text-[10px] font-bold text-blue-600 uppercase tracking-tighter">{block.volume.toFixed(2)} m³</p>
                       </div>
                     </td>
@@ -253,7 +253,7 @@ export default function Sklad2({ user }: { user: User }) {
                           ? 'bg-amber-50 text-amber-700 border-amber-100'
                           : 'bg-blue-50 text-blue-700 border-blue-100'
                       }`}>
-                        {block.status === 'READY' ? 'Tayyor' : block.status === 'DRYING' ? 'Quritishda' : 'Rezerv'}
+                        {block.status === 'READY' ? t('Tayyor') : block.status === 'DRYING' ? t('Quritishda') : t('Rezerv')}
                       </span>
                     </td>
                     <td className="px-8 py-6 text-right">
@@ -267,7 +267,7 @@ export default function Sklad2({ user }: { user: User }) {
                         >
                           <div className="flex items-center gap-2 px-2">
                              <Scissors className="w-4 h-4" />
-                             <span className="text-[11px] font-black uppercase tracking-widest">CNC ga</span>
+                             <span className="text-[11px] font-black uppercase tracking-widest">{t('CNC ga')}</span>
                           </div>
                         </button>
                       ) : block.status === 'DRYING' ? (
@@ -276,7 +276,7 @@ export default function Sklad2({ user }: { user: User }) {
                           className="px-5 py-3 bg-emerald-600 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all flex items-center gap-2 ml-auto"
                         >
                           <CheckCircle2 className="w-4 h-4" />
-                          Tugallash
+                          {t('Tugallash')}
                         </button>
                       ) : (
                         <div className="flex items-center justify-end gap-2 text-slate-400">
@@ -295,8 +295,8 @@ export default function Sklad2({ user }: { user: User }) {
               <Layers className="w-10 h-10 text-slate-200" />
             </div>
             <div className="text-center">
-              <h3 className="text-xl font-black text-slate-900">Bloklar topilmadi</h3>
-              <p className="text-slate-400 font-medium italic">Siz tanlagan kategoriyada hozircha ma'lumot yo'q</p>
+              <h3 className="text-xl font-black text-slate-900">{t('Bloklar topilmadi')}</h3>
+              <p className="text-slate-400 font-medium italic">{t("Siz tanlagan kategoriyada hozircha ma'lumot yo'q")}</p>
             </div>
           </div>
         )}
@@ -319,8 +319,8 @@ export default function Sklad2({ user }: { user: User }) {
                      <Scissors className="w-8 h-8 text-white" />
                    </div>
                    <div>
-                     <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">CNC ga O'tkazish</h3>
-                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest opacity-60">Blokni kesish bo'limiga yuborish</p>
+                     <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">{t("CNC ga O'tkazish")}</h3>
+                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest opacity-60">{t("Blokni kesish bo'limiga yuborish")}</p>
                    </div>
                 </div>
                 <button onClick={() => setIsTransferModalOpen(false)} className="p-3 bg-white text-slate-400 hover:text-slate-900 rounded-2xl transition-all shadow-sm border border-slate-100 hover:border-slate-200">
@@ -331,16 +331,16 @@ export default function Sklad2({ user }: { user: User }) {
               <div className="p-10 space-y-8">
                 <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-200/50 space-y-4">
                    <div className="flex justify-between items-center px-2">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Partiya</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Partiya')}</span>
                       <span className="text-sm font-black text-slate-900">{selectedBlock.zames_number}</span>
                    </div>
                    <div className="grid grid-cols-2 gap-4">
                       <div className="bg-white p-4 rounded-2xl border border-slate-100">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Miqdor</p>
-                        <p className="text-lg font-black text-blue-600">{selectedBlock.block_count} dona</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Miqdor')}</p>
+                        <p className="text-lg font-black text-blue-600">{selectedBlock.block_count} {t('dona')}</p>
                       </div>
                       <div className="bg-white p-4 rounded-2xl border border-slate-100">
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Hajm</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Hajm')}</p>
                         <p className="text-lg font-black text-indigo-600">{selectedBlock.volume.toFixed(2)} m³</p>
                       </div>
                    </div>
@@ -350,25 +350,25 @@ export default function Sklad2({ user }: { user: User }) {
                    <div className="flex items-start gap-4 p-5 bg-amber-50 rounded-[24px] border border-amber-100">
                       <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
                       <p className="text-xs font-bold text-amber-900 leading-relaxed">
-                        Diqqat! Blok CNC ga o'tkazilganda, u boshqa sotuvlar yoki transferlar uchun 
-                        <span className="font-black underline mx-1">RESERV</span> holatiga o'tadi.
+                        {t('Diqqat! Blok CNC ga o\'tkazilganda, u boshqa sotuvlar yoki transferlar uchun')} 
+                        <span className="font-black underline mx-1">{t('RESERV')}</span> {t('holatiga o\'tadi.')}
                       </p>
                    </div>
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <button 
+                   <button 
                     onClick={() => setIsTransferModalOpen(false)}
                     className="flex-1 px-8 py-5 border-2 border-slate-100 text-slate-500 rounded-[28px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all text-xs"
                   >
-                    Bekor qilish
+                    {t('Bekor qilish')}
                   </button>
                   <button 
                     onClick={() => handleTransferToCNC(selectedBlock.id)}
                     className="flex-[1.5] px-8 py-5 bg-blue-600 text-white rounded-[28px] font-black uppercase tracking-widest hover:bg-blue-700 shadow-2xl shadow-blue-200 active:scale-95 transition-all text-xs group"
                   >
                     <div className="flex items-center justify-center gap-3">
-                      <span>Tasdiqlash</span>
+                      <span>{t('Tasdiqlash')}</span>
                       <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     </div>
                   </button>

@@ -33,7 +33,7 @@ import { useI18n } from '../i18n';
 type ViewMode = 'KANBAN' | 'LIST';
 
 export default function Sales({ user }: { user: User }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [viewMode, setViewMode] = useState<ViewMode>(window.innerWidth < 768 ? 'LIST' : 'KANBAN');
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -83,7 +83,7 @@ export default function Sales({ user }: { user: User }) {
       }
     } catch (err) {
       console.error("Failed to fetch sales data", err);
-      uiStore.showNotification("Ma'lumotlarni yuklashda xatolik", "error");
+      uiStore.showNotification(t("Ma'lumotlarni yuklashda xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,7 @@ export default function Sales({ user }: { user: User }) {
 
   const handleCreateOrder = async () => {
     if (cartItems.length === 0) {
-      uiStore.showNotification("Savat bo'sh!", "error");
+      uiStore.showNotification(t("Savat bo'sh!"), "error");
       return;
     }
 
@@ -140,12 +140,12 @@ export default function Sales({ user }: { user: User }) {
         discount_amount: formData.discount
       });
 
-      uiStore.showNotification("Buyurtma muvaffaqiyatli yaratildi", "success");
+      uiStore.showNotification(t("Buyurtma muvaffaqiyatli yaratildi"), "success");
       setIsAddingOrder(false);
       resetForm();
       fetchData();
     } catch (err: any) {
-      const msg = err.response?.data?.error || "Xatolik yuz berdi";
+      const msg = t(err.response?.data?.error || "Xatolik yuz berdi");
       uiStore.showNotification(msg, "error");
     } finally {
       setLoading(false);
@@ -155,7 +155,7 @@ export default function Sales({ user }: { user: User }) {
   const handleStatusTransition = async (id: number, status: string) => {
     try {
       await api.post(`sales/invoices/${id}/transition-status/`, { status });
-      uiStore.showNotification(`Holat o'zgartirildi: ${status}`, "success");
+      uiStore.showNotification(t("Holat o'zgartirildi") + `: ${t(status)}`, "success");
       fetchData();
     } catch (err: any) {
       uiStore.showNotification(err.response?.data?.error || "Xatolik", "error");
@@ -177,7 +177,7 @@ export default function Sales({ user }: { user: User }) {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      uiStore.showNotification("Sotuv exportida xatolik", "error");
+      uiStore.showNotification(t("Sotuv exportida xatolik"), "error");
     }
   };
 
@@ -221,14 +221,14 @@ export default function Sales({ user }: { user: User }) {
   const totalCartAmount = cartItems.reduce((sum, item) => sum + item.total, 0) - formData.discount;
 
   const columns = [
-    { id: 'NEW', name: 'Yangi', color: 'blue', icon: Clock },
-    { id: 'CONFIRMED', name: 'Tasdiqlangan', color: 'amber', icon: CheckCircle2 },
-    { id: 'IN_PRODUCTION', name: 'Ishlab chiq.', color: 'orange', icon: Activity },
-    { id: 'READY', name: 'Tayyor', color: 'emerald', icon: CheckCircle2 },
-    { id: 'SHIPPED', name: 'Jo\'natilgan', color: 'indigo', icon: Truck },
-    { id: 'EN_ROUTE', name: 'Yo\'lda', color: 'purple', icon: Truck },
-    { id: 'DELIVERED', name: 'Yetkazildi', color: 'teal', icon: CheckCircle2 },
-    { id: 'COMPLETED', name: 'Yakunlangan', color: 'emerald', icon: DollarSign },
+    { id: 'NEW', name: t('Yangi'), color: 'blue', icon: Clock },
+    { id: 'CONFIRMED', name: t('Tasdiqlangan'), color: 'amber', icon: CheckCircle2 },
+    { id: 'IN_PRODUCTION', name: t('Ishlab chiq.'), color: 'orange', icon: Activity },
+    { id: 'READY', name: t('Tayyor'), color: 'emerald', icon: CheckCircle2 },
+    { id: 'SHIPPED', name: t('Jo\'natilgan'), color: 'indigo', icon: Truck },
+    { id: 'EN_ROUTE', name: t('Yo\'lda'), color: 'purple', icon: Truck },
+    { id: 'DELIVERED', name: t('Yetkazildi'), color: 'teal', icon: CheckCircle2 },
+    { id: 'COMPLETED', name: t('Yakunlangan'), color: 'emerald', icon: DollarSign },
   ];
 
   return (
@@ -240,10 +240,10 @@ export default function Sales({ user }: { user: User }) {
             <Target className="w-6 h-6 md:w-8 md:h-8 text-white" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-xl md:text-4xl font-black text-slate-900 tracking-tight truncate">Savdo & CRM</h1>
+            <h1 className="text-xl md:text-4xl font-black text-slate-900 tracking-tight truncate">{t('Savdo & CRM')}</h1>
             <p className="text-slate-500 text-[10px] md:text-sm font-medium flex items-center gap-2 truncate">
               <Users className="w-3.5 h-3.5 text-blue-500" />
-              Savdo voronkasi va mijozlar nazorati
+              {t('Savdo voronkasi va mijozlar nazorati')}
             </p>
           </div>
         </div>
@@ -275,8 +275,8 @@ export default function Sales({ user }: { user: User }) {
             className="flex w-full md:w-auto items-center justify-center gap-2 md:gap-3 bg-slate-900 text-white px-5 md:px-10 py-3 md:py-4.5 rounded-2xl md:rounded-[26px] font-black text-[11px] md:text-[12px] uppercase tracking-widest hover:bg-black shadow-2xl shadow-slate-200 active:scale-95 transition-all touch-target"
           >
             <Plus className="w-5 h-5" />
-            <span className="hidden sm:inline">Yangi Buyurtma</span>
-            <span className="sm:hidden">Buyurtma</span>
+            <span className="hidden sm:inline">{t('Yangi Buyurtma')}</span>
+            <span className="sm:hidden">{t('Buyurtma')}</span>
           </button>
         </div>
       </div>
@@ -284,10 +284,10 @@ export default function Sales({ user }: { user: User }) {
       {/* KPI Section */}
       <div className="grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
         {[
-          { label: 'Bugungi Savdo', value: kpi ? new Intl.NumberFormat(locale).format(kpi.today_sum) + ' UZS' : '...', icon: TrendingUp, color: 'blue' },
-          { label: 'Aktiv Buyurtmalar', value: kpi ? kpi.active_orders : '...', icon: Target, color: 'emerald' },
-          { label: 'Oylik Reja', value: kpi ? `${kpi.monthly_progress}%` : '...', icon: Activity, color: 'amber' },
-          { label: 'Konversiya', value: kpi ? `${kpi.conversion_rate}%` : '...', icon: Users, color: 'indigo' },
+          { label: t('Bugungi Savdo'), value: kpi ? new Intl.NumberFormat(locale).format(kpi.today_sum) + ' UZS' : '...', icon: TrendingUp, color: 'blue' },
+          { label: t('Aktiv Buyurtmalar'), value: kpi ? kpi.active_orders : '...', icon: Target, color: 'emerald' },
+          { label: t('Oylik Reja'), value: kpi ? `${kpi.monthly_progress}%` : '...', icon: Activity, color: 'amber' },
+          { label: t('Konversiya'), value: kpi ? `${kpi.conversion_rate}%` : '...', icon: Users, color: 'indigo' },
         ].map((kpiItem, i) => (
           <div key={i} className="card-responsive p-5 md:p-8 flex items-center gap-4 md:gap-6 hover:shadow-lg transition-all">
             <div className={`w-10 h-10 md:w-14 md:h-14 bg-${kpiItem.color}-50 rounded-xl md:rounded-2xl flex items-center justify-center text-${kpiItem.color}-600 shrink-0`}>
@@ -307,13 +307,13 @@ export default function Sales({ user }: { user: User }) {
            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center">
               <Filter className="w-5 h-5 text-slate-400" />
            </div>
-           <h3 className="text-lg font-black text-slate-900 tracking-tight">Savdo Voronkasi</h3>
+           <h3 className="text-lg font-black text-slate-900 tracking-tight">{t('Savdo Voronkasi')}</h3>
         </div>
         <div className="relative w-full sm:w-80 group">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-all" />
           <input 
             type="text" 
-            placeholder="Buyurtmalarni qidirish..." 
+            placeholder={t("Buyurtmalarni qidirish") + "..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-transparent rounded-[20px] outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all text-sm font-bold" 
@@ -359,12 +359,12 @@ export default function Sales({ user }: { user: User }) {
                           </div>
                         ))}
                       </div>
-                      <span className="text-[9px] font-bold text-slate-400">{inv.items.length} turdagi tovarlar</span>
+                      <span className="text-[9px] font-bold text-slate-400">{inv.items.length} {t('turdagi tovarlar')}</span>
                     </div>
 
                     <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
                        <div>
-                          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Summa</p>
+                          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-0.5">{t('Summa')}</p>
                           <p className="font-black text-slate-900">{inv.total_amount.toLocaleString()} <span className="text-[8px] text-slate-300">UZS</span></p>
                        </div>
                        
@@ -391,11 +391,11 @@ export default function Sales({ user }: { user: User }) {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50">
-                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Ma'lumot</th>
-                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Mijoz</th>
-                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Summa</th>
-                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Holati</th>
-                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amallar</th>
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Ma\'lumot')}</th>
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Mijoz')}</th>
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Summa')}</th>
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Holati')}</th>
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('Amallar')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -450,13 +450,13 @@ export default function Sales({ user }: { user: User }) {
                       <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{inv.payment_method_display}</span>
                       <div className="flex gap-2">
                         {inv.status === 'NEW' && (
-                          <button onClick={() => handleStatusTransition(inv.id, 'CONFIRMED')} className="touch-target px-4 bg-amber-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-amber-100">Tasdiq</button>
+                          <button onClick={() => handleStatusTransition(inv.id, 'CONFIRMED')} className="touch-target px-4 bg-amber-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-amber-100">{t('Tasdiq')}</button>
                         )}
                         {inv.status === 'CONFIRMED' && (
-                          <button onClick={() => handleStatusTransition(inv.id, 'SHIPPED')} className="touch-target px-4 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100">Jo'natish</button>
+                          <button onClick={() => handleStatusTransition(inv.id, 'SHIPPED')} className="touch-target px-4 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-indigo-100">{t('Jo\'natish')}</button>
                         )}
                         {inv.status === 'SHIPPED' && (
-                          <button onClick={() => handleStatusTransition(inv.id, 'COMPLETED')} className="touch-target px-4 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100">Yakunlash</button>
+                          <button onClick={() => handleStatusTransition(inv.id, 'COMPLETED')} className="touch-target px-4 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-emerald-100">{t('Yakunlash')}</button>
                         )}
                       </div>
                     </div>
@@ -484,12 +484,12 @@ export default function Sales({ user }: { user: User }) {
                     <ShoppingCart className="text-white w-7 h-7" />
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Buyurtma Ustasi</h2>
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t('Buyurtma Ustasi')}</h2>
                     <div className="flex items-center gap-3 mt-1">
                        {[1, 2, 3].map((s) => (
                          <div key={s} className={`h-1.5 w-12 rounded-full transition-all duration-500 ${step >= s ? 'bg-blue-600' : 'bg-slate-200'}`} />
                        ))}
-                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Qadam {step} / 3</span>
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">{t('Qadam')} {step} / 3</span>
                     </div>
                   </div>
                 </div>
@@ -502,18 +502,18 @@ export default function Sales({ user }: { user: User }) {
                   {step === 1 && (
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
                        <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mijozni tanlang</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Mijozni tanlang')}</label>
                           <select 
                             className="w-full px-7 py-5 bg-white border border-slate-200 rounded-[24px] outline-none focus:border-blue-500 font-bold text-base shadow-sm transition-all"
                             value={formData.customerId}
                             onChange={(e) => setFormData({...formData, customerId: e.target.value})}
                           >
-                            <option value="">Mijozni tanlang...</option>
+                            <option value="">{t('Mijozni tanlang')}...</option>
                             {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                           </select>
                        </div>
                        <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">To'lov usuli</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('To\'lov usuli')}</label>
                           <div className="grid grid-cols-2 gap-3">
                              {['CASH', 'BANK', 'CARD', 'DEBT'].map((m) => (
                                <button 
@@ -521,18 +521,17 @@ export default function Sales({ user }: { user: User }) {
                                  onClick={() => setFormData({...formData, paymentMethod: m})}
                                  className={`p-4 rounded-2xl border font-black text-[10px] uppercase tracking-widest transition-all ${formData.paymentMethod === m ? 'bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-200' : 'bg-white text-slate-500 border-slate-100 hover:border-blue-200'}`}
                                >
-                                 {m === 'CASH' ? 'Naqd' : m === 'BANK' ? 'Perezich' : m === 'CARD' ? 'Karta' : 'Qarz'}
+                                 {m === 'CASH' ? t('Naqd') : m === 'BANK' ? t('Perezich') : m === 'CARD' ? t('Karta') : t('Qarz')}
                                </button>
                              ))}
                           </div>
                        </div>
                     </motion.div>
                   )}
-
                   {step === 2 && (
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
                        <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mahsulot qidirish</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Mahsulot qidirish')}</label>
                           <div className="relative">
                             <QrCode className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500" />
                             <select 
@@ -543,7 +542,7 @@ export default function Sales({ user }: { user: User }) {
                                 setCurrentItem({...currentItem, productId: e.target.value, price: p?.price || 0});
                               }}
                             >
-                              <option value="">Mahsulotni tanlang...</option>
+                              <option value="">{t('Mahsulotni tanlang')}...</option>
                               {products.filter(p => !p.type?.includes('RAW')).map(p => (
                                 <option key={p.id} value={p.id}>{p.name}</option>
                               ))}
@@ -552,7 +551,7 @@ export default function Sales({ user }: { user: User }) {
                        </div>
                        <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-4">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Miqdor</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Miqdor')}</label>
                             <input 
                               type="number" 
                               className="w-full px-7 py-5 bg-white border border-slate-200 rounded-[24px] outline-none focus:border-blue-500 font-bold text-base shadow-sm"
@@ -561,7 +560,7 @@ export default function Sales({ user }: { user: User }) {
                             />
                           </div>
                           <div className="space-y-4">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Narxi</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Narxi')}</label>
                             <input 
                               type="number" 
                               className="w-full px-7 py-5 bg-white border border-slate-200 rounded-[24px] outline-none focus:border-blue-500 font-bold text-base shadow-sm"
@@ -575,7 +574,7 @@ export default function Sales({ user }: { user: User }) {
                         disabled={!currentItem.productId}
                         className="w-full py-5 bg-slate-900 text-white rounded-[24px] font-black text-[11px] uppercase tracking-widest hover:bg-black transition-all shadow-xl disabled:opacity-50"
                        >
-                         Savatga qo'shish &rarr;
+                         {t('Savatga qo\'shish')} &rarr;
                        </button>
                     </motion.div>
                   )}
@@ -583,7 +582,7 @@ export default function Sales({ user }: { user: User }) {
                   {step === 3 && (
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
                        <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Chegirma (UZS)</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Chegirma')} (UZS)</label>
                           <input 
                             type="number" 
                             className="w-full px-7 py-5 bg-white border border-slate-200 rounded-[24px] outline-none focus:border-rose-500 font-black text-xl text-rose-600 shadow-sm"
@@ -592,11 +591,11 @@ export default function Sales({ user }: { user: User }) {
                           />
                        </div>
                        <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Izoh</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Izoh')}</label>
                           <textarea 
                             rows={4}
                             className="w-full px-7 py-5 bg-white border border-slate-200 rounded-[24px] outline-none focus:border-blue-500 font-bold text-sm shadow-sm"
-                            placeholder="Ixtiyoriy izohlar..."
+                            placeholder={t("Ixtiyoriy izohlar") + "..."}
                             value={formData.notes}
                             onChange={(e) => setFormData({...formData, notes: e.target.value})}
                           />
@@ -616,7 +615,7 @@ export default function Sales({ user }: { user: User }) {
                               </div>
                               <div>
                                  <p className="text-base font-black text-slate-900 leading-tight mb-1">{item.name}</p>
-                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.quantity} dona x {item.price.toLocaleString()} UZS</p>
+                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.quantity} {t('dona')} x {item.price.toLocaleString()} UZS</p>
                               </div>
                            </div>
                            <div className="flex items-center gap-10">
@@ -631,17 +630,17 @@ export default function Sales({ user }: { user: User }) {
 
                    <div className="pt-6 md:pt-10 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-end">
                       <div className="space-y-2">
-                         <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Umumiy Summa</span>
+                         <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('Umumiy Summa')}</span>
                          <h3 className="text-4xl font-black text-slate-900 tracking-tighter">
                             {totalCartAmount.toLocaleString()} <span className="text-xs text-slate-300 uppercase tracking-widest font-bold">UZS</span>
                          </h3>
-                         {formData.discount > 0 && <p className="text-rose-500 text-[10px] font-black uppercase tracking-widest">Chegirma: -{formData.discount.toLocaleString()}</p>}
+                         {formData.discount > 0 && <p className="text-rose-500 text-[10px] font-black uppercase tracking-widest">{t('Chegirma')}: -{formData.discount.toLocaleString()}</p>}
                       </div>
                       <div className="flex gap-4">
                          {step > 1 && (
                            <button onClick={() => setStep(step - 1)} className="flex-1 py-5 bg-white border border-slate-200 text-slate-600 rounded-[28px] font-black uppercase text-[11px] tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-3">
                               <ArrowLeft className="w-4 h-4" />
-                              Orqaga
+                              {t('Orqaga')}
                            </button>
                          )}
                          <button 
@@ -649,7 +648,7 @@ export default function Sales({ user }: { user: User }) {
                            disabled={step === 1 && !formData.customerId}
                            className="flex-[2] py-5 bg-blue-600 text-white rounded-[28px] font-black uppercase text-[11px] tracking-widest shadow-2xl shadow-blue-100 hover:bg-blue-700 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                          >
-                            {step === 3 ? 'Tasdiqlash' : 'Keyingi'}
+                            {step === 3 ? t('Tasdiqlash') : t('Keyingi')}
                             <ArrowRight className="w-4 h-4" />
                          </button>
                       </div>

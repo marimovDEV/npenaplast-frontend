@@ -134,14 +134,14 @@ export default function Production({ user }: { user: User }) {
         quantity: Number(orderQuantity),
         deadline: orderDeadline || null
       });
-      uiStore.showNotification("Ishlab chiqarish buyurtmasi yaratildi", "success");
+      uiStore.showNotification(t("Ishlab chiqarish buyurtmasi yaratildi"), "success");
       fetchProductionData();
       setIsOrderModalOpen(false);
       setSelectedProductId('');
       setOrderQuantity('');
       setOrderDeadline('');
     } catch (err) {
-      uiStore.showNotification("Xatolik", "error");
+      uiStore.showNotification(t("Xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -153,11 +153,11 @@ export default function Production({ user }: { user: User }) {
         stage_id: stageId,
         extra_data: extraData
       });
-      uiStore.showNotification("Bosqich boshlandi", "success");
+      uiStore.showNotification(t("Bosqich boshlandi"), "success");
       fetchProductionData();
       setIsStageBunkerModalOpen(null);
     } catch (err: any) {
-      uiStore.showNotification(err.response?.data?.error || "Xatolik", "error");
+      uiStore.showNotification(t(err.response?.data?.error || "Xatolik"), "error");
     }
   };
 
@@ -166,10 +166,10 @@ export default function Production({ user }: { user: User }) {
       await api.post(`production/orders/${orderId}/transition/`, {
         stage_id: stageId
       });
-      uiStore.showNotification("Bosqich yakunlandi", "success");
+      uiStore.showNotification(t("Bosqich yakunlandi"), "success");
       fetchProductionData();
     } catch (err: any) {
-      uiStore.showNotification(err.response?.data?.error || "Xatolik", "error");
+      uiStore.showNotification(t(err.response?.data?.error || "Xatolik"), "error");
     }
   };
 
@@ -180,12 +180,12 @@ export default function Production({ user }: { user: User }) {
         stage_id: isFailModalOpen.stageId,
         reason: failReason
       });
-      uiStore.showNotification("Xatolik qayd etildi", "info");
+      uiStore.showNotification(t("Xatolik qayd etildi"), "info");
       fetchProductionData();
       setIsFailModalOpen(null);
       setFailReason('');
     } catch (err: any) {
-      uiStore.showNotification(err.response?.data?.error || "Xatolik", "error");
+      uiStore.showNotification(t(err.response?.data?.error || "Xatolik"), "error");
     }
   };
 
@@ -193,10 +193,10 @@ export default function Production({ user }: { user: User }) {
     if (!window.confirm(t("Bunkerni majburiy bo'shatishni xohlaysizmi?"))) return;
     try {
       await api.post(`production/bunkers/${bunkerId}/force-release/`);
-      uiStore.showNotification("Bunker bo'shatildi", "success");
+      uiStore.showNotification(t("Bunker bo'shatildi"), "success");
       fetchProductionData();
     } catch (err: any) {
-      uiStore.showNotification(err.response?.data?.error || "Xatolik", "error");
+      uiStore.showNotification(t(err.response?.data?.error || "Xatolik"), "error");
     }
   };
 
@@ -208,10 +208,10 @@ export default function Production({ user }: { user: User }) {
         stage_id: stageId,
         reason: reason
       });
-      uiStore.showNotification("Bosqich majburiy yakunlandi", "success");
+      uiStore.showNotification(t("Bosqich majburiy yakunlandi"), "success");
       fetchProductionData();
     } catch (err: any) {
-      uiStore.showNotification(err.response?.data?.error || "Xatolik", "error");
+      uiStore.showNotification(t(err.response?.data?.error || "Xatolik"), "error");
     }
   };
 
@@ -223,10 +223,10 @@ export default function Production({ user }: { user: User }) {
         stage_id: stageId,
         reason: reason
       });
-      uiStore.showNotification("Bosqich qayta tiklandi", "info");
+      uiStore.showNotification(t("Bosqich qayta tiklandi"), "info");
       fetchProductionData();
     } catch (err: any) {
-      uiStore.showNotification(err.response?.data?.error || "Xatolik", "error");
+      uiStore.showNotification(t(err.response?.data?.error || "Xatolik"), "error");
     }
   };
 
@@ -254,7 +254,7 @@ export default function Production({ user }: { user: User }) {
         height: Number(blockHeight),
         density: Number(blockDensity)
       });
-      uiStore.showNotification("Blok quyish qayd etildi", "success");
+      uiStore.showNotification(t("Blok quyish qayd etildi"), "success");
       fetchProductionData();
       setIsBlockModalOpen(false);
       // Reset form
@@ -263,7 +263,7 @@ export default function Production({ user }: { user: User }) {
       setBlockDensity('');
       setSelectedZamesForBlock('');
     } catch (err) {
-      uiStore.showNotification("Xatolik: " + (err as any).response?.data?.error || "Qayd etib bo'lmadi", "error");
+      uiStore.showNotification(t("Xatolik") + ": " + ((err as any).response?.data?.error || t("Qayd etib bo'lmadi")), "error");
     } finally {
       setLoading(false);
     }
@@ -272,7 +272,7 @@ export default function Production({ user }: { user: User }) {
   const handleCreateZames = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRecipeId) {
-      uiStore.showNotification("Retseptni tanlang", "error");
+      uiStore.showNotification(t("Retseptni tanlang"), "error");
       return;
     }
 
@@ -288,13 +288,13 @@ export default function Production({ user }: { user: User }) {
           quantity: item.quantity
         }))
       });
-      uiStore.showNotification("Zames yaratildi", "success");
+      uiStore.showNotification(t("Zames yaratildi"), "success");
       fetchProductionData();
       setIsZamesModalOpen(false);
       setSelectedRecipeId('');
       setZamesBatchItems([]);
     } catch (err) {
-      uiStore.showNotification("Zames yaratishda xatolik", "error");
+      uiStore.showNotification(t("Zames yaratishda xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -303,10 +303,10 @@ export default function Production({ user }: { user: User }) {
   const handleStartZames = async (id: number) => {
     try {
       await api.post(`production/zames/${id}/start/`);
-      uiStore.showNotification("Zames boshlandi", "success");
+      uiStore.showNotification(t("Zames boshlandi"), "success");
       fetchProductionData();
     } catch (err) {
-      uiStore.showNotification("Xatolik", "error");
+      uiStore.showNotification(t("Xatolik"), "error");
     }
   };
 
@@ -319,12 +319,12 @@ export default function Production({ user }: { user: User }) {
       await api.post(`production/zames/${isFinishModalOpen.id}/finish/`, {
         output_weight: Number(outputWeight)
       });
-      uiStore.showNotification("Zames yakunlandi", "success");
+      uiStore.showNotification(t("Zames yakunlandi"), "success");
       fetchProductionData();
       setIsFinishModalOpen(null);
       setOutputWeight('');
     } catch (err) {
-      uiStore.showNotification("Xatolik", "error");
+      uiStore.showNotification(t("Xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -340,27 +340,27 @@ export default function Production({ user }: { user: User }) {
         bunker: Number(selectedBunkerId),
         required_time: 120 // Example 2 hours
       });
-      uiStore.showNotification("Bunkerga joylandi", "success");
+      uiStore.showNotification(t("Bunkerga joylandi"), "success");
       fetchProductionData();
       setIsBunkerModalOpen(false);
       setSelectedZamesId('');
       setSelectedBunkerId('');
     } catch (err) {
-      uiStore.showNotification("Bunkerga joylab bo'lmadi", "error");
+      uiStore.showNotification(t("Bunkerga joylab bo'lmadi"), "error");
     } finally {
       setLoading(false);
     }
   };
 
   const tabs = [
-    { id: 'zames', name: 'Zames Jurnali' },
-    { id: 'bunker', name: 'Bunkerlar' },
-    { id: 'formovka', name: 'Blok Formovka' },
-    { id: 'orders', name: 'Buyurtmalar (MTO)' },
+    { id: 'zames', name: t('Zames Jurnali') },
+    { id: 'bunker', name: t('Bunkerlar') },
+    { id: 'formovka', name: t('Blok Formovka') },
+    { id: 'orders', name: t('Buyurtmalar (MTO)') },
   ];
 
   if (currentRole === 'Bosh Admin' || currentRole === 'Admin' || currentRole === 'Ishlab chiqarish ustasi') {
-    tabs.push({ id: 'monitoring', name: '📊 Monitoring' });
+    tabs.push({ id: 'monitoring', name: t('Monitoring') });
   }
 
   const availableZames = zamesy.filter(z => z.status === 'DONE' && !bunkers.some(b => b.batchNumber === `EXP-${z.zames_number}`));
@@ -387,15 +387,15 @@ export default function Production({ user }: { user: User }) {
           <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex justify-between items-end">
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Zameslar Jurnali</h3>
-                <p className="text-slate-500 font-medium">Xom ashyoni ko'pirtirish va partiyalash jarayoni</p>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Zameslar Jurnali')}</h3>
+                <p className="text-slate-500 font-medium">{t('Xom ashyoni ko\'pirtirish va partiyalash jarayoni')}</p>
               </div>
               <button 
                 onClick={() => setIsZamesModalOpen(true)}
                 className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all group"
               >
                 <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-                <span>Yangi Zames Yaratish</span>
+                <span>{t('Yangi Zames Yaratish')}</span>
               </button>
             </div>
 
@@ -431,7 +431,7 @@ export default function Production({ user }: { user: User }) {
                             z.status === 'DONE' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
                             'bg-slate-100 text-slate-500 border-slate-200'}
                         `}>
-                          {z.status === 'PENDING' ? 'Kutilmoqda' : z.status === 'IN_PROGRESS' ? 'Jarayonda' : z.status === 'DONE' ? 'Tayyor' : 'Bekor qilingan'}
+                          {z.status === 'PENDING' ? t('Kutilmoqda') : z.status === 'IN_PROGRESS' ? t('Jarayonda') : z.status === 'DONE' ? t('Tayyor') : t('Bekor qilingan')}
                         </span>
                         {z.start_time && (
                           <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
@@ -445,19 +445,19 @@ export default function Production({ user }: { user: User }) {
                     <div className="space-y-4 mb-8">
                       <div>
                         <h4 className="text-xl font-black text-slate-900 leading-tight mb-1">{z.zames_number}</h4>
-                        <p className="text-sm font-bold text-blue-600">Retsept: {z.recipe_name}</p>
+                        <p className="text-sm font-bold text-blue-600">{t('Retsept')}: {z.recipe_name}</p>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Kirish (Kg)</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Kirish')} (Kg)</p>
                           <div className="flex items-center gap-2">
                             <Weight className="w-4 h-4 text-slate-400" />
                             <span className="text-sm font-black text-slate-900">{z.input_weight}</span>
                           </div>
                         </div>
                         <div className="p-3 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
-                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Chiqish (Kg)</p>
+                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">{t('Chiqish')} (Kg)</p>
                           <div className="flex items-center gap-2">
                             <RotateCcw className="w-4 h-4 text-emerald-500" />
                             <span className="text-sm font-black text-emerald-900">{z.output_weight || '—'}</span>
@@ -467,7 +467,7 @@ export default function Production({ user }: { user: User }) {
 
                       <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         <UserIcon className="w-3 h-3" />
-                        <span>Operator: {z.operator_name}</span>
+                        <span>{t('Operator')}: {z.operator_name}</span>
                       </div>
                     </div>
 
@@ -478,7 +478,7 @@ export default function Production({ user }: { user: User }) {
                           className="flex-1 bg-blue-600 text-white py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
                           <Play className="w-4 h-4 fill-current" />
-                          Boshlash
+                          {t('Boshlash')}
                         </button>
                       )}
                       {z.status === 'IN_PROGRESS' && (
@@ -487,13 +487,13 @@ export default function Production({ user }: { user: User }) {
                           className="flex-1 bg-emerald-500 text-white py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
                           <CheckCircle2 className="w-4 h-4" />
-                          Yakunlash
+                          {t('Yakunlash')}
                         </button>
                       )}
                       {z.status === 'DONE' && (
                         <div className="flex-1 py-3.5 rounded-2xl bg-emerald-50 text-emerald-600 font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 border border-emerald-100 cursor-default">
                           <CheckCircle2 className="w-4 h-4" />
-                          Yakunlangan
+                          {t('Yakunlangan')}
                         </div>
                       )}
                     </div>
@@ -519,15 +519,15 @@ export default function Production({ user }: { user: User }) {
           <div className="space-y-6">
             <div className="flex justify-between items-center mb-2">
               <div>
-                <h3 className="text-xl font-bold text-slate-900 tracking-tight">Bunkerlar Holati</h3>
-                <p className="text-slate-500 text-sm">Zameslarni bunkerlarda yetiltirish</p>
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight">{t('Bunkerlar Holati')}</h3>
+                <p className="text-slate-500 text-sm">{t('Zameslarni bunkerlarda yetiltirish')}</p>
               </div>
               <button 
                 onClick={() => setIsBunkerModalOpen(true)}
                 className="bg-blue-50 text-blue-600 px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-blue-100 hover:bg-blue-100 transition-all font-bold"
               >
                 <Plus className="w-5 h-5" />
-                <span>Bunkerga joylash</span>
+                <span>{t('Bunkerga joylash')}</span>
               </button>
             </div>
             
@@ -543,25 +543,25 @@ export default function Production({ user }: { user: User }) {
                       b.status === 'Aging' ? 'bg-amber-50 text-amber-600 border-amber-100 animate-pulse' : 
                       'bg-slate-50 text-slate-400 border-slate-100'
                     }`}>
-                      {b.status === 'Empty' ? 'Bo\'sh' : b.status === 'Aging' ? 'Yetilmoqda' : 'Tayyor'}
+                      {b.status === 'Empty' ? t('Bo\'sh') : b.status === 'Aging' ? t('Yetilmoqda') : t('Tayyor')}
                     </span>
                   </div>
-                  <h4 className="text-lg font-black text-slate-900 mb-1 tracking-tight">Bunker №{b.bunkerNumber}</h4>
+                  <h4 className="text-lg font-black text-slate-900 mb-1 tracking-tight">{t('Bunker')} №{b.bunkerNumber}</h4>
                   <div className="flex flex-col gap-1.5 mb-6 min-h-[48px]">
                     {b.batchNumber ? (
                       <>
-                        <p className="text-xs text-slate-500 font-bold">Partiya: <span className="text-blue-600 font-black tracking-wider">{b.batchNumber}</span></p>
+                        <p className="text-xs text-slate-500 font-bold">{t('Partiya')}: <span className="text-blue-600 font-black tracking-wider">{b.batchNumber}</span></p>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{b.loadedAt ? new Date(b.loadedAt).toLocaleTimeString() : ''}</p>
                       </>
                     ) : (
-                      <p className="text-xs text-slate-400 italic font-medium mt-1">Joylash uchun tayyor</p>
+                      <p className="text-xs text-slate-400 italic font-medium mt-1">{t('Joylash uchun tayyor')}</p>
                     )}
                   </div>
                   
                   {b.status !== 'Empty' && (
                     <div className="space-y-2 mb-6">
                       <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        <span>Saqlash jarayoni</span>
+                        <span>{t('Saqlash jarayoni')}</span>
                         <span className={b.status === 'Ready' ? 'text-emerald-600' : 'text-amber-600'}>{b.status === 'Ready' ? '100%' : '45%'}</span>
                       </div>
                       <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
@@ -583,7 +583,7 @@ export default function Production({ user }: { user: User }) {
                       : 'bg-white border-slate-100 text-slate-300 cursor-not-allowed'
                     }`}
                   >
-                    Formovkaga yuborish
+                    {t('Formovkaga yuborish')}
                   </button>
 
                   {b.status !== 'Empty' && (
@@ -592,16 +592,16 @@ export default function Production({ user }: { user: User }) {
                         if (window.confirm(t("Bunkerni majburiy bo'shatmoqchimisiz?"))) {
                           try {
                             await api.post(`production/bunkers/${b.id}/force-release/`);
-                            uiStore.showNotification("Bunker bo'shatildi", "info");
+                            uiStore.showNotification(t("Bunker bo'shatildi"), "info");
                             fetchProductionData();
                           } catch (err) {
-                            uiStore.showNotification("Xatolik", "error");
+                            uiStore.showNotification(t("Xatolik"), "error");
                           }
                         }
                       }}
                       className="w-full mt-2 py-2 text-[9px] font-black uppercase text-red-500 hover:bg-red-50 rounded-xl transition-all"
                     >
-                      Reset (Majburiy Bo'shatish)
+                      {t('Reset (Majburiy Bo\'shatish)')}
                     </button>
                   )}
                 </div>
@@ -614,15 +614,15 @@ export default function Production({ user }: { user: User }) {
           <div className="space-y-6">
             <div className="flex justify-between items-end">
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Blok Formovka Jurnali</h3>
-                <p className="text-slate-500 font-medium">Bunkerlardan bloklar quyish jarayoni</p>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Blok Formovka Jurnali')}</h3>
+                <p className="text-slate-500 font-medium">{t('Bunkerlardan bloklar quyish jarayoni')}</p>
               </div>
               <button 
                 onClick={() => setIsBlockModalOpen(true)}
                 className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all group"
               >
                 <Plus className="w-5 h-5" />
-                <span>Blok Quyishni Qayd Etish</span>
+                <span>{t('Blok Quyishni Qayd Etish')}</span>
               </button>
             </div>
             
@@ -636,31 +636,31 @@ export default function Production({ user }: { user: User }) {
                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
                       b.status === 'DRYING' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
                     }`}>
-                      {b.status === 'DRYING' ? 'Quritilmoqda' : 'Sklad 2 da'}
+                      {b.status === 'DRYING' ? t('Quritilmoqda') : t('Sklad 2 da')}
                     </span>
                   </div>
                   
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-lg font-black text-slate-900 leading-none">Forma №: {b.form_number}</h4>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Zames: {b.zames_number}</p>
+                      <h4 className="text-lg font-black text-slate-900 leading-none">{t('Forma')} №: {b.form_number}</h4>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{t('Zames')}: {b.zames_number}</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-50">
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Miqdor</p>
-                        <p className="text-sm font-black text-slate-900">{b.block_count} dona</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Miqdor')}</p>
+                        <p className="text-sm font-black text-slate-900">{b.block_count} {t('dona')}</p>
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Hajm</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Hajm')}</p>
                         <p className="text-sm font-black text-slate-900">{b.volume.toFixed(2)} m³</p>
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Zichlik</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Zichlik')}</p>
                         <p className="text-sm font-black text-slate-900">{b.density} kg/m³</p>
                       </div>
                       <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sana</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Sana')}</p>
                         <p className="text-sm font-black text-slate-900">{new Date(b.date).toLocaleDateString()}</p>
                       </div>
                     </div>
@@ -671,7 +671,7 @@ export default function Production({ user }: { user: User }) {
               {blockProductions.length === 0 && (
                 <div className="col-span-full py-20 text-center text-slate-400 italic font-bold">
                   <Layers className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                  <p>Hozircha bloklar quyilmadi</p>
+                  <p>{t('Hozircha bloklar quyilmadi')}</p>
                 </div>
               )}
             </div>
@@ -682,8 +682,8 @@ export default function Production({ user }: { user: User }) {
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Ishlab Chiqarish Nazorati</h3>
-                <p className="text-slate-500 text-sm font-medium">Buyurtma-naryadlar va texnologik jarayon monitoringi</p>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Ishlab Chiqarish Nazorati')}</h3>
+                <p className="text-slate-500 text-sm font-medium">{t('Buyurtma-naryadlar va texnologik jarayon monitoringi')}</p>
               </div>
               <div className="flex items-center gap-4">
                  <button 
@@ -694,14 +694,14 @@ export default function Production({ user }: { user: User }) {
                       : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200 shadow-sm'
                   }`}
                 >
-                  {operatorMode ? '🏭 Operator Rejimi ON' : '⚙️ Grid Rejimi'}
+                  {operatorMode ? t('🏭 Operator Rejimi ON') : t('⚙️ Grid Rejimi')}
                 </button>
                 <button 
                   onClick={() => setIsOrderModalOpen(true)}
                   className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center gap-3 shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
                 >
                   <Plus className="w-4 h-4" />
-                  Yangi Buyurtma
+                  {t('Yangi Buyurtma')}
                 </button>
               </div>
             </div>
@@ -745,7 +745,7 @@ export default function Production({ user }: { user: User }) {
                             </div>
 
                             <div className="mb-10">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Vazifa holati</p>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{t('Vazifa holati')}</p>
                               <div className="flex items-center gap-4">
                                 <div className={`w-4 h-4 rounded-full ${activeStage ? 'bg-amber-500 animate-pulse' : 'bg-slate-200'}`} />
                                 <span className="text-lg font-black text-slate-900">{focusStage.status_display}</span>
@@ -766,7 +766,7 @@ export default function Production({ user }: { user: User }) {
                                       className="w-full py-6 bg-blue-600 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
                                    >
                                       <Play className="w-5 h-5 fill-current" />
-                                      Boshlash
+                                      {t('Boshlash')}
                                    </button>
                                 )}
 
@@ -777,7 +777,7 @@ export default function Production({ user }: { user: User }) {
                                         className="col-span-3 py-6 bg-emerald-500 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-emerald-100 hover:bg-emerald-600 active:scale-95 transition-all"
                                       >
                                         <CheckCircle2 className="w-5 h-5" />
-                                        Yakunlash
+                                        {t('Yakunlash')}
                                       </button>
                                       <button 
                                          onClick={() => setIsFailModalOpen({ orderId: order.id, stageId: focusStage.id })}
@@ -794,7 +794,7 @@ export default function Production({ user }: { user: User }) {
                                       className="w-full py-6 bg-amber-500 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-amber-100 hover:bg-amber-600 active:scale-95 transition-all"
                                    >
                                       <RotateCcw className="w-5 h-5" />
-                                      Qayta Boshlash
+                                      {t('Qayta Boshlash')}
                                    </button>
                                 )}
                              </div>
@@ -810,9 +810,9 @@ export default function Production({ user }: { user: User }) {
                 <div key={colStatus} className="flex flex-col gap-6">
                   <div className="flex items-center justify-between px-2">
                     <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                      {colStatus === 'PENDING' ? 'Kutilmoqda' : 
-                       colStatus === 'PLANNED' ? 'Rejalashtirilgan' : 
-                       colStatus === 'IN_PROGRESS' ? 'Jarayonda' : 'Tugallangan'}
+                      {colStatus === 'PENDING' ? t('Kutilmoqda') : 
+                       colStatus === 'PLANNED' ? t('Rejalashtirilgan') : 
+                       colStatus === 'IN_PROGRESS' ? t('Jarayonda') : t('Tugallangan')}
                     </h4>
                     <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-bold">
                       {productionOrders.filter(o => o.status === colStatus).length}
@@ -844,7 +844,7 @@ export default function Production({ user }: { user: User }) {
                           {order.product_name}
                         </h5>
                         <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-6">
-                          Hajm: {order.quantity} m³ / blok
+                          {t('Hajm')}: {order.quantity} m³ / {t('blok')}
                         </p>
 
                         {/* Pipeline Tracker */}
@@ -907,12 +907,12 @@ export default function Production({ user }: { user: User }) {
                                 {isLocked ? (
                                   <>
                                     <AlertTriangle className="w-3.5 h-3.5" />
-                                    {prevStage.stage_type_display} kutilmoqda
+                                    {prevStage.stage_type_display} {t('kutilmoqda')}
                                   </>
                                 ) : (
                                   <>
                                     <Play className="w-3.5 h-3.5 fill-current" />
-                                    {currentStage.stage_type_display}ni boshlash
+                                    {currentStage.stage_type_display}{t('ni boshlash')}
                                   </>
                                 )}
                               </button>
@@ -925,7 +925,7 @@ export default function Production({ user }: { user: User }) {
                                   className="col-span-3 py-4 bg-amber-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-amber-100 hover:bg-amber-600 transition-all active:scale-95"
                                 >
                                   <CheckCircle2 className="w-3.5 h-3.5" />
-                                  {currentStage.stage_type_display}ni yakunlash
+                                  {currentStage.stage_type_display}{t('ni yakunlash')}
                                 </button>
                                 <button 
                                   onClick={() => setIsFailModalOpen({ orderId: order.id, stageId: currentStage.id })}
@@ -942,7 +942,7 @@ export default function Production({ user }: { user: User }) {
                                 className="w-full py-4 bg-amber-100 text-amber-700 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-200 transition-all active:scale-95"
                               >
                                 <RotateCcw className="w-3.5 h-3.5" />
-                                Qayta urinib ko'rish
+                                {t('Qayta urinib ko\'rish')}
                               </button>
                             )
                           }
@@ -962,8 +962,8 @@ export default function Production({ user }: { user: User }) {
         <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-700">
           <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
             <div>
-              <h3 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Factory Live Monitoring</h3>
-              <p className="text-sm md:text-base text-slate-500 font-medium">Barcha aktiv ishlab chiqarish jarayonlari nazorati</p>
+              <h3 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t('Factory Live Monitoring')}</h3>
+              <p className="text-sm md:text-base text-slate-500 font-medium">{t('Barcha aktiv ishlab chiqarish jarayonlari nazorati')}</p>
             </div>
             <div className="flex gap-4">
               <div className="w-full md:w-auto px-4 py-3 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-center gap-3">
@@ -1010,17 +1010,17 @@ export default function Production({ user }: { user: User }) {
                           </span>
                         </div>
                         <p className="text-sm md:text-base text-slate-500 font-bold flex flex-wrap items-center gap-2">
-                           Joriy Bosqich: <span className="text-blue-600 font-black underline decoration-2 underline-offset-4">{activeStage.stage_type_display}</span>
+                           {t('Joriy Bosqich')}: <span className="text-blue-600 font-black underline decoration-2 underline-offset-4">{activeStage.stage_type_display}</span>
                         </p>
                       </div>
                     </div>
 
                     <div className="flex w-full flex-col gap-5 md:w-auto md:flex-row md:items-center md:gap-12">
                       <div className="text-left md:text-center">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Davomiyligi</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Davomiyligi')}</p>
                         <div className={`flex items-center gap-2 text-2xl md:text-3xl font-black ${isStuck ? 'text-red-600' : 'text-slate-900'}`}>
                            <Clock className="w-5 h-5 md:w-6 md:h-6" />
-                           <span>{durationHrs} soat+</span>
+                           <span>{durationHrs} {t('soat')}+</span>
                         </div>
                       </div>
 
@@ -1028,17 +1028,17 @@ export default function Production({ user }: { user: User }) {
                         <button 
                           onClick={() => handleResetStage(Number(order.id), activeStage.id)}
                           className="px-5 md:px-6 py-3 md:py-4 rounded-2xl bg-white border border-slate-200 text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-slate-50 hover:text-slate-700 transition-all flex items-center justify-center gap-2"
-                          title="Pending holatiga qaytarish"
+                          title={t("Pending holatiga qaytarish")}
                         >
                            <RotateCcw className="w-4 h-4" />
-                           Reset
+                           {t('Reset')}
                         </button>
                         <button 
                           onClick={() => handleForceComplete(Number(order.id), activeStage.id)}
                           className="px-6 md:px-8 py-3 md:py-4 rounded-2xl bg-blue-600 text-white font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
                            <CheckCircle2 className="w-4 h-4" />
-                           Force Finish
+                           {t('Majburiy Tugatish')}
                         </button>
                       </div>
                     </div>
@@ -1046,7 +1046,7 @@ export default function Production({ user }: { user: User }) {
                     {isStuck && (
                       <div className="absolute left-4 top-4 md:left-auto md:right-8 flex items-center gap-2 text-red-600 bg-red-100 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
                          <AlertTriangle className="w-3 h-3" />
-                         Stuck Detected
+                         {t('Stuck Detected')}
                       </div>
                     )}
                   </motion.div>
@@ -1056,8 +1056,8 @@ export default function Production({ user }: { user: User }) {
             {productionOrders.filter(o => o.stages?.some(s => s.status === 'ACTIVE')).length === 0 && (
               <div className="py-20 text-center bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
                  <CheckCircle2 className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-                 <h5 className="text-xl font-black text-slate-400">Hozirda aktiv jarayonlar yo'q</h5>
-                 <p className="text-slate-400 font-medium">Barcha liniyalar bo'sh yoki kutish holatida</p>
+                 <h5 className="text-xl font-black text-slate-400">{t('Hozirda aktiv jarayonlar yo\'q')}</h5>
+                 <p className="text-slate-400 font-medium">{t('Barcha liniyalar bo\'sh yoki kutish holatida')}</p>
               </div>
             )}
           </div>
@@ -1076,8 +1076,8 @@ export default function Production({ user }: { user: User }) {
                     <Plus className="text-white w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Yangi Zames Yaratish</h3>
-                    <p className="text-xs text-slate-500 font-medium">Xom ashyoni ko'pirtirish jarayoni</p>
+                    <h3 className="text-lg font-bold text-slate-900">{t('Yangi Zames Yaratish')}</h3>
+                    <p className="text-xs text-slate-500 font-medium">{t('Xom ashyoni ko\'pirtirish jarayoni')}</p>
                   </div>
                 </div>
                 <button onClick={() => setIsZamesModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
@@ -1085,14 +1085,14 @@ export default function Production({ user }: { user: User }) {
 
               <form onSubmit={handleCreateZames} className="p-4 md:p-6 space-y-6 max-h-[80vh] overflow-y-auto">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">Retseptni tanlang</label>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Retseptni tanlang')}</label>
                   <select 
                     required
                     value={selectedRecipeId}
                     onChange={(e) => handleRecipeChange(e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold"
                   >
-                    <option value="">Retseptni tanlang...</option>
+                    <option value="">{t('Retseptni tanlang')}...</option>
                     {recipes.map(r => (
                       <option key={r.id} value={r.id}>{r.name}</option>
                     ))}
@@ -1101,16 +1101,16 @@ export default function Production({ user }: { user: User }) {
 
                 {zamesBatchItems.length > 0 && (
                   <div className="space-y-4">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">Materiallar va Partiyalar</label>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Materiallar va Partiyalar')}</label>
                     {zamesBatchItems.map((item, idx) => (
                       <div key={idx} className="p-4 bg-slate-50 rounded-[24px] border border-slate-200 flex flex-col gap-4">
                         <div className="flex justify-between items-center">
                           <span className="text-sm font-black text-slate-900">{item.material_name}</span>
-                          <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase tracking-widest">{item.quantity} kg kutilmoqda</span>
+                          <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase tracking-widest">{item.quantity} kg {t('kutilmoqda')}</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <div className="space-y-1">
-                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Partiya</label>
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Partiya')}</label>
                             <select
                               required
                               value={item.batch}
@@ -1121,7 +1121,7 @@ export default function Production({ user }: { user: User }) {
                               }}
                               className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20"
                             >
-                              <option value="">Partiyani tanlang...</option>
+                              <option value="">{t('Partiyani tanlang')}...</option>
                               {batches
                                 .filter(b => b.material === item.material)
                                 .map(b => (
@@ -1131,7 +1131,7 @@ export default function Production({ user }: { user: User }) {
                             </select>
                           </div>
                           <div className="space-y-1">
-                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Vazn (kg)</label>
+                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Vazn')} (kg)</label>
                             <input 
                               type="number"
                               required
@@ -1151,9 +1151,9 @@ export default function Production({ user }: { user: User }) {
                 )}
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-4 sticky bottom-0 bg-white">
-                  <button type="button" onClick={() => setIsZamesModalOpen(false)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">Bekor qilish</button>
+                  <button type="button" onClick={() => setIsZamesModalOpen(false)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
                   <button type="submit" disabled={loading} className="flex-1 px-6 py-3.5 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95 transition-all disabled:bg-slate-300">
-                    {loading ? 'Saqlanmoqda...' : 'Zames Yaratish'}
+                    {loading ? t('Saqlanmoqda...') : t('Zames Yaratish')}
                   </button>
                 </div>
               </form>
@@ -1171,8 +1171,8 @@ export default function Production({ user }: { user: User }) {
                     <CheckCircle2 className="text-white w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Zamesni Yakunlash</h3>
-                    <p className="text-xs text-slate-500 font-medium">Haqiqiy chiqish vaznini kiriting</p>
+                    <h3 className="text-lg font-bold text-slate-900">{t('Zamesni Yakunlash')}</h3>
+                    <p className="text-xs text-slate-500 font-medium">{t('Haqiqiy chiqish vaznini kiriting')}</p>
                   </div>
                 </div>
                 <button onClick={() => setIsFinishModalOpen(null)} className="p-2 text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
@@ -1181,8 +1181,8 @@ export default function Production({ user }: { user: User }) {
               <form onSubmit={handleFinishZames} className="p-6 space-y-5">
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-xs font-bold text-slate-500 mb-1 px-1">
-                    <span>Nomi: {isFinishModalOpen.zames_number}</span>
-                    <span>Kutilgan: {isFinishModalOpen.input_weight} kg</span>
+                    <span>{t('Nomi')}: {isFinishModalOpen.zames_number}</span>
+                    <span>{t('Kutilgan')}: {isFinishModalOpen.input_weight} kg</span>
                   </div>
                   <div className="relative">
                     <Weight className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -1190,19 +1190,19 @@ export default function Production({ user }: { user: User }) {
                       autoFocus
                       type="number"
                       required
-                      placeholder="Chiqish vazni (kg)..."
+                      placeholder={t("Chiqish vazni (kg)...")}
                       value={outputWeight}
                       onChange={(e) => setOutputWeight(e.target.value)}
                       className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-black text-xl text-slate-900 placeholder:font-bold placeholder:text-slate-300"
                     />
                   </div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1 bg-amber-50 p-2 rounded-lg border border-amber-100/50">Diqqat: Chiqish vazni asosida Sklad №2 ga yarim tayyor mahsulot kirim qilinadi.</p>
+                  <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1 bg-amber-50 p-2 rounded-lg border border-amber-100/50">{t('Diqqat: Chiqish vazni asosida Sklad №2 ga yarim tayyor mahsulot kirim qilinadi.')}</p>
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setIsFinishModalOpen(null)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">Bekor qilish</button>
+                  <button type="button" onClick={() => setIsFinishModalOpen(null)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
                   <button type="submit" disabled={loading} className="flex-1 px-6 py-3.5 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-200 active:scale-95 transition-all">
-                    {loading ? 'Saqlanmoqda...' : 'Yakunlash va Saqlash'}
+                    {loading ? t('Saqlanmoqda...') : t('Yakunlash va Saqlash')}
                   </button>
                 </div>
               </form>
@@ -1220,8 +1220,8 @@ export default function Production({ user }: { user: User }) {
                     <Database className="text-white w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Bunkerga Joylash</h3>
-                    <p className="text-xs text-slate-500 font-medium">Tayyor zamesni bunkerga o'tkazish</p>
+                    <h3 className="text-lg font-bold text-slate-900">{t('Bunkerga Joylash')}</h3>
+                    <p className="text-xs text-slate-500 font-medium">{t('Tayyor zamesni bunkerga o\'tkazish')}</p>
                   </div>
                 </div>
                 <button onClick={() => setIsBunkerModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
@@ -1229,22 +1229,22 @@ export default function Production({ user }: { user: User }) {
 
               <form onSubmit={handleBunkerLoad} className="p-4 md:p-6 space-y-5">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">Zamesni tanlang</label>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Zamesni tanlang')}</label>
                   <select 
                     required
                     value={selectedZamesId}
                     onChange={(e) => setSelectedZamesId(e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold"
                   >
-                    <option value="">Tanlang...</option>
+                    <option value="">{t('Tanlang')}...</option>
                     {availableZames.map(z => (
-                      <option key={z.id} value={z.id}>{z.zames_number} (Retsept: {z.recipe_name})</option>
+                      <option key={z.id} value={z.id}>{z.zames_number} ({t('Retsept')}: {z.recipe_name})</option>
                     ))}
                   </select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">Bunkerni tanlang</label>
+                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Bunkerni tanlang')}</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {bunkers.map(b => (
                       <button
@@ -1260,21 +1260,21 @@ export default function Production({ user }: { user: User }) {
                         }`}
                       >
                         <Database className="w-5 h-5" />
-                        <span className="text-xs font-black uppercase tracking-wider">Bunker {b.bunkerNumber}</span>
-                        <span className="text-[9px] uppercase font-bold">{b.status === 'Empty' ? 'Ochiq' : 'Band'}</span>
+                        <span className="text-xs font-black uppercase tracking-wider">{t('Bunker')} {b.bunkerNumber}</span>
+                        <span className="text-[9px] uppercase font-bold">{b.status === 'Empty' ? t('Ochiq') : t('Band')}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button type="button" onClick={() => setIsBunkerModalOpen(false)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">Bekor qilish</button>
+                  <button type="button" onClick={() => setIsBunkerModalOpen(false)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
                   <button 
                     type="submit" 
                     disabled={!selectedZamesId || !selectedBunkerId || loading}
                     className="flex-1 px-6 py-3.5 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95 transition-all disabled:bg-slate-300 disabled:shadow-none"
                   >
-                    {loading ? 'Joylanmoqda...' : 'Joylash'}
+                    {loading ? t('Joylanmoqda...') : t('Joylash')}
                   </button>
                 </div>
               </form>
@@ -1302,8 +1302,8 @@ export default function Production({ user }: { user: User }) {
               <div className="p-5 md:p-12">
                 <div className="flex items-center justify-between mb-10">
                   <div>
-                    <h3 className="text-3xl font-black text-slate-900 tracking-tight">Yangi Buyurtma</h3>
-                    <p className="text-slate-500 text-sm font-medium">Buyurtma-naryad yaratish</p>
+                    <h3 className="text-3xl font-black text-slate-900 tracking-tight">{t('Yangi Buyurtma')}</h3>
+                    <p className="text-slate-500 text-sm font-medium">{t('Buyurtma-naryat yaratish')}</p>
                   </div>
                   <button 
                     onClick={() => setIsOrderModalOpen(false)}
@@ -1315,14 +1315,14 @@ export default function Production({ user }: { user: User }) {
 
                 <form onSubmit={handleCreateOrder} className="space-y-8">
                   <div className="space-y-3">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Mahsulot turi</label>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Mahsulot turi')}</label>
                     <select 
                       value={selectedProductId}
                       onChange={(e) => setSelectedProductId(e.target.value)}
                       required
                       className="w-full h-16 bg-slate-50 border-none rounded-2xl px-6 font-bold text-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none"
                     >
-                      <option value="">Tanlang...</option>
+                      <option value="">{t('Tanlang')}...</option>
                       {materials.map(m => (
                         <option key={m.id} value={m.id}>{m.name}</option>
                       ))}
@@ -1331,18 +1331,18 @@ export default function Production({ user }: { user: User }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Hajm (Blok/m³)</label>
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Hajm')} ({t('Blok')}/m³)</label>
                       <input 
                         type="number"
                         value={orderQuantity}
                         onChange={(e) => setOrderQuantity(e.target.value)}
                         required
                         className="w-full h-16 bg-slate-50 border-none rounded-2xl px-6 font-bold text-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                        placeholder="Masalan: 50"
+                        placeholder={t("Masalan") + ": 50"}
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Deadline</label>
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Deadline')}</label>
                       <input 
                         type="date"
                         value={orderDeadline}
@@ -1357,7 +1357,7 @@ export default function Production({ user }: { user: User }) {
                     disabled={loading}
                     className="w-full py-6 bg-slate-900 text-white rounded-[24px] text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50"
                   >
-                    {loading ? 'Yaratilmoqda...' : 'Buyurtmani Tasdiqlash'}
+                    {loading ? t('Yaratilmoqda...') : t('Buyurtmani Tasdiqlash')}
                   </button>
                 </form>
               </div>
@@ -1383,8 +1383,8 @@ export default function Production({ user }: { user: User }) {
                      <Layers className="w-8 h-8 text-white" />
                    </div>
                    <div>
-                     <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">Blok Quyishni Qayd Etish</h3>
-                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest opacity-60">Ishlab chiqarilgan bloklarni omborga kiritish</p>
+                     <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">{t('Blok Quyishni Qayd Etish')}</h3>
+                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest opacity-60">{t('Ishlab chiqarilgan bloklarni omborga kiritish')}</p>
                    </div>
                 </div>
                 <button onClick={() => setIsBlockModalOpen(false)} className="p-3 bg-white text-slate-400 hover:text-slate-900 rounded-2xl transition-all shadow-sm border border-slate-100 hover:border-slate-200">
@@ -1395,7 +1395,7 @@ export default function Production({ user }: { user: User }) {
               <form onSubmit={handleCreateBlock} className="p-5 md:p-10 space-y-8 max-h-[82vh] overflow-y-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Zamesni tanlang</label>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Zamesni tanlang')}</label>
                     <div className="relative">
                       <FlaskConical className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <select 
@@ -1404,22 +1404,22 @@ export default function Production({ user }: { user: User }) {
                         onChange={(e) => setSelectedZamesForBlock(e.target.value)}
                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 appearance-none shadow-inner"
                       >
-                        <option value="">Zamesni tanlang...</option>
+                        <option value="">{t('Zamesni tanlang')}...</option>
                         {zamesy.filter(z => z.status === 'DONE').map(z => (
-                          <option key={z.id} value={z.id}>Zames №{z.zames_number} ({z.recipe_name})</option>
+                          <option key={z.id} value={z.id}>{t('Zames')} №{z.zames_number} ({z.recipe_name})</option>
                         ))}
                       </select>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Forma №</label>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Forma №')}</label>
                     <div className="relative">
                       <Box className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input 
                         required
                         type="text" 
-                        placeholder="Masalan: F-01"
+                        placeholder={t("Masalan") + ": F-01"}
                         value={formNumber}
                         onChange={(e) => setFormNumber(e.target.value)}
                         className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner"
@@ -1430,7 +1430,7 @@ export default function Production({ user }: { user: User }) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Bloklar soni (dona)</label>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Bloklar soni')} ({t('dona')})</label>
                     <div className="relative">
                       <Plus className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input 
@@ -1445,7 +1445,7 @@ export default function Production({ user }: { user: User }) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Zichlik (kg/m³)</label>
+                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Zichlik')} (kg/m³)</label>
                     <div className="relative">
                       <Weight className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input 
@@ -1461,30 +1461,30 @@ export default function Production({ user }: { user: User }) {
                 </div>
 
                 <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-200/50">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">Blok o'lchamlari (mm)</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">{t('Blok o\'lchamlari')} (mm)</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-slate-500 ml-2">Uzunlik</span>
+                      <span className="text-[9px] font-bold text-slate-500 ml-2">{t('Uzunlik')}</span>
                       <input type="number" value={blockLength} onChange={e => setBlockLength(Number(e.target.value))} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" />
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-slate-500 ml-2">Eni</span>
+                      <span className="text-[9px] font-bold text-slate-500 ml-2">{t('Eni')}</span>
                       <input type="number" value={blockWidth} onChange={e => setBlockWidth(Number(e.target.value))} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" />
                     </div>
                     <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-slate-500 ml-2">Bo'yi</span>
+                      <span className="text-[9px] font-bold text-slate-500 ml-2">{t('Bo\'yi')}</span>
                       <input type="number" value={blockHeight} onChange={e => setBlockHeight(Number(e.target.value))} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" />
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <button type="button" onClick={() => setIsBlockModalOpen(false)} className="flex-1 px-8 py-5 border-2 border-slate-100 text-slate-500 rounded-[28px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all text-xs">Bekor qilish</button>
+                  <button type="button" onClick={() => setIsBlockModalOpen(false)} className="flex-1 px-8 py-5 border-2 border-slate-100 text-slate-500 rounded-[28px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all text-xs">{t('Bekor qilish')}</button>
                   <button 
                     type="submit" 
                     className="flex-[1.5] px-8 py-5 bg-blue-600 text-white rounded-[28px] font-black uppercase tracking-widest hover:bg-blue-700 shadow-2xl shadow-blue-200 active:scale-95 transition-all text-xs"
                   >
-                    Qayd etish
+                    {t('Qayd etish')}
                   </button>
                 </div>
               </form>
@@ -1508,8 +1508,8 @@ export default function Production({ user }: { user: User }) {
                     <AlertTriangle className="w-6 h-6" />
                  </div>
                  <div>
-                    <h3 className="text-xl font-black text-slate-900 leading-tight">Muammoni Qayd Etish</h3>
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Sababni kiriting</p>
+                    <h3 className="text-xl font-black text-slate-900 leading-tight">{t('Muammoni Qayd Etish')}</h3>
+                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{t('Sababni kiriting')}</p>
                  </div>
                </div>
 
@@ -1517,14 +1517,14 @@ export default function Production({ user }: { user: User }) {
                   <textarea 
                     value={failReason}
                     onChange={(e) => setFailReason(e.target.value)}
-                    placeholder="Masalan: Uskuna to'xtadi yoki xom ashyo yetishmadi..."
+                    placeholder={t("Masalan: Uskuna to'xtadi yoki xom ashyo yetishmadi...")}
                     className="w-full p-6 bg-slate-50 border-2 border-transparent focus:border-red-500 rounded-[24px] outline-none text-sm font-bold min-h-[120px] transition-all"
                   />
                </div>
 
                <div className="grid grid-cols-2 gap-4">
-                  <button onClick={() => setIsFailModalOpen(null)} className="py-5 bg-slate-100 text-slate-500 rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all">Bekor Qilish</button>
-                  <button onClick={handleFailStage} className="py-5 bg-red-600 text-white rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-red-100">Tasdiqlash</button>
+                  <button onClick={() => setIsFailModalOpen(null)} className="py-5 bg-slate-100 text-slate-500 rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all">{t('Bekor Qilish')}</button>
+                  <button onClick={handleFailStage} className="py-5 bg-red-600 text-white rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-red-100">{t('Tasdiqlash')}</button>
                </div>
             </motion.div>
           </div>
@@ -1544,8 +1544,8 @@ export default function Production({ user }: { user: User }) {
             >
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">Bunker Tanlang</h3>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-widest opacity-60">Zamesni yetiltirish uchun bunker biriktiring</p>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Bunker Tanlang')}</h3>
+                  <p className="text-slate-500 text-xs font-bold uppercase tracking-widest opacity-60">{t('Zamesni yetiltirish uchun bunker biriktiring')}</p>
                 </div>
                 <button onClick={() => setIsStageBunkerModalOpen(null)} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:text-slate-900 transition-colors">
                   <X className="w-5 h-5" />
@@ -1553,7 +1553,7 @@ export default function Production({ user }: { user: User }) {
               </div>
 
               <div className="space-y-4 mb-8">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">1. Zames Partiyasini tanlang</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">1. {t('Zames Partiyasini tanlang')}</p>
                 <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                   {availableZames.map(z => (
                     <button
@@ -1573,13 +1573,13 @@ export default function Production({ user }: { user: User }) {
                     </button>
                   ))}
                   {availableZames.length === 0 && (
-                    <p className="text-[10px] text-slate-400 italic">Bo'sh (tayyor) zameslar topilmadi</p>
+                    <p className="text-[10px] text-slate-400 italic">{t('Bo\'sh (tayyor) zameslar topilmadi')}</p>
                   )}
                 </div>
               </div>
 
               <div className="space-y-4 mb-8">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">2. Bunkerni tanlang</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">2. {t('Bunkerni tanlang')}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {bunkers.map(b => (
                   <button
@@ -1587,7 +1587,7 @@ export default function Production({ user }: { user: User }) {
                     onClick={() => {
                       if (b.status !== 'Empty') return;
                       if (!selectedZamesId) {
-                        uiStore.showNotification("Zames partiyasini tanlang", "error");
+                        uiStore.showNotification(t("Zames partiyasini tanlang"), "error");
                         return;
                       }
                       handleStartStage(isStageBunkerModalOpen.orderId, isStageBunkerModalOpen.stageId, { 
@@ -1597,16 +1597,12 @@ export default function Production({ user }: { user: User }) {
                     }}
                     disabled={b.status !== 'Empty' || !selectedZamesId}
                     className={`p-5 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${
-                      b.status === 'Empty' 
-                        ? (selectedZamesId ? 'bg-white border-slate-200 hover:border-blue-500 hover:bg-blue-50/30 shadow-sm' : 'bg-slate-50 border-slate-100 opacity-60 cursor-not-allowed')
-                        : 'bg-slate-50 border-transparent opacity-40 cursor-not-allowed'
+                      selectedBunkerId === b.id.toString() ? 'border-blue-500 bg-blue-50' : 'border-slate-100 hover:border-slate-200'
                     }`}
                   >
-                    <Database className={`w-6 h-6 ${b.status === 'Empty' ? 'text-blue-600' : 'text-slate-300'}`} />
-                    <div className="text-center">
-                      <p className="text-[11px] font-black text-slate-900 uppercase">Bunker {b.bunkerNumber}</p>
-                      <p className="text-[9px] font-bold text-slate-400">{b.status === 'Empty' ? 'BO\'SH' : 'BAND'}</p>
-                    </div>
+                    <Database className="w-6 h-6" />
+                    <span className="text-xs font-black uppercase tracking-widest">{t('Bunker')} {b.bunkerNumber}</span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{b.status === 'Empty' ? t('Bo\'sh') : t('Band')}</span>
                   </button>
                 ))}
               </div>
@@ -1616,7 +1612,7 @@ export default function Production({ user }: { user: User }) {
                 onClick={() => setIsStageBunkerModalOpen(null)}
                 className="w-full py-5 bg-slate-100 text-slate-500 rounded-[24px] text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all font-bold"
               >
-                Bekor qilish
+                {t('Bekor qilish')}
               </button>
             </motion.div>
           </div>

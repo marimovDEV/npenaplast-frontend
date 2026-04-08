@@ -29,7 +29,7 @@ import { User } from '../types';
 import { useI18n } from '../i18n';
 
 export default function Documents({ user }: { user: User }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [docs, setDocs] = useState<ERPDocument[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,13 +82,13 @@ export default function Documents({ user }: { user: User }) {
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'DONE': return { label: 'Yakunlandi', color: 'bg-emerald-50 text-emerald-600 border-emerald-100', icon: CheckCircle2 };
-      case 'IN_PROGRESS': return { label: 'Jarayonda', color: 'bg-blue-50 text-blue-600 border-blue-100', icon: Clock };
-      case 'IN_TRANSIT': return { label: 'Yo\'lda', color: 'bg-indigo-50 text-indigo-600 border-indigo-100', icon: Truck };
-      case 'CREATED': return { label: 'Yaratildi', color: 'bg-slate-50 text-slate-600 border-slate-100', icon: Plus };
-      case 'PENDING': return { label: 'Kutilmoqda', color: 'bg-amber-50 text-amber-600 border-amber-100', icon: Clock };
-      case 'APPROVED': return { label: 'Tasdiqlandi', color: 'bg-blue-50 text-blue-600 border-blue-100', icon: CheckCircle2 };
-      case 'CANCELLED': return { label: 'Bekor qilindi', color: 'bg-rose-50 text-rose-600 border-rose-100', icon: X };
+      case 'DONE': return { label: t('Yakunlandi'), color: 'bg-emerald-50 text-emerald-600 border-emerald-100', icon: CheckCircle2 };
+      case 'IN_PROGRESS': return { label: t('Jarayonda'), color: 'bg-blue-50 text-blue-600 border-blue-100', icon: Clock };
+      case 'IN_TRANSIT': return { label: t('Yo\'lda'), color: 'bg-indigo-50 text-indigo-600 border-indigo-100', icon: Truck };
+      case 'CREATED': return { label: t('Yaratildi'), color: 'bg-slate-50 text-slate-600 border-slate-100', icon: Plus };
+      case 'PENDING': return { label: t('Kutilmoqda'), color: 'bg-amber-50 text-amber-600 border-amber-100', icon: Clock };
+      case 'APPROVED': return { label: t('Tasdiqlandi'), color: 'bg-blue-50 text-blue-600 border-blue-100', icon: CheckCircle2 };
+      case 'CANCELLED': return { label: t('Bekor qilindi'), color: 'bg-rose-50 text-rose-600 border-rose-100', icon: X };
       default: return { label: status, color: 'bg-slate-50 text-slate-500 border-slate-100', icon: FileText };
     }
   };
@@ -106,20 +106,20 @@ export default function Documents({ user }: { user: User }) {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Hujjatlar Jurnali</h1>
-          <p className="text-slate-500 text-sm font-medium">Operatsion harakatlar va rasmiy hujjatlar arxivi</p>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t('Hujjatlar Jurnali')}</h1>
+          <p className="text-slate-500 text-sm font-medium">{t('Operatsion harakatlar va rasmiy hujjatlar arxivi')}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
           {canExportDocuments && (
             <button className="flex items-center justify-center gap-2 bg-white text-slate-600 px-5 py-3 rounded-2xl font-black text-[10px] border border-slate-200 uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
               <Download className="w-4 h-4" />
-              Eksport
+              {t('Eksport')}
             </button>
           )}
           {canCreateDocument && (
             <button className="flex items-center justify-center gap-2 bg-blue-600 text-white px-7 py-3 rounded-[22px] font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 active:scale-95">
               <Plus className="w-5 h-5" />
-              Yangi Hujjat
+              {t('Yangi Hujjat')}
             </button>
           )}
         </div>
@@ -128,10 +128,10 @@ export default function Documents({ user }: { user: User }) {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: 'Jami Hujjatlar', count: docs.length, icon: FileText, color: 'blue' },
-          { label: 'Kutilayotgan', count: docs.filter(d => ['PENDING', 'IN_TRANSIT'].includes(d.status)).length, icon: Clock, color: 'amber' },
-          { label: 'Tasdiqlangan', count: docs.filter(d => d.status === 'DONE').length, icon: CheckCircle2, color: 'emerald' },
-          { label: 'Bekor qilingan', count: docs.filter(d => d.status === 'CANCELLED').length, icon: AlertCircle, color: 'rose' },
+          { label: t('Jami Hujjatlar'), count: docs.length, icon: FileText, color: 'blue' },
+          { label: t('Kutilayotgan'), count: docs.filter(d => ['PENDING', 'IN_TRANSIT'].includes(d.status)).length, icon: Clock, color: 'amber' },
+          { label: t('Tasdiqlangan'), count: docs.filter(d => d.status === 'DONE').length, icon: CheckCircle2, color: 'emerald' },
+          { label: t('Bekor qilingan'), count: docs.filter(d => d.status === 'CANCELLED').length, icon: AlertCircle, color: 'rose' },
         ].map((stat, i) => (
           <div key={i} className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm relative overflow-hidden group">
             <div className={`absolute top-0 right-0 w-24 h-24 bg-${stat.color}-400/5 rounded-full -mr-12 -mt-12 transition-all group-hover:scale-125`} />
@@ -150,10 +150,10 @@ export default function Documents({ user }: { user: User }) {
         <div className="p-6 border-b border-slate-50 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="flex bg-slate-100 p-1.5 rounded-[22px] gap-1 overflow-x-auto no-scrollbar">
             {[
-              { id: 'ALL', label: 'Barchasi' },
-              { id: 'PRODUCTION', label: 'Ishlab Chiqarish' },
-              { id: 'INVENTORY', label: 'Ombor & Logistika' },
-              { id: 'SALES', label: 'Savdo & Moliya' }
+              { id: 'ALL', label: t('Barchasi') },
+              { id: 'PRODUCTION', label: t('Ishlab Chiqarish') },
+              { id: 'INVENTORY', label: t('Ombor & Logistika') },
+              { id: 'SALES', label: t('Savdo & Moliya') }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -170,7 +170,7 @@ export default function Documents({ user }: { user: User }) {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Hujjat raqami yoki xodim..."
+                placeholder={t("Hujjat raqami yoki xodim...")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-11 pr-5 py-3.5 rounded-2xl border border-slate-100 bg-slate-50/50 focus:bg-white focus:ring-4 focus:ring-blue-500/5 outline-none transition-all text-xs font-bold text-slate-900 shadow-inner"
@@ -181,7 +181,7 @@ export default function Documents({ user }: { user: User }) {
               className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl border transition-all font-black text-[10px] uppercase tracking-widest shadow-sm ${showFilters ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
             >
               <Filter className="w-4 h-4" />
-              <span>Filtr</span>
+              <span>{t('Filtr')}</span>
             </button>
           </div>
         </div>
@@ -197,7 +197,7 @@ export default function Documents({ user }: { user: User }) {
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Sana oralig'i (dan)</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Sana oralig\'i (dan)')}</label>
                   <input 
                     type="date" 
                     value={filters.dateFrom}
@@ -206,7 +206,7 @@ export default function Documents({ user }: { user: User }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Sana oralig'i (gacha)</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Sana oralig\'i (gacha)')}</label>
                   <input 
                     type="date" 
                     value={filters.dateTo}
@@ -215,31 +215,31 @@ export default function Documents({ user }: { user: User }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Hujjat turi</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Hujjat turi')}</label>
                   <select 
                     value={filters.type}
                     onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                     className="w-full p-3 bg-slate-50 border-none rounded-2xl text-xs font-bold outline-none"
                   >
-                    <option value="">Barchasi</option>
-                    <option value="HISOB_FAKTURA_KIRIM">Hisob-faktura (Kirim)</option>
-                    <option value="HISOB_FAKTURA_CHIQIM">Hisob-faktura (Chiqim)</option>
-                    <option value="ICHKI_YUK_XATI">Ichki yuk xati</option>
-                    <option value="OTKAZMA_BUYRUGI">O‘tkazma buyrug‘i</option>
+                    <option value="">{t('Barchasi')}</option>
+                    <option value="HISOB_FAKTURA_KIRIM">{t('Hisob-faktura (Kirim)')}</option>
+                    <option value="HISOB_FAKTURA_CHIQIM">{t('Hisob-faktura (Chiqim)')}</option>
+                    <option value="ICHKI_YUK_XATI">{t('Ichki yuk xati')}</option>
+                    <option value="OTKAZMA_BUYRUGI">{t('O‘tkazma buyrug‘i')}</option>
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Status</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Status')}</label>
                   <select 
                     value={filters.status}
                     onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                     className="w-full p-3 bg-slate-50 border-none rounded-2xl text-xs font-bold outline-none"
                   >
-                    <option value="">Barchasi</option>
-                    <option value="DONE">Yakunlandi</option>
-                    <option value="IN_TRANSIT">Yo'lda</option>
-                    <option value="PENDING">Kutilmoqda</option>
-                    <option value="CANCELLED">Bekor qilingan</option>
+                    <option value="">{t('Barchasi')}</option>
+                    <option value="DONE">{t('Yakunlandi')}</option>
+                    <option value="IN_TRANSIT">{t('Yo\'lda')}</option>
+                    <option value="PENDING">{t('Kutilmoqda')}</option>
+                    <option value="CANCELLED">{t('Bekor qilingan')}</option>
                   </select>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function Documents({ user }: { user: User }) {
           {loading ? (
             <div className="flex flex-col items-center justify-center p-20 gap-4">
               <RefreshCcw className="w-10 h-10 text-blue-500 animate-spin" />
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Ma'lumotlar yuklanmoqda...</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('Ma\'lumotlar yuklanmoqda')}...</p>
             </div>
           ) : isMobile ? (
             <div className="p-4 space-y-3">
@@ -275,16 +275,16 @@ export default function Documents({ user }: { user: User }) {
                     </div>
                     <div className="mt-4 grid grid-cols-2 gap-3">
                       <div className="rounded-2xl bg-slate-50 p-3">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Kimdan</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t('Kimdan')}</p>
                         <p className="mt-1 text-xs font-black text-slate-900 break-words">{doc.from_entity_name || '—'}</p>
                       </div>
                       <div className="rounded-2xl bg-slate-50 p-3">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Kimga</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t('Kimga')}</p>
                         <p className="mt-1 text-xs font-black text-slate-900 break-words">{doc.to_entity_name || '—'}</p>
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-between text-[10px] font-bold text-slate-500">
-                      <span>{doc.created_by_name || 'Noma’lum'}</span>
+                      <span>{doc.created_by_name || t('Noma’lum')}</span>
                       <span>{new Date(doc.created_at || '').toLocaleDateString(locale)}</span>
                     </div>
                   </button>
@@ -295,11 +295,11 @@ export default function Documents({ user }: { user: User }) {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Identifikator</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Hujjat Turi</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Tomonlar (Lojava)</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Xodim</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Identifikator')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Hujjat Turi')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('Tomonlar')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Xodim')}</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Status')}</th>
                   <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest"></th>
                 </tr>
               </thead>
@@ -327,11 +327,10 @@ export default function Documents({ user }: { user: User }) {
                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
                           {doc.type_label || doc.type}
                         </span>
-                      </td>
-                      <td className="px-8 py-6">
+                                         <td className="px-8 py-6">
                         <div className="flex items-center justify-center gap-4">
                           <div className="flex flex-col items-end min-w-[100px]">
-                            <span className="text-[9px] text-slate-400 font-black uppercase tracking-tighter">Yubordi</span>
+                            <span className="text-[9px] text-slate-400 font-black uppercase tracking-tighter">{t('Yubordim')}</span>
                             <span className="text-[11px] text-slate-900 font-black truncate max-w-[140px] italic">{doc.from_entity_name || '—'}</span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -340,11 +339,12 @@ export default function Documents({ user }: { user: User }) {
                              <div className="h-px w-6 bg-slate-200" />
                           </div>
                           <div className="flex flex-col min-w-[100px]">
-                            <span className="text-[9px] text-slate-400 font-black uppercase tracking-tighter">Qabul qildi</span>
+                            <span className="text-[9px] text-slate-400 font-black uppercase tracking-tighter">{t('Qabul qildi')}</span>
                             <span className="text-[11px] text-slate-900 font-black truncate max-w-[140px] italic">{doc.to_entity_name || '—'}</span>
                           </div>
                         </div>
                       </td>
+        </td>
                       <td className="px-8 py-6">
                          <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-[10px] shadow-inner border border-blue-100">
@@ -375,7 +375,7 @@ export default function Documents({ user }: { user: User }) {
                <div className="w-24 h-24 bg-slate-50 rounded-[40px] flex items-center justify-center text-slate-200">
                   <Search className="w-12 h-12" />
                </div>
-               <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] italic">Hujjatlar topilmadi</p>
+               <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em] italic">{t('Hujjatlar topilmadi')}</p>
             </div>
           )}
         </div>
@@ -419,34 +419,34 @@ export default function Documents({ user }: { user: User }) {
                 {/* Status and Info Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8 p-5 md:p-8 bg-slate-50 rounded-[28px] md:rounded-[40px] border border-slate-100">
                    <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Joriy Holat</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Joriy Holat')}</p>
                       <div className={`flex items-center gap-2 text-xs font-black uppercase tracking-wider ${getStatusConfig(selectedDoc.status).color.split(' ')[1]}`}>
                          {getStatusConfig(selectedDoc.status).label}
                       </div>
                    </div>
                    <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Yaratilgan Sana</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Yaratilgan Sana')}</p>
                       <p className="text-xs font-black text-slate-900">{new Date(selectedDoc.created_at || '').toLocaleString(locale)}</p>
                    </div>
                    <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mas'ul Xodim</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Mas\'ul Xodim')}</p>
                       <p className="text-xs font-black text-slate-900">{selectedDoc.created_by_name}</p>
                    </div>
                    <div className="space-y-1">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">QR Identifikator</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('QR Identifikator')}</p>
                       <p className="text-[10px] font-black text-blue-600 font-mono">{(selectedDoc.qr_code || selectedDoc.id).toString().slice(0, 8)}</p>
                    </div>
                 </div>
 
                 {/* Route Section */}
                 <div className="space-y-5">
-                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Hujjat Marshruti</h3>
+                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">{t('Hujjat Marshruti')}</h3>
                    <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 p-5 md:p-8 bg-white border border-slate-100 rounded-[28px] md:rounded-[40px] shadow-sm">
                       <div className="flex-1 space-y-2">
                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400">
                             <Package className="w-5 h-5" />
                          </div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kimdan</p>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Kimdan')}</p>
                          <p className="text-sm font-black text-slate-900">{selectedDoc.from_entity_name || '—'}</p>
                       </div>
                       <div className="flex flex-col items-center gap-2">
@@ -459,7 +459,7 @@ export default function Documents({ user }: { user: User }) {
                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 ml-auto">
                             <UserIcon className="w-5 h-5" />
                          </div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kimga</p>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Kimga')}</p>
                          <p className="text-sm font-black text-slate-900">{selectedDoc.to_entity_name || '—'}</p>
                       </div>
                    </div>
@@ -467,13 +467,13 @@ export default function Documents({ user }: { user: User }) {
 
                 {/* Items Section */}
                 <div className="space-y-5">
-                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">Hujjat Ma'lumotlari</h3>
+                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-4">{t('Hujjat Ma\'lumotlari')}</h3>
                    <div className="bg-slate-900 rounded-[28px] md:rounded-[40px] overflow-hidden shadow-2xl">
                       <table className="w-full text-left">
                          <thead>
                             <tr className="bg-white/5 border-b border-white/5">
-                               <th className="px-8 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Mahsulot</th>
-                               <th className="px-8 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest text-right">Miqdor</th>
+                               <th className="px-8 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">{t('Mahsulot')}</th>
+                               <th className="px-8 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest text-right">{t('Miqdor')}</th>
                             </tr>
                          </thead>
                          <tbody className="divide-y divide-white/5">
@@ -481,10 +481,10 @@ export default function Documents({ user }: { user: User }) {
                                <tr key={i} className="hover:bg-white/5 transition-colors">
                                   <td className="px-8 py-5">
                                      <span className="text-xs font-black text-white">{item.product_name}</span>
-                                     <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{item.batch_number || 'Batch yo\'q'}</p>
+                                     <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">{item.batch_number || t('Batch yo\'q')}</p>
                                   </td>
                                   <td className="px-8 py-5 text-right">
-                                     <span className="text-xs font-black text-emerald-400">{item.quantity.toLocaleString(locale)} {item.unit || 'dona'}</span>
+                                     <span className="text-xs font-black text-emerald-400">{item.quantity.toLocaleString(locale)} {item.unit || t('dona')}</span>
                                   </td>
                                 </tr>
                             ))}
@@ -492,7 +492,7 @@ export default function Documents({ user }: { user: User }) {
                       </table>
                       {(!selectedDoc.items || selectedDoc.items.length === 0) && (
                         <div className="p-10 text-center text-slate-500 text-[10px] font-black uppercase tracking-widest italic">
-                           Bandlar ro'yxati bo'sh
+                           {t('Bandlar ro\'yxati bo\'sh')}
                         </div>
                       )}
                    </div>
@@ -502,11 +502,11 @@ export default function Documents({ user }: { user: User }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 pb-4 md:pb-10">
                    <button className="flex items-center justify-center gap-3 py-5 bg-white border border-slate-200 rounded-[28px] font-black text-[10px] uppercase tracking-[0.2em] text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
                       <Printer className="w-5 h-5" />
-                      Yopish / Print
+                      {t('Yopish / Print')}
                    </button>
                    <button className="flex items-center justify-center gap-3 py-5 bg-slate-900 text-white rounded-[28px] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-800 transition-all shadow-2xl">
                       <Download className="w-5 h-5 text-blue-400" />
-                      PDF Yuklash
+                      {t('PDF Yuklash')}
                    </button>
                 </div>
               </div>

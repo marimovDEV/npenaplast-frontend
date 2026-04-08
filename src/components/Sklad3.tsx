@@ -46,8 +46,8 @@ export default function Sklad3({ user }: { user: User }) {
     setLoading(true);
     try {
       const [docsRes, blocksRes, whRes] = await Promise.all([
-        api.get('documents/?type=OTKAZMA_BUYRUGI'),
-        api.get('production/blocks/?status=READY&warehouse=2'), // Sklad 2 is ID 2 usually
+        api.get('documents/', { params: { type: 'OTKAZMA_BUYRUGI' } }),
+        api.get('production/blocks/', { params: { status: 'READY', warehouse: 2 } }),
         api.get('warehouses/')
       ]);
 
