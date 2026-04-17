@@ -12,6 +12,7 @@ import { uiStore } from '../lib/store';
 import { Client, Invoice, Cashbox, ContactLog, User } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import { useI18n } from '../i18n';
+import CustomerProfile from './CustomerProfile';
 
 type ModalType = 'ADD' | 'EDIT' | 'PAYMENT' | 'ORDERS' | 'CRM';
 
@@ -23,6 +24,7 @@ export default function Clients({ user }: { user: User }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<ModalType>('ADD');
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [showProfile, setShowProfile] = useState(false);
   const [loading, setLoading] = useState(true);
   
   // CRM / History state
@@ -193,6 +195,16 @@ export default function Clients({ user }: { user: User }) {
 
   const Trophy = ({ className }: { className?: string }) => <CheckCircle className={className} />;
 
+  if (showProfile && selectedClient) {
+    return <CustomerProfile customerId={selectedClient.id} onBack={() => setShowProfile(false)} />;
+  }
+
+  const segmentColors = {
+    VIP: 'bg-amber-100 text-amber-700 border-amber-200',
+    REGULAR: 'bg-blue-100 text-blue-700 border-blue-200',
+    RISK: 'bg-rose-100 text-rose-700 border-rose-200'
+  };
+
   return (
     <div className="space-y-8 pb-10">
       {/* Header */}
@@ -234,8 +246,13 @@ export default function Clients({ user }: { user: User }) {
                       <p className="text-xs font-bold text-slate-400">{client.company_name || t('Shaxsiy mijoz')}</p>
                     </div>
                   </div>
-                  <div className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest ${getInterestColor(client.interest_level)}`}>
-                    {client.interest_level === 'HIGH' ? '🔥 ' + t('Yuqori') : client.interest_level === 'MEDIUM' ? '⚡ ' + t('O\'rtacha') : '❄️ ' + t('Past')}
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded-lg border text-[9px] font-black uppercase ${segmentColors[client.segment || 'REGULAR']}`}>
+                      {client.segment || 'REGULAR'}
+                    </span>
+                    <div className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-widest ${getInterestColor(client.interest_level)}`}>
+                      {client.interest_level === 'HIGH' ? '🔥 ' + t('Yuqori') : client.interest_level === 'MEDIUM' ? '⚡ ' + t('O\'rtacha') : '❄️ ' + t('Past')}
+                    </div>
                   </div>
                 </div>
 
@@ -250,22 +267,28 @@ export default function Clients({ user }: { user: User }) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                   <button 
-                    onClick={() => openCRMModal(client)}
-                    className="flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-2xl hover:bg-black transition-all"
-                   >
-                     <MessageSquare className="w-4 h-4" />
-                     <span className="text-[10px] font-black uppercase">CRM</span>
-                   </button>
-                   <button 
-                    onClick={() => { setSelectedClient(client); setFormData({...client}); setModalType('EDIT'); setIsModalOpen(true); }}
-                    className="flex items-center justify-center gap-2 py-4 bg-white border border-slate-100 text-slate-400 rounded-2xl hover:text-blue-600 hover:border-blue-100 transition-all"
-                   >
-                     <Edit2 className="w-4 h-4" />
-                     <span className="text-[10px] font-black uppercase">{t('Tahrirlash')}</span>
-                   </button>
-                </div>
+                 <div className="grid grid-cols-3 gap-2">
+                    <button 
+                     onClick={() => openCRMModal(client)}
+                     className="flex items-center justify-center gap-2 py-4 bg-slate-900 text-white rounded-2xl hover:bg-black transition-all"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      <span className="text-[10px] font-black uppercase text-white">CRM</span>
+                    </button>
+                    <button 
+                     onClick={() => { setSelectedClient(client); setShowProfile(true); }}
+                     className="flex items-center justify-center gap-2 py-4 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition-all"
+                    >
+                      <Info className="w-4 h-4" />
+                      <span className="text-[10px] font-black uppercase">Stat</span>
+                    </button>
+                    <button 
+                     onClick={() => { setSelectedClient(client); setFormData({...client}); setModalType('EDIT'); setIsModalOpen(true); }}
+                     className="flex items-center justify-center gap-2 py-4 bg-white border border-slate-100 text-slate-400 rounded-2xl hover:text-blue-600 hover:border-blue-100 transition-all font-black text-[10px]"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                 </div>
               </motion.div>
             );
           })}

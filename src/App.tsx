@@ -25,7 +25,9 @@ import {
   CheckCircle2,
   FileText,
   QrCode,
-  Wallet
+  Wallet,
+  Calculator as CalculatorIcon,
+  Target
 } from 'lucide-react';
 import { User, UserRole } from './types';
 import LanguageSwitcher from './components/LanguageSwitcher';
@@ -58,7 +60,14 @@ const Documents = lazy(() => import('./components/Documents'));
 const QRScanner = lazy(() => import('./components/QRScanner'));
 const Finance = lazy(() => import('./components/Finance'));
 const Contracts = lazy(() => import('./components/Contracts'));
-const Debtors = lazy(() => import('./components/Debtors'));
+const Debtors = lazy(() => import('./components/DebtDashboard'));
+const Accounting = lazy(() => import('./components/Accounting'));
+const BudgetManager = lazy(() => import('./components/BudgetManager'));
+const Compliance = lazy(() => import('./components/Compliance'));
+const Alerts = lazy(() => import('./components/Alerts'));
+const ExecutiveDashboard = lazy(() => import('./components/ExecutiveDashboard'));
+const ProductionCosting = lazy(() => import('./components/ProductionCosting'));
+const ProfitabilityDashboard = lazy(() => import('./components/ProfitabilityDashboard'));
 
 export default function App() {
   const { t } = useI18n();
@@ -186,6 +195,7 @@ export default function App() {
       title: null,
       items: [
         { id: 'dashboard', name: 'Boshqaruv Paneli', icon: LayoutDashboard, roles: ['Bosh Admin', 'Omborchi', 'Ishlab chiqarish ustasi', 'CNC operatori', 'Pardozlovchi', 'Chiqindi operatori', 'Sotuv menejeri', 'Kuryer'] },
+        { id: 'exec-dashboard', name: 'Direktor Paneli', icon: Target, roles: ['Bosh Admin'] },
       ]
     },
     {
@@ -252,21 +262,27 @@ export default function App() {
       icon: BarChart3,
       items: [
         { id: 'reports', name: 'Hisobotlar', icon: BarChart3, roles: ['Bosh Admin'] },
+        { id: 'profit-analytics', name: 'Tannarx & Foyda', icon: CalculatorIcon, roles: ['Bosh Admin', 'Buxgalter'] },
+        { id: 'cost-analytics', name: 'Tan narx moduli', icon: CalculatorIcon, roles: ['Bosh Admin', 'Buxgalter'] },
       ]
     },
     {
       id: 'finance-main',
-      title: '9. Moliya',
+      title: '9. Moliya & Byudjet',
       icon: Wallet,
       items: [
-        { id: 'finance', name: 'Moliya & Kassa', icon: Wallet, roles: ['Bosh Admin', 'Sotuv menejeri'] },
+        { id: 'finance', name: 'Moliya & Kassa', icon: Wallet, roles: ['Bosh Admin', 'Sotuv menejeri', 'Moliya boshqaruvchi'] },
+        { id: 'accounting', name: 'Buxgalteriya', icon: CalculatorIcon, roles: ['Bosh Admin', 'Buxgalter', 'Moliya boshqaruvchi'] },
+        { id: 'budgets', name: 'Byudjet Nazorati', icon: BarChart3, roles: ['Bosh Admin', 'Moliya boshqaruvchi'] },
       ]
     },
     {
       id: 'management',
-      title: '8. Boshqaruv',
+      title: '8. Boshqaruv & Nazorat',
       icon: Settings,
       items: [
+        { id: 'compliance', name: 'Soliq & Hujjatlar', icon: FileText, roles: ['Bosh Admin', 'Admin'] },
+        { id: 'alerts', name: 'Tizim Alertlari', icon: Bell, roles: ['Bosh Admin', 'Admin'] },
         { id: 'documents', name: 'Hujjatlar Jurnali', icon: FileText, roles: ['Bosh Admin', 'Admin', 'Omborchi', 'Ishlab chiqarish ustasi', 'Sotuv menejeri', 'Kuryer'] },
         { id: 'staff', name: 'Xodimlar', icon: UserIcon, roles: ['Bosh Admin'] },
         { id: 'activity', name: 'Faollik Jurnali', icon: Activity, roles: ['Bosh Admin'] },
@@ -329,6 +345,20 @@ export default function App() {
         return <Contracts user={user} />;
       case 'debtors':
         return <Debtors user={user} />;
+      case 'accounting':
+        return <Accounting user={user} />;
+      case 'budgets':
+        return <BudgetManager />;
+      case 'compliance':
+        return <Compliance />;
+      case 'alerts':
+        return <Alerts />;
+      case 'exec-dashboard':
+        return <ExecutiveDashboard />;
+      case 'cost-analytics':
+        return <ProductionCosting />;
+      case 'profit-analytics':
+        return <ProfitabilityDashboard />;
       default:
         return <Dashboard user={user} onAction={setActiveTab} />;
     }

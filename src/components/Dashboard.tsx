@@ -33,6 +33,7 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
   const [recentKirim, setRecentKirim] = useState<any[]>([]);
   const [dynamicChartData, setDynamicChartData] = useState<any[]>([]);
   const [overdueCount, setOverdueCount] = useState(0);
+  const [heuristics, setHeuristics] = useState<any>(null);
   const currentRole = user.effective_role || user.role_display || user.role;
 
   const isAdmin = currentRole === 'Bosh Admin' || currentRole === 'Admin';
@@ -60,6 +61,7 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
       setRecentTransactions((statsRes.data.recentSales || []).slice(0, 5));
       setDynamicChartData(statsRes.data.chartData || []);
       setOverdueCount(statsRes.data.overdueCount || 0);
+      setHeuristics(statsRes.data.heuristics || null);
 
       const auditData = logsRes.data.results || logsRes.data || [];
       setRecentActions(Array.isArray(auditData) ? auditData.slice(0, 5) : []);
@@ -543,6 +545,58 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
             ))}
           </div>
         </div>
+
+        {/* Enterprise Phase 7: Heuristic AI Insights */}
+        {isAdmin && heuristics && (
+          <div className="lg:col-span-2 bg-slate-900 p-8 rounded-[40px] shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-blue-600/20 transition-all duration-700" />
+            <h3 className="text-xl font-black text-white mb-8 flex items-center gap-3 relative z-10">
+              <Zap className="w-6 h-6 text-amber-400" />
+              AI Bashorat (Heuristics)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+              <div className="space-y-4">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 group-hover:text-blue-400 transition-colors">Suminot Bashorati</p>
+                {heuristics.supply_alerts.length > 0 ? heuristics.supply_alerts.map((alert: any) => (
+                  <div key={alert.material} className="p-4 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-black text-slate-200">{alert.material}</p>
+                      <p className="text-[9px] font-bold text-slate-500 uppercase">{alert.warehouse}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${alert.status === 'CRITICAL' ? 'bg-rose-500 text-white' : 'bg-amber-500 text-white'}`}>
+                        {alert.days_left} Kun qoldi
+                      </span>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="p-4 bg-white/5 border border-dashed border-white/10 rounded-2xl text-center">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">{t("Resurslar yetarli")}</p>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 group-hover:text-amber-400 transition-colors">Moliyaviy Likvidlik Riski</p>
+                <div className="p-5 bg-white/5 border border-white/10 rounded-3xl">
+                   <div className="flex justify-between items-end mb-4">
+                      <div>
+                         <p className="text-[9px] font-black text-slate-500 uppercase mb-1">Kutilayotgan tushum (15 kun)</p>
+                         <p className="text-lg font-black text-emerald-400">
+                           {heuristics.cash_prediction.projected_15d_inflow.toLocaleString()} UZS
+                         </p>
+                      </div>
+                      <span className={`text-[9px] font-black px-2 py-1 rounded-md ${heuristics.cash_prediction.risk_level === 'HIGH' ? 'bg-rose-500' : 'bg-blue-600'} text-white`}>
+                        {heuristics.cash_prediction.risk_level} RISK
+                      </span>
+                   </div>
+                   <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-emerald-400 h-full" style={{ width: '40%' }}></div>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="card-responsive p-6 md:p-8 overflow-hidden">

@@ -624,3 +624,273 @@ export interface Delivery {
   delivered_at: string | null;
   notes: string;
 }
+
+// ═══════════════════════════════════════════════════
+// ACCOUNTING MODULE TYPES
+// ═══════════════════════════════════════════════════
+
+export type AccountType = 'ASSET' | 'LIABILITY' | 'EQUITY' | 'REVENUE' | 'EXPENSE' | 'CONTRA';
+
+export interface AccountNode {
+  id: number;
+  code: string;
+  name: string;
+  account_type: AccountType;
+  account_type_display: string;
+  parent: number | null;
+  parent_name?: string;
+  parent_code?: string;
+  children_count: number;
+  children?: AccountNode[];
+  description: string;
+  is_active: boolean;
+  is_system: boolean;
+  balance: number;
+  full_path: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface JournalEntryLine {
+  id: number;
+  account: number;
+  account_code: string;
+  account_name: string;
+  debit: number;
+  credit: number;
+  description: string;
+}
+
+export interface JournalEntry {
+  id: number;
+  entry_number: string;
+  date: string;
+  description: string;
+  source_type: 'MANUAL' | 'WAREHOUSE' | 'PRODUCTION' | 'SALE' | 'FINANCE' | 'TRANSFER' | 'ADJUSTMENT';
+  source_type_display: string;
+  source_id: string | null;
+  source_description: string;
+  status: 'DRAFT' | 'POSTED' | 'VOID';
+  status_display: string;
+  reference: string;
+  tax_rate: number | null;
+  total_amount: number;
+  total_debit: number;
+  total_credit: number;
+  is_balanced: boolean;
+  fiscal_period: number | null;
+  created_by: number | null;
+  created_by_name: string | null;
+  posted_at: string | null;
+  voided_at: string | null;
+  voided_by: number | null;
+  voided_by_name: string | null;
+  void_reason: string;
+  created_at: string;
+  updated_at: string;
+  lines: JournalEntryLine[];
+}
+
+export interface TrialBalanceAccount {
+  code: string;
+  name: string;
+  account_type: AccountType;
+  opening_debit: number;
+  opening_credit: number;
+  period_debit: number;
+  period_credit: number;
+  closing_debit: number;
+  closing_credit: number;
+}
+
+export interface TrialBalance {
+  start_date: string;
+  end_date: string;
+  accounts: TrialBalanceAccount[];
+  total_debit: number;
+  total_credit: number;
+  is_balanced: boolean;
+}
+
+export interface BalanceSheetItem {
+  code: string;
+  name: string;
+  balance: number;
+}
+
+export interface BalanceSheet {
+  date: string;
+  assets: BalanceSheetItem[];
+  liabilities: BalanceSheetItem[];
+  equity: BalanceSheetItem[];
+  retained_earnings: number;
+  total_assets: number;
+  total_liabilities: number;
+  total_equity: number;
+  total_liabilities_and_equity: number;
+  is_balanced: boolean;
+}
+
+export interface IncomeStatementItem {
+  code: string;
+  name: string;
+  amount: number;
+}
+
+export interface IncomeStatement {
+  start_date: string;
+  end_date: string;
+  revenues: IncomeStatementItem[];
+  expenses: IncomeStatementItem[];
+  total_revenue: number;
+  total_expenses: number;
+  net_income: number;
+  profit_margin: number;
+}
+
+export interface CashFlowEntry {
+  date: string;
+  description: string;
+  amount: number;
+  source: string;
+  entry_number: string;
+}
+
+export interface CashFlowStatement {
+  start_date: string;
+  end_date: string;
+  opening_cash: number;
+  total_inflow: number;
+  total_outflow: number;
+  net_cash_flow: number;
+  closing_cash: number;
+  inflows: CashFlowEntry[];
+  outflows: CashFlowEntry[];
+}
+
+export interface AccountingSummary {
+  balances: {
+    cash: number;
+    bank: number;
+    total_cash: number;
+    receivables: number;
+    payables: number;
+    raw_materials: number;
+    finished_goods: number;
+  };
+  monthly_pl: {
+    revenue: number;
+    expenses: number;
+    net_income: number;
+    profit_margin: number;
+  };
+  monthly_totals: {
+    total_debit: number;
+    total_credit: number;
+  };
+  recent_entries: JournalEntry[];
+  entry_count: number;
+  posted_count: number;
+  draft_count: number;
+}
+
+export interface TaxRate {
+  id: number;
+  name: string;
+  code: string;
+  rate: number;
+  is_active: boolean;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FiscalPeriod {
+  id: number;
+  name: string;
+  start_date: string;
+  end_date: string;
+  is_closed: boolean;
+  closed_by: number | null;
+  closed_by_name: string | null;
+  closed_at: string | null;
+  created_at: string;
+}
+
+// ═══════════════════════════════════════════════════
+// PHASE 2: BUDGETS, COMPLIANCE, ALERTS TYPES
+// ═══════════════════════════════════════════════════
+
+export interface CostCenter {
+  id: number;
+  name: string;
+  code: string;
+  manager: number | null;
+  manager_name?: string;
+  is_active: boolean;
+}
+
+export interface Budget {
+  id: number;
+  name: string;
+  fiscal_period: number;
+  cost_center: number | null;
+  cost_center_name?: string;
+  account: number;
+  account_code?: string;
+  account_name?: string;
+  planned_amount: number;
+  actual_amount: number;
+  variance?: number;
+  used_percentage?: number;
+  status: 'DRAFT' | 'ACTIVE' | 'CLOSED';
+  created_at: string;
+}
+
+export interface ComplianceRule {
+  id: number;
+  name: string;
+  rule_type: string;
+  rule_type_display?: string;
+  severity: 'WARNING' | 'BLOCK';
+  severity_display?: string;
+  is_active: boolean;
+  description: string;
+}
+
+export interface ComplianceViolation {
+  id: number;
+  rule: number;
+  rule_name?: string;
+  severity?: string;
+  description: string;
+  context_data: any;
+  is_resolved: boolean;
+  resolved_by: number | null;
+  resolved_by_name?: string;
+  resolution_note: string;
+  created_at: string;
+}
+
+export interface AlertRule {
+  id: number;
+  name: string;
+  trigger_type: string;
+  trigger_type_display?: string;
+  threshold: number | null;
+  is_active: boolean;
+  recipients: number[];
+}
+
+export interface Alert {
+  id: number;
+  rule: number | null;
+  title: string;
+  message: string;
+  severity: 'INFO' | 'WARNING' | 'CRITICAL';
+  severity_display?: string;
+  is_resolved: boolean;
+  resolved_by: number | null;
+  resolved_by_name?: string;
+  created_at: string;
+}
