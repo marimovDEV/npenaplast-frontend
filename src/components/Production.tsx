@@ -366,1360 +366,755 @@ export default function Production({ user }: { user: User }) {
   const availableZames = zamesy.filter(z => z.status === 'DONE' && !bunkers.some(b => b.batchNumber === `EXP-${z.zames_number}`));
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit border border-slate-200 shadow-inner">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setSubTab(tab.id)}
-            className={`
-              px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300
-              ${subTab === tab.id ? 'bg-white text-blue-600 shadow-lg shadow-blue-100 ring-1 ring-blue-50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}
-            `}
-          >
-            {tab.name}
-          </button>
-        ))}
-      </div>
+    <>
+      <div className="space-y-6">
+        <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit border border-slate-200 shadow-inner">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setSubTab(tab.id)}
+              className={`
+                px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300
+                ${subTab === tab.id ? 'bg-white text-blue-600 shadow-lg shadow-blue-100 ring-1 ring-blue-50' : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'}
+              `}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
 
-      <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[500px]">
-        {subTab === 'zames' && (
-          <div className="space-y-10 animate-in fade-in duration-500">
-            {/* Header with New Action */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-              <div>
-                <h3 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                  <FlaskConical className="w-8 h-8 text-blue-600" />
-                  {t('Zameslar Jurnali')}
-                </h3>
-                <p className="text-slate-500 font-medium">{t('Xom ashyoni ko\'pirtirish va partiyalash jarayoni')}</p>
-              </div>
-              <button 
-                onClick={() => setIsZamesModalOpen(true)}
-                className="bg-blue-600 text-white px-10 py-4 rounded-[24px] font-black flex items-center gap-3 shadow-2xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all group"
-              >
-                <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
-                <span>{t('Yangi Zames Yaratish')}</span>
-              </button>
-            </div>
-
-            {/* LIVE CONTROLLER: Active Zames Section */}
-            {zamesy.some(z => z.status === 'IN_PROGRESS') && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-3 bg-blue-600 rounded-full animate-ping" />
-                  <h4 className="text-sm font-black text-blue-600 uppercase tracking-widest">{t('Aktiv Jarayonlar')}</h4>
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[500px]">
+          {subTab === 'zames' && (
+            <div className="space-y-10 animate-in fade-in duration-500">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                  <h3 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                    <FlaskConical className="w-8 h-8 text-blue-600" />
+                    {t('Zameslar Jurnali')}
+                  </h3>
+                  <p className="text-slate-500 font-medium">{t('Xom ashyoni ko\'pirtirish va partiyalash jarayoni')}</p>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {zamesy.filter(z => z.status === 'IN_PROGRESS').map(z => (
-                    <motion.div 
-                      key={z.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-white rounded-[48px] border-4 border-blue-500/20 p-10 shadow-2xl shadow-blue-100 relative overflow-hidden group"
-                    >
-                      {/* Background Pulse */}
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
-                      
-                      <div className="relative flex flex-col md:flex-row gap-10">
-                        <div className="flex-1 space-y-6">
-                          <div className="flex items-center gap-4">
-                             <div className="p-4 bg-blue-600 rounded-3xl text-white shadow-xl shadow-blue-200">
-                                <FlaskConical className="w-8 h-8 animate-bounce" />
-                             </div>
-                             <div>
-                                <h4 className="text-2xl font-black text-slate-900">{z.zames_number}</h4>
-                                <span className="text-blue-600 font-black text-sm uppercase tracking-widest">{z.recipe_name}</span>
-                             </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-6">
-                            <div className="p-5 bg-slate-50 rounded-[32px] border border-slate-100">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('Kiritilgan Vazn')}</p>
-                              <div className="flex items-center gap-3">
-                                <Weight className="w-6 h-6 text-slate-400" />
-                                <span className="text-xl font-black text-slate-900">{z.input_weight} <span className="text-sm font-bold text-slate-400">kg</span></span>
-                              </div>
-                            </div>
-                            <div className="p-5 bg-blue-50/50 rounded-[32px] border border-blue-100/50">
-                              <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">{t('Davomiyligi')}</p>
-                              <div className="flex items-center gap-3">
-                                <Clock className="w-6 h-6 text-blue-500" />
-                                <span className="text-xl font-black text-blue-900">
-                                  {z.start_time ? Math.floor((new Date().getTime() - new Date(z.start_time).getTime()) / 1000 / 60) : 0} <span className="text-sm font-bold text-blue-400">min</span>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col justify-center gap-4 md:w-64">
-                          <button 
-                            onClick={() => setIsFinishModalOpen(z)}
-                            className="bg-emerald-500 text-white p-6 rounded-[32px] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-100 hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-all flex flex-col items-center gap-3"
-                          >
-                            <CheckCircle2 className="w-10 h-10" />
-                            {t('Tugatish')}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Progress Bar Container */}
-                      <div className="absolute bottom-0 left-0 right-0 h-2 bg-slate-100">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: "100%" }}
-                          transition={{ duration: 180, ease: "linear" }}
-                          className="h-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.8)]"
-                        />
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Zames History Table / Grid */}
-            <div className="space-y-6">
-              <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t('Yaqindagi Zameslar')}</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <AnimatePresence mode="popLayout">
-                  {zamesy
-                    .filter(z => z.status !== 'IN_PROGRESS')
-                    .map(z => (
-                    <motion.div 
-                      layout
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      key={z.id} 
-                      className={`
-                        relative overflow-hidden rounded-[40px] border p-6 transition-all duration-300 bg-white group hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1
-                        ${z.status === 'DONE' ? 'border-emerald-100' : 'border-slate-100'}
-                      `}
-                    >
-                      <div className="flex justify-between items-start mb-6">
-                        <div className={`
-                          p-4 rounded-3xl shadow-lg transition-transform group-hover:scale-110
-                          ${z.status === 'DONE' ? 'bg-emerald-500 text-white shadow-emerald-100' : 
-                            'bg-slate-100 text-slate-400'}
-                        `}>
-                          <FlaskConical className="w-6 h-6" />
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <span className={`
-                            px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border
-                            ${z.status === 'DONE' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
-                              z.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
-                              'bg-slate-50 text-slate-500 border-slate-200'}
-                          `}>
-                            {z.status === 'PENDING' ? t('Kutilmoqda') : z.status === 'DONE' ? t('Tayyor') : t('Bekor qilingan')}
-                          </span>
-                          <span className="text-[10px] font-black text-slate-400 tracking-tighter uppercase whitespace-nowrap">
-                            {new Date(z.created_at).toLocaleDateString()} • {new Date(z.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 mb-8">
-                        <div>
-                          <h4 className="text-xl font-black text-slate-900 mb-1">{z.zames_number}</h4>
-                          <p className="text-xs font-bold text-blue-600 truncate">{z.recipe_name}</p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Kirish')}</p>
-                            <span className="text-sm font-black text-slate-900">{z.input_weight} <span className="text-[10px]">kg</span></span>
-                          </div>
-                          <div className={`p-3 rounded-2xl border ${z.status === 'DONE' ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
-                            <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${z.status === 'DONE' ? 'text-emerald-500' : 'text-slate-400'}`}>{t('Chiqish')}</p>
-                            <span className={`text-sm font-black ${z.status === 'DONE' ? 'text-emerald-900' : 'text-slate-900'}`}>{z.output_weight || '—'} <span className="text-[10px]">kg</span></span>
-                          </div>
-                        </div>
-
-                        {z.output_weight && z.input_weight > 0 && (
-                          <div className="pt-2">
-                             <div className="flex justify-between items-center text-[10px] font-black uppercase mb-1">
-                                <span className="text-slate-400">{t('Samaradorlik')}</span>
-                                <span className={z.output_weight / z.input_weight < 0.95 ? 'text-red-500' : 'text-emerald-600'}>
-                                   {Math.round((z.output_weight / z.input_weight) * 100)}%
-                                </span>
-                             </div>
-                             <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div 
-                                  className={`h-full rounded-full ${z.output_weight / z.input_weight < 0.95 ? 'bg-red-500' : 'bg-emerald-500'}`}
-                                  style={{ width: `${Math.min((z.output_weight / z.input_weight) * 100, 100)}%` }}
-                                />
-                             </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2 pt-4 border-t border-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[8px] border border-white">
-                          {z.operator_name?.charAt(0)}
-                        </div>
-                        <span>{z.operator_name}</span>
-                      </div>
-
-                      {z.status === 'PENDING' && (
-                        <button 
-                          onClick={() => handleStartZames(z.id)}
-                          className="w-full mt-6 bg-blue-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
-                        >
-                          <Play className="w-4 h-4 fill-current" />
-                          {t('Boshlash')}
-                        </button>
-                      )}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {subTab === 'bunker' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center mb-2">
-              <div>
-                <h3 className="text-xl font-bold text-slate-900 tracking-tight">{t('Bunkerlar Holati')}</h3>
-                <p className="text-slate-500 text-sm">{t('Zameslarni bunkerlarda yetiltirish')}</p>
-              </div>
-              <button 
-                onClick={() => setIsBunkerModalOpen(true)}
-                className="bg-blue-50 text-blue-600 px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-blue-100 hover:bg-blue-100 transition-all font-bold"
-              >
-                <Plus className="w-5 h-5" />
-                <span>{t('Bunkerga joylash')}</span>
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {bunkers.map(b => (
-                <div key={b.id} className="border border-slate-100 rounded-3xl p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden ring-1 ring-transparent hover:ring-blue-100">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${b.status === 'Empty' ? 'bg-white text-slate-300 border border-slate-100 group-hover:scale-110' : 'bg-blue-600 text-white shadow-blue-200 group-hover:scale-110'}`}>
-                      <Database className="w-6 h-6" />
-                    </div>
-                    <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
-                      b.status === 'Ready' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
-                      b.status === 'Aging' ? 'bg-amber-50 text-amber-600 border-amber-100 animate-pulse' : 
-                      'bg-slate-50 text-slate-400 border-slate-100'
-                    }`}>
-                      {b.status === 'Empty' ? t('Bo\'sh') : b.status === 'Aging' ? t('Yetilmoqda') : t('Tayyor')}
-                    </span>
-                  </div>
-                  <h4 className="text-lg font-black text-slate-900 mb-1 tracking-tight">{t('Bunker')} №{b.bunkerNumber}</h4>
-                  <div className="flex flex-col gap-1.5 mb-6 min-h-[48px]">
-                    {b.batchNumber ? (
-                      <>
-                        <p className="text-xs text-slate-500 font-bold">{t('Partiya')}: <span className="text-blue-600 font-black tracking-wider">{b.batchNumber}</span></p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{b.loadedAt ? new Date(b.loadedAt).toLocaleTimeString() : ''}</p>
-                      </>
-                    ) : (
-                      <p className="text-xs text-slate-400 italic font-medium mt-1">{t('Joylash uchun tayyor')}</p>
-                    )}
-                  </div>
-                  
-                  {b.status !== 'Empty' && (
-                    <div className="space-y-2 mb-6">
-                      <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        <span>{t('Saqlash jarayoni')}</span>
-                        <span className={b.status === 'Ready' ? 'text-emerald-600' : 'text-amber-600'}>{b.status === 'Ready' ? '100%' : '45%'}</span>
-                      </div>
-                      <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: b.status === 'Ready' ? '100%' : '45%' }}
-                          className={`h-full rounded-full transition-all duration-1000 ${b.status === 'Ready' ? 'bg-emerald-500 shadow-lg shadow-emerald-200' : 'bg-amber-500 shadow-lg shadow-amber-200'}`}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <button 
-                    onClick={() => handleCreateFormovka(b.id)}
-                    disabled={b.status !== 'Ready'}
-                    className={`w-full py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border ${
-                      b.status === 'Ready' 
-                      ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95' 
-                      : 'bg-white border-slate-100 text-slate-300 cursor-not-allowed'
-                    }`}
-                  >
-                    {t('Formovkaga yuborish')}
-                  </button>
-
-                  {b.status !== 'Empty' && (
-                    <button 
-                      onClick={async () => {
-                        if (window.confirm(t("Bunkerni majburiy bo'shatmoqchimisiz?"))) {
-                          try {
-                            await api.post(`production/bunkers/${b.id}/force-release/`);
-                            uiStore.showNotification(t("Bunker bo'shatildi"), "info");
-                            fetchProductionData();
-                          } catch (err) {
-                            uiStore.showNotification(t("Xatolik"), "error");
-                          }
-                        }
-                      }}
-                      className="w-full mt-2 py-2 text-[9px] font-black uppercase text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                    >
-                      {t('Reset (Majburiy Bo\'shatish)')}
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {subTab === 'formovka' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-end">
-              <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Blok Formovka Jurnali')}</h3>
-                <p className="text-slate-500 font-medium">{t('Bunkerlardan bloklar quyish jarayoni')}</p>
-              </div>
-              <button 
-                onClick={() => setIsBlockModalOpen(true)}
-                className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all group"
-              >
-                <Plus className="w-5 h-5" />
-                <span>{t('Blok Quyishni Qayd Etish')}</span>
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {blockProductions.map(b => (
-                <div key={b.id} className="bg-white rounded-[32px] border border-slate-100 p-6 shadow-sm hover:shadow-xl transition-all group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-blue-50 rounded-2xl">
-                       <Box className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                      b.status === 'DRYING' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                    }`}>
-                      {b.status === 'DRYING' ? t('Quritilmoqda') : t('Sklad 2 da')}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-lg font-black text-slate-900 leading-none">{t('Forma')} №: {b.form_number}</h4>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{t('Zames')}: {b.zames_number}</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-50">
-                      <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Miqdor')}</p>
-                        <p className="text-sm font-black text-slate-900">{b.block_count} {t('dona')}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Hajm')}</p>
-                        <p className="text-sm font-black text-slate-900">{b.volume.toFixed(2)} m³</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Zichlik')}</p>
-                        <p className="text-sm font-black text-slate-900">{b.density} kg/m³</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Sana')}</p>
-                        <p className="text-sm font-black text-slate-900">{new Date(b.date).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              {blockProductions.length === 0 && (
-                <div className="col-span-full py-20 text-center text-slate-400 italic font-bold">
-                  <Layers className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                  <p>{t('Hozircha bloklar quyilmadi')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {subTab === 'orders' && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Ishlab Chiqarish Nazorati')}</h3>
-                <p className="text-slate-500 text-sm font-medium">{t('Buyurtma-naryadlar va texnologik jarayon monitoringi')}</p>
-              </div>
-              <div className="flex items-center gap-4">
-                 <button 
-                  onClick={() => setOperatorMode(!operatorMode)}
-                  className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    operatorMode 
-                      ? 'bg-amber-100 text-amber-700 shadow-inner' 
-                      : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200 shadow-sm'
-                  }`}
-                >
-                  {operatorMode ? t('🏭 Operator Rejimi ON') : t('⚙️ Grid Rejimi')}
-                </button>
                 <button 
-                  onClick={() => setIsOrderModalOpen(true)}
-                  className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center gap-3 shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
+                  onClick={() => setIsZamesModalOpen(true)}
+                  className="bg-blue-600 text-white px-10 py-4 rounded-[24px] font-black flex items-center gap-3 shadow-2xl shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all group"
                 >
-                  <Plus className="w-4 h-4" />
-                  {t('Yangi Buyurtma')}
+                  <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
+                  <span>{t('Yangi Zames Yaratish')}</span>
                 </button>
               </div>
-            </div>
 
-            {operatorMode ? (
-              /* FOCUSED OPERATOR VIEW */
-              <div className="space-y-8">
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {productionOrders
-                      .filter(o => o.status !== 'COMPLETED')
-                      .map(order => {
-                        const activeStage = order.stages.find(s => s.status === 'ACTIVE' || s.status === 'FAILED');
-                        const pendingStage = order.stages.find(s => s.status === 'PENDING');
-                        const focusStage = activeStage || pendingStage;
-
-                        if (!focusStage) return null;
-
-                        return (
-                          <motion.div 
-                            key={order.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className={`p-10 rounded-[48px] border-4 transition-all ${
-                              activeStage?.status === 'FAILED' 
-                                ? 'bg-red-50 border-red-200' 
-                                : activeStage 
-                                  ? 'bg-amber-50 border-amber-200 shadow-2xl shadow-amber-100' 
-                                  : 'bg-white border-slate-100'
-                            }`}
-                          >
-                            <div className="flex justify-between items-start mb-8">
-                              <div>
-                                <h4 className="text-2xl font-black text-slate-900 leading-tight mb-2">{order.order_number}</h4>
-                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{order.product_name}</p>
-                              </div>
-                              <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase ${
-                                activeStage?.status === 'FAILED' ? 'bg-red-500 text-white' : 'bg-slate-900 text-white'
-                              }`}>
-                                {focusStage.stage_type_display}
-                              </span>
-                            </div>
-
-                            <div className="mb-10">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{t('Vazifa holati')}</p>
-                              <div className="flex items-center gap-4">
-                                <div className={`w-4 h-4 rounded-full ${activeStage ? 'bg-amber-500 animate-pulse' : 'bg-slate-200'}`} />
-                                <span className="text-lg font-black text-slate-900">{focusStage.status_display}</span>
-                              </div>
-                            </div>
-
-                             {/* MAIN CONTROLS */}
-                             <div className="space-y-4">
-                                {focusStage.status === 'PENDING' && (
-                                   <button 
-                                      onClick={() => {
-                                        if (focusStage.stage_type === 'BUNKER') {
-                                          setIsStageBunkerModalOpen({ orderId: order.id, stageId: focusStage.id });
-                                        } else {
-                                          handleStartStage(order.id, focusStage.id);
-                                        }
-                                      }}
-                                      className="w-full py-6 bg-blue-600 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
-                                   >
-                                      <Play className="w-5 h-5 fill-current" />
-                                      {t('Boshlash')}
-                                   </button>
-                                )}
-
-                                {focusStage.status === 'ACTIVE' && (
-                                   <div className="grid grid-cols-4 gap-4">
-                                      <button 
-                                        onClick={() => handleTransitionStage(order.id, focusStage.id)}
-                                        className="col-span-3 py-6 bg-emerald-500 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-emerald-100 hover:bg-emerald-600 active:scale-95 transition-all"
-                                      >
-                                        <CheckCircle2 className="w-5 h-5" />
-                                        {t('Yakunlash')}
-                                      </button>
-                                      <button 
-                                         onClick={() => setIsFailModalOpen({ orderId: order.id, stageId: focusStage.id })}
-                                         className="col-span-1 p-6 bg-red-100 text-red-600 rounded-3xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center shadow-lg shadow-red-50"
-                                      >
-                                         <AlertTriangle className="w-6 h-6" />
-                                      </button>
-                                   </div>
-                                )}
-
-                                {focusStage.status === 'FAILED' && (
-                                   <button 
-                                      onClick={() => handleStartStage(order.id, focusStage.id)}
-                                      className="w-full py-6 bg-amber-500 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-amber-100 hover:bg-amber-600 active:scale-95 transition-all"
-                                   >
-                                      <RotateCcw className="w-5 h-5" />
-                                      {t('Qayta Boshlash')}
-                                   </button>
-                                )}
-                             </div>
-                          </motion.div>
-                        );
-                      })}
-                 </div>
-              </div>
-            ) : (
-              /* TRADITIONAL GRID VIEW */
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[600px]">
-              {(['PENDING', 'PLANNED', 'IN_PROGRESS', 'COMPLETED'] as const).map(colStatus => (
-                <div key={colStatus} className="flex flex-col gap-6">
-                  <div className="flex items-center justify-between px-2">
-                    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                      {colStatus === 'PENDING' ? t('Kutilmoqda') : 
-                       colStatus === 'PLANNED' ? t('Rejalashtirilgan') : 
-                       colStatus === 'IN_PROGRESS' ? t('Jarayonda') : t('Tugallangan')}
-                    </h4>
-                    <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-bold">
-                      {productionOrders.filter(o => o.status === colStatus).length}
-                    </span>
+              {zamesy.some(z => z.status === 'IN_PROGRESS') && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-3 h-3 bg-blue-600 rounded-full animate-ping" />
+                    <h4 className="text-sm font-black text-blue-600 uppercase tracking-widest">{t('Aktiv Jarayonlar')}</h4>
                   </div>
-
-                  <div className="flex flex-col gap-4">
-                    {productionOrders.filter(o => o.status === colStatus).map(order => (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {zamesy.filter(z => z.status === 'IN_PROGRESS').map(z => (
                       <motion.div 
-                        key={order.id}
-                        layoutId={`order-${order.id}`}
-                        className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 transition-all group"
+                        key={z.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-white rounded-[48px] border-4 border-blue-500/20 p-10 shadow-2xl shadow-blue-100 relative overflow-hidden group"
                       >
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-tighter">
-                            {order.order_number}
-                          </span>
-                          {order.deadline && (
-                            <div className="flex items-center gap-1.5 text-rose-500">
-                              <Clock className="w-3.5 h-3.5" />
-                              <span className="text-[10px] font-black uppercase tracking-tighter">
-                                {new Date(order.deadline).toLocaleDateString()}
-                              </span>
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                        
+                        <div className="relative flex flex-col md:flex-row gap-10">
+                          <div className="flex-1 space-y-6">
+                            <div className="flex items-center gap-4">
+                               <div className="p-4 bg-blue-600 rounded-3xl text-white shadow-xl shadow-blue-200">
+                                  <FlaskConical className="w-8 h-8 animate-bounce" />
+                               </div>
+                               <div>
+                                  <h4 className="text-2xl font-black text-slate-900">{z.zames_number}</h4>
+                                  <span className="text-blue-600 font-black text-sm uppercase tracking-widest">{z.recipe_name}</span>
+                               </div>
                             </div>
-                          )}
-                        </div>
 
-                        <h5 className="text-lg font-black text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">
-                          {order.product_name}
-                        </h5>
-                        <p className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest mb-6">
-                          {t('Hajm')}: {order.quantity} m³ / {t('blok')}
-                        </p>
-
-                        {/* Pipeline Tracker */}
-                        <div className="flex items-center justify-between gap-1 mb-6">
-                          {order.stages.map((stage) => (
-                            <div key={stage.id} className="flex-1 group/stage relative">
-                              <div 
-                                className={`h-1.5 rounded-full transition-all duration-500 ${
-                                  stage.status === 'DONE' ? 'bg-emerald-500' :
-                                  stage.status === 'FAILED' ? 'bg-red-500' :
-                                  stage.status === 'ACTIVE' ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]' :
-                                  'bg-slate-100'
-                                }`}
-                              />
-                              <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/stage:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-20">
-                                {stage.stage_type_display}: {stage.status_display}
+                            <div className="grid grid-cols-2 gap-6">
+                              <div className="p-5 bg-slate-50 rounded-[32px] border border-slate-100">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('Kiritilgan Vazn')}</p>
+                                <div className="flex items-center gap-3">
+                                  <Weight className="w-6 h-6 text-slate-400" />
+                                  <span className="text-xl font-black text-slate-900">{z.input_weight} <span className="text-sm font-bold text-slate-400">kg</span></span>
+                                </div>
+                              </div>
+                              <div className="p-5 bg-blue-50/50 rounded-[32px] border border-blue-100/50">
+                                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">{t('Davomiyligi')}</p>
+                                <div className="flex items-center gap-3">
+                                  <Clock className="w-6 h-6 text-blue-500" />
+                                  <span className="text-xl font-black text-blue-900">
+                                    {z.start_time ? Math.floor((new Date().getTime() - new Date(z.start_time).getTime()) / 1000 / 60) : 0} <span className="text-sm font-bold text-blue-400">min</span>
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          ))}
+                          </div>
+
+                          <div className="flex flex-col justify-center gap-4 md:w-64">
+                            <button 
+                              onClick={() => setIsFinishModalOpen(z)}
+                              className="bg-emerald-500 text-white p-6 rounded-[32px] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-100 hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-all flex flex-col items-center gap-3"
+                            >
+                              <CheckCircle2 className="w-10 h-10" />
+                              {t('Tugatish')}
+                            </button>
+                          </div>
                         </div>
 
-                        <div className="flex items-center justify-between mb-6">
-                           <div className="flex flex-col">
-                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Progress</span>
-                             <span className="text-sm font-black text-slate-900">{Math.round(order.progress)}%</span>
-                           </div>
-                           <div className="flex -space-x-2">
-                              <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-black text-slate-400">
-                                {order.responsible_name?.[0]?.toUpperCase() || 'A'}
-                              </div>
-                           </div>
+                        <div className="absolute bottom-0 left-0 right-0 h-2 bg-slate-100">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: "100%" }}
+                            transition={{ duration: 180, ease: "linear" }}
+                            className="h-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.8)]"
+                          />
                         </div>
-
-                        {order.status !== 'COMPLETED' && (() => {
-                          const currentStageIndex = order.stages.findIndex(s => s.status === 'PENDING' || s.status === 'ACTIVE');
-                          const currentStage = order.stages[currentStageIndex];
-                          if (!currentStage) return null;
-
-                          const prevStage = currentStageIndex > 0 ? order.stages[currentStageIndex - 1] : null;
-                          const isLocked = prevStage && prevStage.status !== 'DONE';
-
-                          if (currentStage.status === 'PENDING') {
-                            return (
-                              <button 
-                                onClick={() => {
-                                  if (isLocked) return;
-                                  if (currentStage.stage_type === 'BUNKER') {
-                                    setIsStageBunkerModalOpen({ orderId: order.id, stageId: currentStage.id });
-                                  } else {
-                                    handleStartStage(order.id, currentStage.id);
-                                  }
-                                }}
-                                disabled={isLocked}
-                                className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all ${
-                                  isLocked 
-                                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-60' 
-                                    : 'bg-blue-600 text-white shadow-lg shadow-blue-100 hover:bg-blue-700 active:scale-95'
-                                }`}
-                              >
-                                {isLocked ? (
-                                  <>
-                                    <AlertTriangle className="w-3.5 h-3.5" />
-                                    {prevStage.stage_type_display} {t('kutilmoqda')}
-                                  </>
-                                ) : (
-                                  <>
-                                    <Play className="w-3.5 h-3.5 fill-current" />
-                                    {currentStage.stage_type_display}{t('ni boshlash')}
-                                  </>
-                                )}
-                              </button>
-                            );
-                          } else if (currentStage.status === 'ACTIVE') {
-                            return (
-                              <div className="grid grid-cols-4 gap-2">
-                                <button 
-                                  onClick={() => handleTransitionStage(order.id, currentStage.id)}
-                                  className="col-span-3 py-4 bg-amber-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-amber-100 hover:bg-amber-600 transition-all active:scale-95"
-                                >
-                                  <CheckCircle2 className="w-3.5 h-3.5" />
-                                  {currentStage.stage_type_display}{t('ni yakunlash')}
-                                </button>
-                                <button 
-                                  onClick={() => setIsFailModalOpen({ orderId: order.id, stageId: currentStage.id })}
-                                  className="col-span-1 p-4 bg-red-100 text-red-600 rounded-2xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"
-                                >
-                                  <AlertTriangle className="w-4 h-4" />
-                                </button>
-                              </div>
-                            );
-                          } else if (currentStage.status === 'FAILED') {
-                            return (
-                               <button 
-                                onClick={() => handleStartStage(order.id, currentStage.id)}
-                                className="w-full py-4 bg-amber-100 text-amber-700 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-amber-200 transition-all active:scale-95"
-                              >
-                                <RotateCcw className="w-3.5 h-3.5" />
-                                {t('Qayta urinib ko\'rish')}
-                              </button>
-                            )
-                          }
-                          return null;
-                        })()}
                       </motion.div>
                     ))}
                   </div>
                 </div>
-              ))}
+              )}
+
+              <div className="space-y-6">
+                <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t('Yaqindagi Zameslar')}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  <AnimatePresence mode="popLayout">
+                    {zamesy
+                      .filter(z => z.status !== 'IN_PROGRESS')
+                      .map(z => (
+                      <motion.div 
+                        layout
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        key={z.id} 
+                        className={`
+                          relative overflow-hidden rounded-[40px] border p-6 transition-all duration-300 bg-white group hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1
+                          ${z.status === 'DONE' ? 'border-emerald-100' : 'border-slate-100'}
+                        `}
+                      >
+                        <div className="flex justify-between items-start mb-6">
+                          <div className={`
+                            p-4 rounded-3xl shadow-lg transition-transform group-hover:scale-110
+                            ${z.status === 'DONE' ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-slate-100 text-slate-400'}
+                          `}>
+                            <FlaskConical className="w-6 h-6" />
+                          </div>
+                          <div className="flex flex-col items-end gap-2">
+                            <span className={`
+                              px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border
+                              ${z.status === 'DONE' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                                z.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                'bg-slate-50 text-slate-500 border-slate-200'}
+                            `}>
+                              {z.status === 'PENDING' ? t('Kutilmoqda') : z.status === 'DONE' ? t('Tayyor') : t('Bekor qilingan')}
+                            </span>
+                            <span className="text-[10px] font-black text-slate-400 tracking-tighter uppercase whitespace-nowrap">
+                              {new Date(z.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 mb-8">
+                          <div>
+                            <h4 className="text-xl font-black text-slate-900 mb-1">{z.zames_number}</h4>
+                            <p className="text-xs font-bold text-blue-600 truncate">{z.recipe_name}</p>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Kirish')}</p>
+                              <span className="text-sm font-black text-slate-900">{z.input_weight} kg</span>
+                            </div>
+                            <div className={`p-3 rounded-2xl border ${z.status === 'DONE' ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
+                              <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${z.status === 'DONE' ? 'text-emerald-500' : 'text-slate-400'}`}>{t('Chiqish')}</p>
+                              <span className={`text-sm font-black ${z.status === 'DONE' ? 'text-emerald-900' : 'text-slate-900'}`}>{z.output_weight || '—'} kg</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 pt-4 border-t border-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                          <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[8px] border border-white">
+                            {z.operator_name?.charAt(0)}
+                          </div>
+                          <span>{z.operator_name}</span>
+                        </div>
+
+                        {z.status === 'PENDING' && (
+                          <button 
+                            onClick={() => handleStartZames(z.id)}
+                            className="w-full mt-6 bg-blue-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
+                          >
+                            <Play className="w-4 h-4 fill-current" />
+                            {t('Boshlash')}
+                          </button>
+                        )}
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {subTab === 'bunker' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight">{t('Bunkerlar Holati')}</h3>
+                  <p className="text-slate-500 text-sm">{t('Zameslarni bunkerlarda yetiltirish')}</p>
+                </div>
+                <button 
+                  onClick={() => setIsBunkerModalOpen(true)}
+                  className="bg-blue-50 text-blue-600 px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-blue-100 hover:bg-blue-100 transition-all"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>{t('Bunkerga joylash')}</span>
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {bunkers.map(b => (
+                  <div key={b.id} className="border border-slate-100 rounded-3xl p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden ring-1 ring-transparent hover:ring-blue-100">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 ${b.status === 'Empty' ? 'bg-white text-slate-300 border border-slate-100 group-hover:scale-110' : 'bg-blue-600 text-white shadow-blue-200 group-hover:scale-110'}`}>
+                        <Database className="w-6 h-6" />
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
+                        b.status === 'Ready' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                        b.status === 'Aging' ? 'bg-amber-50 text-amber-600 border-amber-100 animate-pulse' : 
+                        'bg-slate-50 text-slate-400 border-slate-100'
+                      }`}>
+                        {b.status === 'Empty' ? t('Bo\'sh') : b.status === 'Aging' ? t('Yetilmoqda') : t('Tayyor')}
+                      </span>
+                    </div>
+                    <h4 className="text-lg font-black text-slate-900 mb-1 tracking-tight">{t('Bunker')} №{b.bunkerNumber}</h4>
+                    <div className="flex flex-col gap-1.5 mb-6 min-h-[48px]">
+                      {b.batchNumber ? (
+                        <>
+                          <p className="text-xs text-slate-500 font-bold">{t('Partiya')}: <span className="text-blue-600 font-black tracking-wider">{b.batchNumber}</span></p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{b.loadedAt ? new Date(b.loadedAt).toLocaleTimeString() : ''}</p>
+                        </>
+                      ) : (
+                        <p className="text-xs text-slate-400 italic font-medium mt-1">{t('Joylash uchun tayyor')}</p>
+                      )}
+                    </div>
+                    
+                    {b.status !== 'Empty' && (
+                      <div className="space-y-2 mb-6">
+                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                          <span>{t('Saqlash jarayoni')}</span>
+                          <span className={b.status === 'Ready' ? 'text-emerald-600' : 'text-amber-600'}>{b.status === 'Ready' ? '100%' : '45%'}</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden shadow-inner">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: b.status === 'Ready' ? '100%' : '45%' }}
+                            className={`h-full rounded-full transition-all duration-1000 ${b.status === 'Ready' ? 'bg-emerald-500 shadow-lg shadow-emerald-200' : 'bg-amber-500 shadow-lg shadow-amber-200'}`}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    <button 
+                      onClick={() => handleCreateFormovka(b.id)}
+                      disabled={b.status !== 'Ready'}
+                      className={`w-full py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all border ${
+                        b.status === 'Ready' 
+                        ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-[0.98]' 
+                        : 'bg-white border-slate-100 text-slate-300 cursor-not-allowed'
+                      }`}
+                    >
+                      {t('Formovkaga yuborish')}
+                    </button>
+
+                    {b.status !== 'Empty' && (
+                      <button 
+                        onClick={() => handleForceReleaseBunker(b.id)}
+                        className="w-full mt-2 py-2 text-[9px] font-black uppercase text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                      >
+                        {t('Reset (Majburiy Bo\'shatish)')}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {subTab === 'formovka' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-end">
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Blok Formovka Jurnali')}</h3>
+                  <p className="text-slate-500 font-medium">{t('Bunkerlardan bloklar quyish jarayoni')}</p>
+                </div>
+                <button 
+                  onClick={() => setIsBlockModalOpen(true)}
+                  className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-[0.98] transition-all group"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>{t('Blok Quyishni Qayd Etish')}</span>
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {blockProductions.map(b => (
+                  <div key={b.id} className="bg-white rounded-[32px] border border-slate-100 p-6 shadow-sm hover:shadow-xl transition-all group">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="p-3 bg-blue-50 rounded-2xl">
+                         <Box className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                        b.status === 'DRYING' ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                      }`}>
+                        {b.status === 'DRYING' ? t('Quritilmoqda') : t('Sklad 2 da')}
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-lg font-black text-slate-900 leading-none">{t('Forma')} №: {b.form_number}</h4>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{t('Zames')}: {b.zames_number}</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-50">
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Miqdor')}</p>
+                          <p className="text-sm font-black text-slate-900">{b.block_count} {t('dona')}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Hajm')}</p>
+                          <p className="text-sm font-black text-slate-900">{b.volume.toFixed(2)} m³</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Zichlik')}</p>
+                          <p className="text-sm font-black text-slate-900">{b.density} kg/m³</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t('Sana')}</p>
+                          <p className="text-sm font-black text-slate-900">{new Date(b.date).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {subTab === 'orders' && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Ishlab Chiqarish Nazorati')}</h3>
+                  <p className="text-slate-500 text-sm font-medium">{t('Buyurtma-naryadlar va texnologik jarayon monitoringi')}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setOperatorMode(!operatorMode)}
+                    className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      operatorMode 
+                        ? 'bg-amber-100 text-amber-700 shadow-inner' 
+                        : 'bg-white text-slate-400 border border-slate-100 hover:border-slate-200 shadow-sm'
+                    }`}
+                  >
+                    {operatorMode ? t('🏭 Operator Rejimi ON') : t('⚙️ Grid Rejimi')}
+                  </button>
+                  <button 
+                    onClick={() => setIsOrderModalOpen(true)}
+                    className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center gap-3 shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98]"
+                  >
+                    <Plus className="w-4 h-4" />
+                    {t('Yangi Buyurtma')}
+                  </button>
+                </div>
+              </div>
+
+              {operatorMode ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {productionOrders
+                    .filter(o => o.status !== 'COMPLETED')
+                    .map(order => {
+                      const activeStage = order.stages.find(s => s.status === 'ACTIVE' || s.status === 'FAILED');
+                      const pendingStage = order.stages.find(s => s.status === 'PENDING');
+                      const focusStage = activeStage || pendingStage;
+                      if (!focusStage) return null;
+
+                      return (
+                        <motion.div 
+                          key={order.id}
+                          className={`p-10 rounded-[48px] border-4 transition-all ${
+                            activeStage?.status === 'FAILED' ? 'bg-red-50 border-red-200' : 
+                            activeStage ? 'bg-amber-50 border-amber-200 shadow-2xl shadow-amber-100' : 'bg-white border-slate-100'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start mb-8">
+                             <div>
+                                <h4 className="text-2xl font-black text-slate-900 mb-1">{order.order_number}</h4>
+                                <p className="text-sm font-bold text-slate-500">{order.product_name}</p>
+                             </div>
+                             <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase ${
+                               activeStage?.status === 'FAILED' ? 'bg-red-500 text-white' : 'bg-slate-900 text-white'
+                             }`}>
+                               {focusStage.stage_type_display}
+                             </span>
+                          </div>
+                          
+                          <div className="space-y-4">
+                            {focusStage.status === 'PENDING' && (
+                               <button 
+                                  onClick={() => focusStage.stage_type === 'BUNKER' ? setIsStageBunkerModalOpen({ orderId: order.id, stageId: focusStage.id }) : handleStartStage(order.id, focusStage.id)}
+                                  className="w-full py-6 bg-blue-600 text-white rounded-3xl text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3"
+                               >
+                                  <Play className="w-5 h-5 fill-current" /> {t('Boshlash')}
+                               </button>
+                            )}
+                            {focusStage.status === 'ACTIVE' && (
+                               <div className="grid grid-cols-4 gap-4">
+                                  <button onClick={() => handleTransitionStage(order.id, focusStage.id)} className="col-span-3 py-6 bg-emerald-500 text-white rounded-[32px] text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3">
+                                    <CheckCircle2 className="w-5 h-5" /> {t('Yakunlash')}
+                                  </button>
+                                  <button onClick={() => setIsFailModalOpen({ orderId: order.id, stageId: focusStage.id })} className="col-span-1 p-6 bg-red-100 text-red-600 rounded-[32px] hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+                                     <AlertTriangle className="w-6 h-6" />
+                                  </button>
+                               </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[600px]">
+                  {(['PENDING', 'PLANNED', 'IN_PROGRESS', 'COMPLETED'] as const).map(colStatus => (
+                    <div key={colStatus} className="flex flex-col gap-6">
+                      <div className="flex items-center justify-between px-2">
+                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                          {colStatus === 'PENDING' ? t('Kutilmoqda') : colStatus === 'PLANNED' ? t('Rejalashtirilgan') : colStatus === 'IN_PROGRESS' ? t('Jarayonda') : t('Tugallangan')}
+                        </h4>
+                      </div>
+                      <div className="flex flex-col gap-4">
+                        {productionOrders.filter(o => o.status === colStatus).map(order => (
+                          <motion.div key={order.id} className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 hover:shadow-xl transition-all">
+                            <div className="flex items-center justify-between mb-4">
+                              <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{order.order_number}</span>
+                            </div>
+                            <h5 className="text-lg font-black text-slate-900 mb-1">{order.product_name}</h5>
+                            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-6">{t('Hajm')}: {order.quantity} m³</p>
+                            {order.status !== 'COMPLETED' && (() => {
+                               const currentStage = order.stages.find(s => s.status === 'PENDING' || s.status === 'ACTIVE' || s.status === 'FAILED');
+                               if (!currentStage) return null;
+                               if (currentStage.status === 'PENDING') return (
+                                 <button onClick={() => currentStage.stage_type === 'BUNKER' ? setIsStageBunkerModalOpen({ orderId: order.id, stageId: currentStage.id }) : handleStartStage(order.id, currentStage.id)} className="w-full py-4 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2">
+                                   <Play className="w-3.5 h-3.5 fill-current" /> {currentStage.stage_type_display}{t('ni boshlash')}
+                                 </button>
+                               );
+                               return null;
+                            })()}
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {subTab === 'monitoring' && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t('Factory Live Monitoring')}</h3>
+                  <p className="text-slate-500 font-medium">{t('Barcha aktiv ishlab chiqarish jarayonlari nazorati')}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-6">
+                {productionOrders
+                  .filter(order => order.stages?.some(s => s.status === 'ACTIVE'))
+                  .map(order => {
+                    const activeStage = order.stages?.find(s => s.status === 'ACTIVE');
+                    if (!activeStage) return null;
+                    return (
+                      <motion.div key={order.id} className="rounded-[40px] border-2 border-slate-100 bg-white p-8 flex items-center justify-between shadow-sm">
+                        <div className="flex items-center gap-8">
+                           <div className="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center shadow-xl shadow-blue-100">
+                              <Factory className="w-10 h-10" />
+                           </div>
+                           <div>
+                              <h4 className="text-2xl font-black text-slate-900">{order.order_number}</h4>
+                              <p className="text-sm font-bold text-slate-500">{order.product_name}</p>
+                              <p className="text-xs font-black text-blue-600 uppercase tracking-widest mt-1">{t('Joriy Bosqich')}: {activeStage.stage_type_display}</p>
+                           </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                           <button onClick={() => handleResetStage(order.id, activeStage.id)} className="px-6 py-4 rounded-2xl bg-slate-50 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all flex items-center gap-2">
+                              <RotateCcw className="w-4 h-4" /> {t('Tayyor holatga') }
+                           </button>
+                           <button onClick={() => handleForceComplete(order.id, activeStage.id)} className="px-8 py-4 rounded-2xl bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4" /> {t('Yakunlash')}
+                           </button>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+              </div>
             </div>
           )}
         </div>
-      )}
+      </div>
 
-      {subTab === 'monitoring' && (
-        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-700">
-          <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
-            <div>
-              <h3 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t('Factory Live Monitoring')}</h3>
-              <p className="text-sm md:text-base text-slate-500 font-medium">{t('Barcha aktiv ishlab chiqarish jarayonlari nazorati')}</p>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-full md:w-auto px-4 py-3 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-center gap-3">
-                 <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse" />
-                 <span className="text-xs md:text-sm font-black text-blue-700 uppercase tracking-widest">Live</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
-            {productionOrders
-              .filter(order => order.stages?.some(s => s.status === 'ACTIVE'))
-              .map(order => {
-                const activeStage = order.stages?.find(s => s.status === 'ACTIVE');
-                if (!activeStage) return null;
-
-                const startTime = activeStage.started_at ? new Date(activeStage.started_at).getTime() : 0;
-                const durationHrs = startTime ? Math.floor((new Date().getTime() - startTime) / (1000 * 60 * 60)) : 0;
-                const isStuck = durationHrs >= 4;
-
-                return (
-                  <motion.div 
-                    key={order.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className={`
-                      relative overflow-hidden rounded-[28px] md:rounded-[40px] border-2 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-8 p-5 md:p-8
-                      ${isStuck ? 'bg-red-50/50 border-red-200' : 'bg-white border-slate-100 shadow-sm'}
-                    `}
-                  >
-                    <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-8 flex-1 w-full">
-                      <div className={`
-                        w-16 h-16 md:w-20 md:h-20 rounded-3xl flex items-center justify-center shadow-2xl
-                        ${isStuck ? 'bg-red-600 text-white shadow-red-200' : 'bg-blue-600 text-white shadow-blue-200'}
-                      `}>
-                         <Factory className="w-8 h-8 md:w-10 md:h-10" />
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                          <h4 className="text-xl md:text-2xl font-black text-slate-900">{order.order_number}</h4>
-                          <span className="self-start px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-full">
-                            {order.product_name}
-                          </span>
-                        </div>
-                        <p className="text-sm md:text-base text-slate-500 font-bold flex flex-wrap items-center gap-2">
-                           {t('Joriy Bosqich')}: <span className="text-blue-600 font-black underline decoration-2 underline-offset-4">{activeStage.stage_type_display}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex w-full flex-col gap-5 md:w-auto md:flex-row md:items-center md:gap-12">
-                      <div className="text-left md:text-center">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Davomiyligi')}</p>
-                        <div className={`flex items-center gap-2 text-2xl md:text-3xl font-black ${isStuck ? 'text-red-600' : 'text-slate-900'}`}>
-                           <Clock className="w-5 h-5 md:w-6 md:h-6" />
-                           <span>{durationHrs} {t('soat')}+</span>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full md:w-auto">
-                        <button 
-                          onClick={() => handleResetStage(Number(order.id), activeStage.id)}
-                          className="px-5 md:px-6 py-3 md:py-4 rounded-2xl bg-white border border-slate-200 text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-slate-50 hover:text-slate-700 transition-all flex items-center justify-center gap-2"
-                          title={t("Pending holatiga qaytarish")}
-                        >
-                           <RotateCcw className="w-4 h-4" />
-                           {t('Reset')}
-                        </button>
-                        <button 
-                          onClick={() => handleForceComplete(Number(order.id), activeStage.id)}
-                          className="px-6 md:px-8 py-3 md:py-4 rounded-2xl bg-blue-600 text-white font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
-                        >
-                           <CheckCircle2 className="w-4 h-4" />
-                           {t('Majburiy Tugatish')}
-                        </button>
-                      </div>
-                    </div>
-
-                    {isStuck && (
-                      <div className="absolute left-4 top-4 md:left-auto md:right-8 flex items-center gap-2 text-red-600 bg-red-100 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                         <AlertTriangle className="w-3 h-3" />
-                         {t('Stuck Detected')}
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-
-            {productionOrders.filter(o => o.stages?.some(s => s.status === 'ACTIVE')).length === 0 && (
-              <div className="py-20 text-center bg-slate-50 rounded-[40px] border-2 border-dashed border-slate-200">
-                 <CheckCircle2 className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-                 <h5 className="text-xl font-black text-slate-400">{t('Hozirda aktiv jarayonlar yo\'q')}</h5>
-                 <p className="text-slate-400 font-medium">{t('Barcha liniyalar bo\'sh yoki kutish holatida')}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-
+      {/* Modals Section */}
       <AnimatePresence>
         {isZamesModalOpen && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsZamesModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
-              <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-                    <Plus className="text-white w-6 h-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">{t('Yangi Zames Yaratish')}</h3>
-                    <p className="text-xs text-slate-500 font-medium">{t('Xom ashyoni ko\'pirtirish jarayoni')}</p>
-                  </div>
-                </div>
-                <button onClick={() => setIsZamesModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
-              </div>
-
-              <form onSubmit={handleCreateZames} className="p-4 md:p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Retseptni tanlang')}</label>
-                  <select 
-                    required
-                    value={selectedRecipeId}
-                    onChange={(e) => handleRecipeChange(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold"
-                  >
-                    <option value="">{t('Retseptni tanlang')}...</option>
-                    {recipes.map(r => (
-                      <option key={r.id} value={r.id}>{r.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {zamesBatchItems.length > 0 && (
-                  <div className="space-y-4">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Materiallar va Partiyalar')}</label>
-                    {zamesBatchItems.map((item, idx) => (
-                      <div key={idx} className="p-4 bg-slate-50 rounded-[24px] border border-slate-200 flex flex-col gap-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-black text-slate-900">{item.material_name}</span>
-                          <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase tracking-widest">{item.quantity} kg {t('kutilmoqda')}</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Partiya')}</label>
-                            <select
-                              required
-                              value={item.batch}
-                              onChange={(e) => {
-                                const newItems = [...zamesBatchItems];
-                                newItems[idx].batch = e.target.value;
-                                setZamesBatchItems(newItems);
-                              }}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20"
-                            >
-                              <option value="">{t('Partiyani tanlang')}...</option>
-                              {batches
-                                .filter(b => b.material === item.material)
-                                .map(b => (
-                                  <option key={b.id} value={b.batch_number}>{b.batch_number} ({b.quantity_kg} kg qolgan)</option>
-                                ))
-                              }
-                            </select>
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Vazn')} (kg)</label>
-                            <input 
-                              type="number"
-                              required
-                              value={item.quantity}
-                              onChange={(e) => {
-                                const newItems = [...zamesBatchItems];
-                                newItems[idx].quantity = Number(e.target.value);
-                                setZamesBatchItems(newItems);
-                              }}
-                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20"
-                            />
-                          </div>
-                        </div>
+               <form onSubmit={handleCreateZames}>
+                  <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100">
+                        <Plus className="text-white w-6 h-6" />
                       </div>
-                    ))}
+                      <div>
+                        <h3 className="text-xl font-black text-slate-900">{t('Yangi Zames Yaratish')}</h3>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t('Xom ashyo va retseptura')}</p>
+                      </div>
+                    </div>
+                    <button type="button" onClick={() => setIsZamesModalOpen(false)} className="p-2 hover:bg-slate-200 rounded-xl transition-all">
+                      <X className="w-6 h-6 text-slate-400" />
+                    </button>
                   </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 sticky bottom-0 bg-white">
-                  <button type="button" onClick={() => setIsZamesModalOpen(false)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
-                  <button type="submit" disabled={loading} className="flex-1 px-6 py-3.5 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95 transition-all disabled:bg-slate-300">
-                    {loading ? t('Saqlanmoqda...') : t('Zames Yaratish')}
-                  </button>
-                </div>
-              </form>
+                  
+                  <div className="p-8 space-y-8">
+                     <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Retsept tanlang')}</label>
+                        <select 
+                          value={selectedRecipeId} 
+                          onChange={(e) => handleRecipeChange(e.target.value)} 
+                          required
+                          className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all font-bold"
+                        >
+                           <option value="">{t('Tanlang...')}</option>
+                           {recipes.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                        </select>
+                     </div>
+                     
+                     {zamesBatchItems.length > 0 && (
+                        <div className="space-y-4">
+                           <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Materiallar va Partiyalar')}</h4>
+                           <div className="space-y-3">
+                              {zamesBatchItems.map((item, idx) => (
+                                <div key={idx} className="grid grid-cols-2 gap-4 p-4 bg-blue-50/30 rounded-2xl border border-blue-100/50">
+                                   <div className="flex flex-col">
+                                      <span className="text-[9px] font-black text-blue-400 uppercase tracking-widest">{item.material_name}</span>
+                                      <span className="text-sm font-black text-slate-900">{item.quantity} kg</span>
+                                   </div>
+                                   <select 
+                                     required
+                                     className="p-2 bg-white border border-blue-100 rounded-xl text-xs font-bold"
+                                     value={item.batch}
+                                     onChange={(e) => {
+                                       const newItems = [...zamesBatchItems];
+                                       newItems[idx].batch = e.target.value;
+                                       setZamesBatchItems(newItems);
+                                     }}
+                                   >
+                                      <option value="">{t('Partiya tanlang')}</option>
+                                      {batches.filter(b => b.material === item.material).map(b => (
+                                        <option key={b.id} value={b.batch_number}>{b.batch_number} ({b.quantity}kg)</option>
+                                      ))}
+                                   </select>
+                                </div>
+                              ))}
+                           </div>
+                        </div>
+                     )}
+                  </div>
+                  
+                  <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex gap-4">
+                     <button type="button" onClick={() => setIsZamesModalOpen(false)} className="flex-1 py-4 bg-white text-slate-500 font-black rounded-2xl border border-slate-200 hover:bg-slate-100 transition-all">{t('Bekor qilish')}</button>
+                     <button type="submit" disabled={loading} className="flex-1 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">{loading ? t('Yaratilmoqda...') : t('Zamesni Boshlash')}</button>
+                  </div>
+               </form>
             </motion.div>
           </div>
         )}
 
         {isFinishModalOpen && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
-              onClick={() => setIsFinishModalOpen(null)} 
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 40 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 40 }} 
-              className="relative bg-white w-full max-w-xl rounded-[48px] shadow-3xl border border-slate-100 overflow-hidden"
-            >
-              <div className="p-10 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-emerald-500 rounded-[24px] flex items-center justify-center shadow-2xl shadow-emerald-200">
-                    <CheckCircle2 className="text-white w-8 h-8" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsFinishModalOpen(null)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+               <form onSubmit={handleFinishZames} className="p-8 space-y-8">
+                  <div className="text-center">
+                     <div className="w-20 h-20 bg-emerald-500 text-white rounded-[32px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-100">
+                        <CheckCircle2 className="w-10 h-10" />
+                     </div>
+                     <h3 className="text-2xl font-black text-slate-900">{t('Zamesni Yakunlash')}</h3>
+                     <p className="text-sm font-bold text-slate-400 mt-2">{isFinishModalOpen.zames_number} • {isFinishModalOpen.recipe_name}</p>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Zamesni Yakunlash')}</h3>
-                    <p className="text-slate-500 font-bold">{t('Jarayonni to\'xtatish va natijani qayd etish')}</p>
+                  
+                  <div className="space-y-3">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Tayyor mahsulot vazni (kg)')}</label>
+                     <input 
+                       type="number" 
+                       step="0.01"
+                       value={outputWeight}
+                       onChange={(e) => setOutputWeight(e.target.value)}
+                       required
+                       className="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-[28px] text-center text-3xl font-black text-blue-600 focus:border-blue-500 focus:bg-white outline-none transition-all"
+                       placeholder="0.00"
+                     />
                   </div>
-                </div>
-                <button 
-                  onClick={() => setIsFinishModalOpen(null)} 
-                  className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
-                >
-                  <X className="w-8 h-8" />
-                </button>
-              </div>
-
-              <form onSubmit={handleFinishZames} className="p-10 space-y-8">
-                <div className="grid grid-cols-2 gap-6 p-6 bg-slate-50 rounded-[32px] border border-slate-100">
-                  <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Zames No')}</p>
-                    <p className="text-lg font-black text-slate-900">{isFinishModalOpen.zames_number}</p>
+                  
+                  <div className="flex gap-4">
+                     <button type="button" onClick={() => setIsFinishModalOpen(null)} className="flex-1 py-4 bg-slate-50 text-slate-400 font-black rounded-2xl">{t('Qaytish')}</button>
+                     <button type="submit" disabled={loading} className="flex-2 py-4 bg-emerald-500 text-white font-black rounded-2xl shadow-xl shadow-emerald-100 hover:bg-emerald-600">{t('Tasdiqlash')}</button>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Kutilgan Vazn')}</p>
-                    <p className="text-lg font-black text-blue-600">{isFinishModalOpen.input_weight} kg</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-sm font-black text-slate-900 px-1">{t('Haqiqiy chiqish vazni (Kg)')}</label>
-                  <div className="relative">
-                    <Weight className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400" />
-                    <input 
-                      autoFocus
-                      type="number" 
-                      required 
-                      step="0.01"
-                      placeholder="0.00"
-                      value={outputWeight}
-                      onChange={(e) => setOutputWeight(e.target.value)}
-                      className="w-full pl-16 pr-8 py-6 bg-slate-50 border-2 border-slate-100 rounded-[32px] text-2xl font-black text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-8 focus:ring-blue-500/5 transition-all"
-                    />
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium px-4">
-                    {t('Eslatma: Bu vazn asosida kelajakdagi tannarx va yo\'qotishlar hisoblanadi.')}
-                  </p>
-                </div>
-
-                <div className="flex gap-4 pt-4">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsFinishModalOpen(null)} 
-                    className="flex-1 px-8 py-5 text-slate-500 rounded-3xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-all"
-                  >
-                    {t('Bekor qilish')}
-                  </button>
-                  <button 
-                    type="submit" 
-                    disabled={loading} 
-                    className="flex-[2] px-8 py-5 bg-emerald-500 text-white rounded-[24px] font-black text-sm uppercase tracking-widest shadow-2xl shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
-                  >
-                    {loading ? t('Yakunlanmoqda...') : t('Jarayonni Tugatish')}
-                  </button>
-                </div>
-              </form>
+               </form>
             </motion.div>
           </div>
         )}
 
         {isBunkerModalOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsBunkerModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
-              <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200">
-                    <Database className="text-white w-6 h-6" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8">
+               <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('Bunkerga Yuklash')}</h3>
+                  <button onClick={() => setIsBunkerModalOpen(false)}><X className="text-slate-400" /></button>
+               </div>
+               <form onSubmit={handleBunkerLoad} className="space-y-6">
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Zamesni Tanlang')}</label>
+                     <select value={selectedZamesId} onChange={(e) => setSelectedZamesId(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold outline-none focus:border-blue-500 transition-all">
+                        <option value="">{t('Zames tanlang...')}</option>
+                        {availableZames.map(z => <option key={z.id} value={z.id}>{z.zames_number} ({z.output_weight} kg)</option>)}
+                     </select>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">{t('Bunkerga Joylash')}</h3>
-                    <p className="text-xs text-slate-500 font-medium">{t('Tayyor zamesni bunkerga o\'tkazish')}</p>
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Bunkerni Tanlang')}</label>
+                     <select value={selectedBunkerId} onChange={(e) => setSelectedBunkerId(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold outline-none focus:border-blue-500 transition-all">
+                        <option value="">{t('Bunker tanlang...')}</option>
+                        {bunkers.filter(b => b.status === 'Empty').map(b => <option key={b.id} value={b.id}>Bunker №{b.bunkerNumber}</option>)}
+                     </select>
                   </div>
-                </div>
-                <button onClick={() => setIsBunkerModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
-              </div>
-
-              <form onSubmit={handleBunkerLoad} className="p-4 md:p-6 space-y-5">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Zamesni tanlang')}</label>
-                  <select 
-                    required
-                    value={selectedZamesId}
-                    onChange={(e) => setSelectedZamesId(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold"
-                  >
-                    <option value="">{t('Tanlang')}...</option>
-                    {availableZames.map(z => (
-                      <option key={z.id} value={z.id}>{z.zames_number} ({t('Retsept')}: {z.recipe_name})</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider ml-1">{t('Bunkerni tanlang')}</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {bunkers.map(b => (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => b.status === 'Empty' && setSelectedBunkerId(b.id)}
-                        className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
-                          selectedBunkerId === b.id 
-                            ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200' 
-                            : b.status === 'Empty' 
-                              ? 'bg-white border-slate-100 hover:border-blue-300 text-slate-600' 
-                              : 'bg-slate-50 border-slate-50 text-slate-200 cursor-not-allowed opacity-50'
-                        }`}
-                      >
-                        <Database className="w-5 h-5" />
-                        <span className="text-xs font-black uppercase tracking-wider">{t('Bunker')} {b.bunkerNumber}</span>
-                        <span className="text-[9px] uppercase font-bold">{b.status === 'Empty' ? t('Ochiq') : t('Band')}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button type="button" onClick={() => setIsBunkerModalOpen(false)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
-                  <button 
-                    type="submit" 
-                    disabled={!selectedZamesId || !selectedBunkerId || loading}
-                    className="flex-1 px-6 py-3.5 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 active:scale-95 transition-all disabled:bg-slate-300 disabled:shadow-none"
-                  >
-                    {loading ? t('Joylanmoqda...') : t('Joylash')}
-                  </button>
-                </div>
-              </form>
+                  <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">{t('Joylash')}</button>
+               </form>
             </motion.div>
-          </div>
+           </div>
         )}
-      </AnimatePresence>
-      {/* Production Order Modal */}
-      <AnimatePresence>
-        {isOrderModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOrderModalOpen(false)}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-lg bg-white rounded-[48px] shadow-2xl overflow-hidden border border-white"
-            >
-              <div className="p-5 md:p-12">
-                <div className="flex items-center justify-between mb-10">
-                  <div>
-                    <h3 className="text-3xl font-black text-slate-900 tracking-tight">{t('Yangi Buyurtma')}</h3>
-                    <p className="text-slate-500 text-sm font-medium">{t('Buyurtma-naryat yaratish')}</p>
-                  </div>
-                  <button 
-                    onClick={() => setIsOrderModalOpen(false)}
-                    className="p-4 bg-slate-50 text-slate-400 rounded-[24px] hover:text-slate-600 transition-colors"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
 
-                <form onSubmit={handleCreateOrder} className="space-y-8">
-                  <div className="space-y-3">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Mahsulot turi')}</label>
-                    <select 
-                      value={selectedProductId}
-                      onChange={(e) => setSelectedProductId(e.target.value)}
-                      required
-                      className="w-full h-16 bg-slate-50 border-none rounded-2xl px-6 font-bold text-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none"
-                    >
-                      <option value="">{t('Tanlang')}...</option>
-                      {materials.map(m => (
-                        <option key={m.id} value={m.id}>{m.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Hajm')} ({t('Blok')}/m³)</label>
-                      <input 
-                        type="number"
-                        value={orderQuantity}
-                        onChange={(e) => setOrderQuantity(e.target.value)}
-                        required
-                        className="w-full h-16 bg-slate-50 border-none rounded-2xl px-6 font-bold text-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                        placeholder={t("Masalan") + ": 50"}
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Deadline')}</label>
-                      <input 
-                        type="date"
-                        value={orderDeadline}
-                        onChange={(e) => setOrderDeadline(e.target.value)}
-                        className="w-full h-16 bg-slate-50 border-none rounded-2xl px-6 font-bold text-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <button 
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-6 bg-slate-900 text-white rounded-[24px] text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50"
-                  >
-                    {loading ? t('Yaratilmoqda...') : t('Buyurtmani Tasdiqlash')}
-                  </button>
-                </form>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Block Production Modal */}
-      <AnimatePresence>
         {isBlockModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsBlockModalOpen(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 40 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 40 }} 
-              className="relative bg-white w-full max-w-2xl rounded-[48px] shadow-2xl overflow-hidden border border-slate-100"
-            >
-              <div className="p-10 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
-                <div className="flex items-center gap-5">
-                   <div className="w-16 h-16 bg-blue-600 rounded-[28px] flex items-center justify-center shadow-xl shadow-blue-200">
-                     <Layers className="w-8 h-8 text-white" />
-                   </div>
-                   <div>
-                     <h3 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">{t('Blok Quyishni Qayd Etish')}</h3>
-                     <p className="text-xs text-slate-500 font-bold uppercase tracking-widest opacity-60">{t('Ishlab chiqarilgan bloklarni omborga kiritish')}</p>
-                   </div>
-                </div>
-                <button onClick={() => setIsBlockModalOpen(false)} className="p-3 bg-white text-slate-400 hover:text-slate-900 rounded-2xl transition-all shadow-sm border border-slate-100 hover:border-slate-200">
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-
-              <form onSubmit={handleCreateBlock} className="p-5 md:p-10 space-y-8 max-h-[82vh] overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsBlockModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8">
+               <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('Blok Quyishni Qayd Etish')}</h3>
+                  <button onClick={() => setIsBlockModalOpen(false)}><X className="text-slate-400" /></button>
+               </div>
+               <form onSubmit={handleCreateBlock} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Zamesni tanlang')}</label>
-                    <div className="relative">
-                      <FlaskConical className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <select 
-                        required
-                        value={selectedZamesForBlock}
-                        onChange={(e) => setSelectedZamesForBlock(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 appearance-none shadow-inner"
-                      >
-                        <option value="">{t('Zamesni tanlang')}...</option>
-                        {zamesy.filter(z => z.status === 'DONE').map(z => (
-                          <option key={z.id} value={z.id}>{t('Zames')} №{z.zames_number} ({z.recipe_name})</option>
-                        ))}
-                      </select>
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Bunkerdagi Zames')}</label>
+                     <select value={selectedZamesForBlock} onChange={(e) => setSelectedZamesForBlock(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold outline-none focus:border-blue-500 transition-all">
+                        <option value="">{t('Tanlang...')}</option>
+                        {bunkers.filter(b => b.status === 'Ready').map(b => <option key={b.id} value={b.id}>Bunker №{b.bunkerNumber} ({b.batchNumber})</option>)}
+                     </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Forma №')}</label>
+                       <input type="text" value={formNumber} onChange={(e) => setFormNumber(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Dona')}</label>
+                       <input type="number" value={blockCount} onChange={(e) => setBlockCount(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold" />
                     </div>
                   </div>
-
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Forma №')}</label>
-                    <div className="relative">
-                      <Box className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input 
-                        required
-                        type="text" 
-                        placeholder={t("Masalan") + ": F-01"}
-                        value={formNumber}
-                        onChange={(e) => setFormNumber(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner"
-                      />
-                    </div>
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Zichlik (kg/m³)')}</label>
+                     <input type="number" value={blockDensity} onChange={(e) => setBlockDensity(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold" />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Bloklar soni')} ({t('dona')})</label>
-                    <div className="relative">
-                      <Plus className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input 
-                        required
-                        type="number" 
-                        placeholder="14"
-                        value={blockCount}
-                        onChange={(e) => setBlockCount(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Zichlik')} (kg/m³)</label>
-                    <div className="relative">
-                      <Weight className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                      <input 
-                        required
-                        type="number" 
-                        placeholder="20"
-                        value={blockDensity}
-                        onChange={(e) => setBlockDensity(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-[22px] outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-black text-slate-900 shadow-inner"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-50 p-6 rounded-[32px] border border-slate-200/50">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">{t('Blok o\'lchamlari')} (mm)</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-slate-500 ml-2">{t('Uzunlik')}</span>
-                      <input type="number" value={blockLength} onChange={e => setBlockLength(Number(e.target.value))} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-slate-500 ml-2">{t('Eni')}</span>
-                      <input type="number" value={blockWidth} onChange={e => setBlockWidth(Number(e.target.value))} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[9px] font-bold text-slate-500 ml-2">{t('Bo\'yi')}</span>
-                      <input type="number" value={blockHeight} onChange={e => setBlockHeight(Number(e.target.value))} className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                  <button type="button" onClick={() => setIsBlockModalOpen(false)} className="flex-1 px-8 py-5 border-2 border-slate-100 text-slate-500 rounded-[28px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all text-xs">{t('Bekor qilish')}</button>
-                  <button 
-                    type="submit" 
-                    className="flex-[1.5] px-8 py-5 bg-blue-600 text-white rounded-[28px] font-black uppercase tracking-widest hover:bg-blue-700 shadow-2xl shadow-blue-200 active:scale-95 transition-all text-xs"
-                  >
-                    {t('Qayd etish')}
-                  </button>
-                </div>
-              </form>
+                  <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">{t('Qayd Etish')}</button>
+               </form>
             </motion.div>
-          </div>
+           </div>
         )}
-      </AnimatePresence>
-      {/* Failure Reason Modal */}
-      <AnimatePresence>
-        {isFailModalOpen && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsFailModalOpen(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 20 }} 
-              className="relative w-full max-w-md bg-white rounded-[40px] shadow-2xl overflow-hidden p-8"
-            >
-               <div className="flex items-center gap-4 mb-6">
-                 <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600">
-                    <AlertTriangle className="w-6 h-6" />
-                 </div>
-                 <div>
-                    <h3 className="text-xl font-black text-slate-900 leading-tight">{t('Muammoni Qayd Etish')}</h3>
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{t('Sababni kiriting')}</p>
-                 </div>
-               </div>
 
-               <div className="mb-8">
-                  <textarea 
-                    value={failReason}
-                    onChange={(e) => setFailReason(e.target.value)}
-                    placeholder={t("Masalan: Uskuna to'xtadi yoki xom ashyo yetishmadi...")}
-                    className="w-full p-6 bg-slate-50 border-2 border-transparent focus:border-red-500 rounded-[24px] outline-none text-sm font-bold min-h-[120px] transition-all"
-                  />
+        {isOrderModalOpen && (
+           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsOrderModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl p-8">
+               <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('Yangi Ishlab Chiqarish Buyurtmasi')}</h3>
+                  <button onClick={() => setIsOrderModalOpen(false)}><X className="text-slate-400" /></button>
                </div>
-
-               <div className="grid grid-cols-2 gap-4">
-                  <button onClick={() => setIsFailModalOpen(null)} className="py-5 bg-slate-100 text-slate-500 rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all">{t('Bekor Qilish')}</button>
-                  <button onClick={handleFailStage} className="py-5 bg-red-600 text-white rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-red-100">{t('Tasdiqlash')}</button>
-               </div>
+               <form onSubmit={handleCreateOrder} className="space-y-6">
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Mahsulot')}</label>
+                     <select value={selectedProductId} onChange={(e) => setSelectedProductId(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold">
+                        <option value="">{t('Mahsulot tanlang...')}</option>
+                        {materials.filter(m => m.category_name === 'Tayyor Mahsulot').map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                     </select>
+                  </div>
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Miqdor (m³)')}</label>
+                     <input type="number" value={orderQuantity} onChange={(e) => setOrderQuantity(e.target.value)} required className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold" />
+                  </div>
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Muddat')}</label>
+                     <input type="date" value={orderDeadline} onChange={(e) => setOrderDeadline(e.target.value)} className="w-full p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 font-bold" />
+                  </div>
+                  <button type="submit" className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">{t('Yaratish')}</button>
+               </form>
             </motion.div>
-          </div>
+           </div>
         )}
-      </AnimatePresence>
 
-      {/* Bunker Selection for Stage Modal */}
-      <AnimatePresence>
         {isStageBunkerModalOpen && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsStageBunkerModalOpen(null)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }} 
-              animate={{ opacity: 1, scale: 1, y: 0 }} 
-              exit={{ opacity: 0, scale: 0.9, y: 20 }} 
-              className="relative w-full max-w-md bg-white rounded-[40px] shadow-2xl overflow-hidden p-8"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Bunker Tanlang')}</h3>
-                  <p className="text-slate-500 text-xs font-bold uppercase tracking-widest opacity-60">{t('Zamesni yetiltirish uchun bunker biriktiring')}</p>
-                </div>
-                <button onClick={() => setIsStageBunkerModalOpen(null)} className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:text-slate-900 transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-4 mb-8">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">1. {t('Zames Partiyasini tanlang')}</p>
-                <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
-                  {availableZames.map(z => (
-                    <button
-                      key={z.id}
-                      onClick={() => setSelectedZamesId(z.id.toString())}
-                      className={`p-4 rounded-2xl border-2 text-left transition-all flex items-center justify-between ${
-                        selectedZamesId === z.id.toString() 
-                          ? 'bg-blue-50 border-blue-500 shadow-sm' 
-                          : 'bg-white border-slate-100 hover:border-slate-200'
-                      }`}
-                    >
-                      <div>
-                        <p className="text-xs font-black text-slate-900">{z.zames_number}</p>
-                        <p className="text-[10px] font-bold text-slate-400 italic">{z.recipe_name}</p>
-                      </div>
-                      {selectedZamesId === z.id.toString() && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
-                    </button>
-                  ))}
-                  {availableZames.length === 0 && (
-                    <p className="text-[10px] text-slate-400 italic">{t('Bo\'sh (tayyor) zameslar topilmadi')}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-4 mb-8">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">2. {t('Bunkerni tanlang')}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {bunkers.map(b => (
-                  <button
-                    key={b.id}
-                    onClick={() => {
-                      if (b.status !== 'Empty') return;
-                      if (!selectedZamesId) {
-                        uiStore.showNotification(t("Zames partiyasini tanlang"), "error");
-                        return;
-                      }
-                      handleStartStage(isStageBunkerModalOpen.orderId, isStageBunkerModalOpen.stageId, { 
-                        bunker_id: b.id,
-                        zames_id: Number(selectedZamesId)
-                      });
-                    }}
-                    disabled={b.status !== 'Empty' || !selectedZamesId}
-                    className={`p-5 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${
-                      selectedBunkerId === b.id.toString() ? 'border-blue-500 bg-blue-50' : 'border-slate-100 hover:border-slate-200'
-                    }`}
-                  >
-                    <Database className="w-6 h-6" />
-                    <span className="text-xs font-black uppercase tracking-widest">{t('Bunker')} {b.bunkerNumber}</span>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{b.status === 'Empty' ? t('Bo\'sh') : t('Band')}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button 
-                onClick={() => setIsStageBunkerModalOpen(null)}
-                className="w-full py-5 bg-slate-100 text-slate-500 rounded-[24px] text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all font-bold"
-              >
-                {t('Bekor qilish')}
-              </button>
+           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsStageBunkerModalOpen(null)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-8">
+               <h3 className="text-xl font-black text-slate-900 mb-6">{t('Bunker Tanlang')}</h3>
+               <div className="grid grid-cols-2 gap-4">
+                 {bunkers.filter(b => b.status === 'Ready').map(b => (
+                   <button 
+                     key={b.id} 
+                     onClick={() => handleStartStage(isStageBunkerModalOpen.orderId, isStageBunkerModalOpen.stageId, { bunker_id: b.id })}
+                     className="p-6 bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 rounded-2xl transition-all flex flex-col items-center gap-2 group"
+                   >
+                     <Database className="w-8 h-8 text-slate-300 group-hover:text-blue-500 transition-colors" />
+                     <span className="text-sm font-black text-slate-700">№{b.bunkerNumber}</span>
+                   </button>
+                 ))}
+               </div>
+               <button onClick={() => setIsStageBunkerModalOpen(null)} className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-2xl font-black uppercase text-xs tracking-widest">{t('Bekor qilish')}</button>
             </motion.div>
-          </div>
+           </div>
+        )}
+
+        {isFailModalOpen && (
+           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsFailModalOpen(null)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-8">
+               <h3 className="text-xl font-black text-slate-900 mb-6 underline decoration-red-500">{t('Xatolikni Qayd Etish')}</h3>
+               <textarea 
+                 value={failReason} 
+                 onChange={(e) => setFailReason(e.target.value)} 
+                 placeholder={t('Xatolik sababini kiriting...')}
+                 className="w-full h-32 p-4 bg-red-50/50 border-2 border-red-100 rounded-2xl outline-none focus:border-red-500 transition-all font-bold placeholder:text-red-300"
+               />
+               <div className="grid grid-cols-2 gap-4 mt-6">
+                 <button onClick={() => setIsFailModalOpen(null)} className="py-4 bg-slate-100 text-slate-500 rounded-xl font-black">{t('Bekor qilish')}</button>
+                 <button onClick={handleFailStage} className="py-4 bg-red-600 text-white rounded-xl font-black shadow-lg shadow-red-100">{t('Qayd Etish')}</button>
+               </div>
+            </motion.div>
+           </div>
         )}
       </AnimatePresence>
     </div>
+    </div>
+    </>
   );
 }
