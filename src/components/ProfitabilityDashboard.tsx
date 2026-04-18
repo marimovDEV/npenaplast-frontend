@@ -16,10 +16,12 @@ import {
   Settings,
   Scale,
   RefreshCcw,
-  Target
+  Target,
+  X 
 } from 'lucide-react';
 import api from '../lib/api';
 import { uiStore } from '../lib/store';
+import { useI18n } from '../i18n';
 
 interface ProfitData {
   invoice: string;
@@ -35,6 +37,7 @@ interface ProfitData {
 }
 
 export default function ProfitabilityDashboard() {
+  const { t } = useI18n();
   const [data, setData] = useState<ProfitData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<ProfitData | null>(null);
