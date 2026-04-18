@@ -42,23 +42,19 @@ import Topbar from './components/layout/Topbar';
 import FAB from './components/layout/FAB';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
-const Sklad1 = lazy(() => import('./components/Sklad1'));
-const Production = lazy(() => import('./components/Production'));
-const Sklad2 = lazy(() => import('./components/Sklad2'));
+const WarehouseUnified = lazy(() => import('./components/WarehouseUnified'));
+const ProductionFloor = lazy(() => import('./components/ProductionFloor'));
 const Sales = lazy(() => import('./components/Sales'));
 const Clients = lazy(() => import('./components/Clients'));
 const CNC = lazy(() => import('./components/CNC'));
 const Finishing = lazy(() => import('./components/Finishing'));
-const Sklad4 = lazy(() => import('./components/Sklad4'));
 const Waste = lazy(() => import('./components/Waste'));
-const Sklad3 = lazy(() => import('./components/Sklad3'));
 const Reports = lazy(() => import('./components/Reports'));
 const StaffManagement = lazy(() => import('./components/StaffManagement'));
 const AdminActivity = lazy(() => import('./components/AdminActivity'));
 const QualityControl = lazy(() => import('./components/QualityControl'));
 const CourierDashboard = lazy(() => import('./components/CourierDashboard'));
-const ProductionOrders = lazy(() => import('./components/ProductionOrders'));
-const ProductionMaster = lazy(() => import('./components/ProductionMaster'));
+const ProductionOrderManagement = lazy(() => import('./components/ProductionOrderManagement'));
 const Documents = lazy(() => import('./components/Documents'));
 const QRScanner = lazy(() => import('./components/QRScanner'));
 const Finance = lazy(() => import('./components/Finance'));
@@ -69,8 +65,12 @@ const BudgetManager = lazy(() => import('./components/BudgetManager'));
 const Compliance = lazy(() => import('./components/Compliance'));
 const Alerts = lazy(() => import('./components/Alerts'));
 const ExecutiveDashboard = lazy(() => import('./components/ExecutiveDashboard'));
-const ProductionCosting = lazy(() => import('./components/ProductionCosting'));
 const ProfitabilityDashboard = lazy(() => import('./components/ProfitabilityDashboard'));
+const MasterData = lazy(() => import('./components/MasterData'));
+const InternalTransfers = lazy(() => import('./components/InternalTransfers'));
+const Suppliers = lazy(() => import('./components/Suppliers'));
+const PurchaseOrders = lazy(() => import('./components/PurchaseOrders'));
+const DebtorsManagement = lazy(() => import('./components/Debtors'));
 
 export default function App() {
   const { t } = useI18n();
@@ -202,11 +202,12 @@ export default function App() {
       ]
     },
     {
-      id: 'raw-materials',
-      title: '1. Xom Ashyo Ombori',
+      id: 'warehouse-unified',
+      title: '1. Ombor Tizimi',
       icon: Database,
       items: [
-        { id: 'sklad1', name: 'Sklad №1 (Xom Ashyo)', icon: Database, roles: ['Bosh Admin', 'Omborchi'] },
+        { id: 'warehouse', name: 'Ombor Boshqaruvi', icon: Database, roles: ['Bosh Admin', 'Omborchi', 'Ishlab chiqarish ustasi', 'CNC operatori', 'Sotuv menejeri'] },
+        { id: 'transfers', name: 'Ichki O\'tkazmalar', icon: Truck, roles: ['Bosh Admin', 'Omborchi'] },
       ]
     },
     {
@@ -214,81 +215,59 @@ export default function App() {
       title: '2. Ishlab Chiqarish',
       icon: Factory,
       items: [
-        { id: 'production', name: 'Ishlab Chiqarish', icon: Factory, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi'] },
-        { id: 'production-master', name: 'Usta Nazorati', icon: Activity, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi'] },
-        { id: 'production-orders', name: 'Buyurtmalar Natijasi', icon: BarChart3, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi'] },
+        { id: 'production-orders', name: 'Ishlab Chiqarish Buyurtmalari', icon: FileText, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi'] },
+        { id: 'production', name: 'Ishlab Chiqarish Poligoni', icon: Factory, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi', 'CNC operatori', 'Pardozlovchi', 'Chiqindi operatori'] },
+        { id: 'qc', name: 'Sifat Nazorati (QC)', icon: CheckCircle2, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi'] },
       ]
     },
     {
-      id: 'blocks',
-      title: '3. Tayyor Bloklar',
-      icon: Layers,
+      id: 'procurement',
+      title: '3. Ta\'minot & Xarid',
+      icon: ShoppingCart,
       items: [
-        { id: 'sklad2', name: 'Sklad №2 (Bloklar)', icon: Layers, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi'] },
-      ]
-    },
-    {
-      id: 'decor-production',
-      title: '4. Dekor Ishlab Chiqarish',
-      icon: Scissors,
-      items: [
-        { id: 'sklad3', name: 'Sklad №3 (Ichki)', icon: Truck, roles: ['Bosh Admin', 'CNC operatori'] },
-        { id: 'cnc', name: 'CNC Sexi', icon: Scissors, roles: ['Bosh Admin', 'CNC operatori'] },
-        { id: 'waste', name: 'Chiqindi Sexi', icon: Trash2, roles: ['Bosh Admin', 'Chiqindi operatori'] },
-        { id: 'finishing', name: 'Armirlash & Shpaklyovka', icon: Brush, roles: ['Bosh Admin', 'Pardozlovchi'] },
-        { id: 'qc', name: 'Sifat Nazorati', icon: CheckCircle2, roles: ['Bosh Admin'] },
-      ]
-    },
-    {
-      id: 'final-product',
-      title: '5. Tayyor Mahsulot',
-      icon: CheckCircle2,
-      items: [
-        { id: 'sklad4', name: 'Sklad №4 (Tayyor)', icon: CheckCircle2, roles: ['Bosh Admin', 'Sotuv menejeri'] },
-        { id: 'logistics', name: 'Logistika', icon: Truck, roles: ['Bosh Admin', 'Kuryer'] },
+        { id: 'suppliers', name: 'Ta\'minotchilar', icon: UserIcon, roles: ['Bosh Admin', 'Omborchi'] },
+        { id: 'purchase-orders', name: 'Xarid Buyurtmalari', icon: FileText, roles: ['Bosh Admin', 'Omborchi'] },
       ]
     },
     {
       id: 'sales-main',
-      title: '6. Sotuv & Mijozlar',
+      title: '4. Sotuv & CRM',
       icon: ShoppingCart,
       items: [
         { id: 'sales', name: 'Sotuvlar', icon: ShoppingCart, roles: ['Bosh Admin', 'Sotuv menejeri'] },
-        { id: 'clients', name: 'Mijozlar', icon: UserIcon, roles: ['Bosh Admin', 'Sotuv menejeri'] },
-        { id: 'contracts', name: 'Shartnomalar', icon: FileText, roles: ['Bosh Admin', 'Sotuv menejeri'] },
-        { id: 'debtors', name: 'Qarzdorlar', icon: Wallet, roles: ['Bosh Admin', 'Sotuv menejeri'] },
+        { id: 'clients', name: 'Mijozlar & CRM', icon: UserIcon, roles: ['Bosh Admin', 'Sotuv menejeri'] },
+        { id: 'debtors', name: 'Qarzdorlar Nazorati', icon: Wallet, roles: ['Bosh Admin', 'Sotuv menejeri'] },
       ]
     },
     {
-      id: 'analytics',
-      title: '7. Hisobotlar',
-      icon: BarChart3,
-      items: [
-        { id: 'reports', name: 'Hisobotlar', icon: BarChart3, roles: ['Bosh Admin'] },
-        { id: 'profit-analytics', name: 'Tannarx & Foyda', icon: CalculatorIcon, roles: ['Bosh Admin', 'Buxgalter'] },
-        { id: 'cost-analytics', name: 'Tan narx moduli', icon: CalculatorIcon, roles: ['Bosh Admin', 'Buxgalter'] },
-      ]
-    },
-    {
-      id: 'finance-main',
-      title: '9. Moliya & Byudjet',
+      id: 'finance-accounting',
+      title: '5. Moliya & Buxgalteriya',
       icon: Wallet,
       items: [
-        { id: 'finance', name: 'Moliya & Kassa', icon: Wallet, roles: ['Bosh Admin', 'Sotuv menejeri', 'Moliya boshqaruvchi'] },
-        { id: 'accounting', name: 'Buxgalteriya', icon: CalculatorIcon, roles: ['Bosh Admin', 'Buxgalter', 'Moliya boshqaruvchi'] },
-        { id: 'budgets', name: 'Byudjet Nazorati', icon: BarChart3, roles: ['Bosh Admin', 'Moliya boshqaruvchi'] },
+        { id: 'finance', name: 'Moliya & Kassa', icon: Wallet, roles: ['Bosh Admin', 'Moliya boshqaruvchi'] },
+        { id: 'accounting', name: 'Buxgalteriya', icon: CalculatorIcon, roles: ['Bosh Admin', 'Buxgalter'] },
+        { id: 'profit-analytics', name: 'Foyda Analitikasi', icon: BarChart3, roles: ['Bosh Admin', 'Buxgalter'] },
       ]
     },
     {
-      id: 'management',
-      title: '8. Boshqaruv & Nazorat',
+      id: 'master-data',
+      title: '6. Master Data',
+      icon: Database,
+      items: [
+        { id: 'recipes', name: 'Retseptlar & Normalar', icon: Layers, roles: ['Bosh Admin', 'Ishlab chiqarish ustasi'] },
+        { id: 'products', name: 'Mahsulot Katalogi', icon: Box, roles: ['Bosh Admin', 'Sotuv menejeri'] },
+      ]
+    },
+    {
+      id: 'system-admin',
+      title: '7. Tizim Boshqaruvi',
       icon: Settings,
       items: [
-        { id: 'compliance', name: 'Soliq & Hujjatlar', icon: FileText, roles: ['Bosh Admin', 'Admin'] },
-        { id: 'alerts', name: 'Tizim Alertlari', icon: Bell, roles: ['Bosh Admin', 'Admin'] },
-        { id: 'documents', name: 'Hujjatlar Jurnali', icon: FileText, roles: ['Bosh Admin', 'Admin', 'Omborchi', 'Ishlab chiqarish ustasi', 'Sotuv menejeri', 'Kuryer'] },
         { id: 'staff', name: 'Xodimlar', icon: UserIcon, roles: ['Bosh Admin'] },
-        { id: 'activity', name: 'Faollik Jurnali', icon: Activity, roles: ['Bosh Admin'] },
+        { id: 'compliance', name: 'Hujjatlar & Soliq', icon: FileText, roles: ['Bosh Admin'] },
+        { id: 'documents', name: 'Hujjatlar Jurnali', icon: FileText, roles: ['Bosh Admin', 'Omborchi', 'Ishlab chiqarish ustasi', 'Sotuv menejeri', 'Kuryer'] },
+        { id: 'activity', name: 'Tizim Faolligi', icon: Activity, roles: ['Bosh Admin'] },
+        { id: 'alerts', name: 'Xabarnomalar', icon: Bell, roles: ['Bosh Admin'] },
       ]
     }
   ];
@@ -306,50 +285,48 @@ export default function App() {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard user={user} onAction={setActiveTab} />;
-      case 'sklad1':
-        return <Sklad1 user={user} />;
+      case 'warehouse':
+        return <WarehouseUnified user={user!} />;
+      case 'transfers':
+        return <InternalTransfers />;
       case 'production':
-        return <Production user={user} />;
-      case 'sklad2':
-        return <Sklad2 user={user} />;
+        return <ProductionFloor user={user!} />;
       case 'sales':
-        return <Sales user={user} />;
+        return <Sales user={user!} />;
       case 'clients':
         return user ? <Clients user={user} /> : null;
       case 'cnc':
-        return <CNC user={user} />;
+        return <CNC user={user!} />;
       case 'finishing':
-        return <Finishing user={user} />;
-      case 'sklad4':
-        return <Sklad4 user={user} />;
+        return <Finishing user={user!} />;
       case 'waste':
-        return <Waste user={user} />;
-      case 'sklad3':
-        return <Sklad3 user={user} />;
+        return <Waste user={user!} />;
       case 'reports':
-        return <Reports user={user} />;
+        return <Reports user={user!} />;
       case 'qc':
         return user ? <QualityControl user={user} /> : null;
       case 'logistics':
         return user ? <CourierDashboard user={user} /> : null;
       case 'production-orders':
-        return <ProductionOrders />;
-      case 'production-master':
-        return user ? <ProductionMaster user={user} /> : null;
+        return <ProductionOrderManagement />;
+      case 'suppliers':
+        return <Suppliers />;
+      case 'purchase-orders':
+        return <PurchaseOrders />;
       case 'activity':
         return <AdminActivity />;
       case 'staff':
-        return <StaffManagement user={user} />;
+        return <StaffManagement user={user!} />;
       case 'documents':
-        return <Documents user={user} />;
+        return <Documents user={user!} />;
       case 'finance':
-        return <Finance user={user} />;
+        return <Finance user={user!} />;
       case 'contracts':
-        return <Contracts user={user} />;
+        return <Contracts user={user!} />;
       case 'debtors':
-        return <Debtors user={user} />;
+        return <DebtorsManagement user={user!} />;
       case 'accounting':
-        return <Accounting user={user} />;
+        return <Accounting user={user!} />;
       case 'budgets':
         return <BudgetManager />;
       case 'compliance':
@@ -358,10 +335,11 @@ export default function App() {
         return <Alerts />;
       case 'exec-dashboard':
         return <ExecutiveDashboard />;
-      case 'cost-analytics':
-        return <ProductionCosting />;
       case 'profit-analytics':
         return <ProfitabilityDashboard />;
+      case 'recipes':
+      case 'products':
+        return <MasterData />;
       default:
         return <Dashboard user={user} onAction={setActiveTab} />;
     }

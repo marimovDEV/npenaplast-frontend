@@ -31,7 +31,7 @@ import { uiStore, authStore } from '../lib/store';
 import api from '../lib/api';
 import { useI18n } from '../i18n';
 
-export default function ProductionOrders() {
+export default function ProductionOrderManagement() {
   const { locale, t } = useI18n();
   const [productionOrders, setProductionOrders] = useState<ProductionOrder[]>([]);
   const [kpiSummary, setKpiSummary] = useState<any>(null);
