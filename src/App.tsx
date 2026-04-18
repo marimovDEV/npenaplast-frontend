@@ -519,8 +519,10 @@ export default function App() {
 
 
 
+  const activeTabName = navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli';
+
   return (
-    <div className="h-screen bg-slate-50 flex overflow-hidden">
+    <div className="h-screen bg-surface flex overflow-hidden">
       {/* Global Loading Overlay */}
       <AnimatePresence>
         {globalLoading && (
@@ -528,228 +530,51 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[10000] bg-white/60 backdrop-blur-[2px] flex items-center justify-center"
+            className="fixed inset-0 z-[10000] bg-white/60 backdrop-blur-[2px] flex items-center justify-center transition-all"
           >
-            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin shadow-xl"></div>
+            <div className="w-12 h-12 border-4 border-primary-accent border-t-transparent rounded-full animate-spin shadow-xl"></div>
           </motion.div>
         )}
       </AnimatePresence>
 
       <Toast />
 
-      {/* =========== DESKTOP SIDEBAR (only on ≥768px) =========== */}
+      {/* =========== DESKTOP SIDEBAR =========== */}
       {!isMobile && (
-        <aside className="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-100">
-          <div className="h-full flex flex-col">
-            <div className="p-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
-                <Factory className="text-white w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="font-bold text-slate-900 leading-tight">Penoplast</h1>
-                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">ERP Tizimi</p>
-              </div>
-            </div>
-
-            <nav className="flex-1 px-3 py-2 space-y-2 overflow-y-auto custom-scrollbar pb-8">
-              {navigationGroups.map((group) => {
-                const visibleItems = group.items.filter(item => {
-                  const isPrivileged = isPrivilegedUser;
-                  if (isPrivileged) return true;
-                  const hasRole = item.roles?.includes(currentRole);
-                  if ((item.id || '').startsWith('sklad')) {
-                    const warehouseId = parseInt(item.id.replace('sklad', ''), 10);
-                    const isAssigned = user?.assignedWarehouses?.includes('*') || user?.assignedWarehouses?.includes(warehouseId);
-                    return hasRole && isAssigned;
-                  }
-                  return hasRole;
-                });
-                if (visibleItems.length === 0) return null;
-
-                const isOpen = activeGroup === group.id;
-                const isMain = group.id === 'main';
-
-                return (
-                  <div key={group.id} className="space-y-1">
-                    {!isMain && group.title && (
-                      <button
-                        onClick={() => toggleGroup(group.id)}
-                        className="w-full px-4 py-2 flex items-center justify-between group/header hover:bg-slate-50 rounded-xl transition-all"
-                      >
-                        <div className="flex items-center gap-2">
-                          {group.icon && (
-                            <div className={`p-1.5 rounded-lg transition-colors ${isOpen ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-400 group-hover/header:text-slate-600'}`}>
-                              <group.icon className="w-4 h-4" />
-                            </div>
-                          )}
-                          <h3 className={`text-[11px] font-bold uppercase tracking-wider transition-colors ${isOpen ? 'text-blue-600' : 'text-slate-500 group-hover/header:text-slate-900'}`}>
-                            {group.title}
-                          </h3>
-                        </div>
-                        <ChevronRight className={`w-3.5 h-3.5 text-slate-300 transition-transform duration-300 ${isOpen ? 'rotate-90 text-blue-400' : ''}`} />
-                      </button>
-                    )}
-                    
-                    <AnimatePresence initial={false}>
-                      {(isMain || isOpen) && (
-                        <motion.div 
-                          initial={isMain ? false : { height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: 'easeInOut' }}
-                          className="overflow-hidden space-y-0.5"
-                        >
-                          {visibleItems.map((item) => (
-                            <button
-                              key={item.id}
-                              onClick={() => setActiveTab(item.id)}
-                              className={`
-                                w-full flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group
-                                ${activeTab === item.id 
-                                  ? 'bg-blue-50 text-blue-600 shadow-sm' 
-                                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}
-                                ${!isMain ? 'ml-2 w-[calc(100%-0.5rem)]' : ''}
-                              `}
-                            >
-                              <item.icon className={`w-4.5 h-4.5 ${activeTab === item.id ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600'}`} />
-                              <span className={`font-semibold text-sm ${activeTab === item.id ? 'font-bold' : ''}`}>{item.name}</span>
-                              {activeTab === item.id && (
-                                <motion.div layoutId="active" className="ml-auto w-1.5 h-1.5 bg-blue-600 rounded-full" />
-                              )}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })}
-            </nav>
-
-            <div className="p-4 border-t border-slate-100">
-              <div className="bg-slate-50 p-4 rounded-2xl flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                  <UserIcon className="text-slate-400 w-6 h-6" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider truncate">{t(currentRole)}</p>
-                </div>
-              </div>
-              <div className="mb-3 flex justify-center">
-                <LanguageSwitcher />
-              </div>
-              <button 
-                onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 rounded-xl transition-all font-semibold text-sm"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>{t('Chiqish')}</span>
-              </button>
-            </div>
-          </div>
-        </aside>
+        <Sidebar 
+          user={user}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          navigationGroups={navigationGroups}
+          onLogout={handleLogout}
+          isOpen={isSidebarOpen}
+          setIsOpen={setIsSidebarOpen}
+        />
       )}
 
       {/* =========== MAIN CONTENT AREA =========== */}
-      <main className={`flex-1 flex flex-col min-w-0 min-h-0 ${!isMobile ? 'ml-72' : ''}`}>
+      <main className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${!isMobile ? (isSidebarOpen ? 'ml-72' : 'ml-[88px]') : ''}`}>
         
-        {/* ===== MOBILE HEADER (app-style greeting) ===== */}
-        {isMobile ? (
-          <header className="bg-white/80 backdrop-blur-md px-4 py-3 sticky top-0 z-40 safe-area-top border-b border-slate-100/50">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-100 flex-none group active:scale-90 transition-transform">
-                  <Factory className="text-white w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-base font-black text-slate-900 truncate tracking-tight">
-                    {user.name.split(' ')[0]} 👋
-                  </h2>
-                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest truncate">
-                    {t(navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli')}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <LanguageSwitcher compact />
-                <button 
-                  onClick={() => setIsScannerOpen(true)}
-                  className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-600 rounded-xl active:bg-blue-50 active:text-blue-600 transition-colors"
-                >
-                  <QrCode className="w-5 h-5" />
-                </button>
-                <div className="relative">
-                  <button 
-                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                    className="w-10 h-10 flex items-center justify-center text-slate-400 rounded-xl relative active:bg-slate-100 transition-colors"
-                  >
-                    <Bell className="w-5 h-5" />
-                    {unreadCount > 0 && (
-                      <span className="absolute top-2.5 right-2.5 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-white text-[7px] flex items-center justify-center text-white font-black animate-pulse">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    )}
-                  </button>
-                  <NotificationDropdown 
-                    isOpen={isNotificationsOpen} 
-                    onClose={() => setIsNotificationsOpen(false)} 
-                    onUnreadChange={setUnreadCount}
-                  />
-                </div>
-              </div>
-            </div>
-          </header>
-        ) : (
-          /* ===== DESKTOP HEADER ===== */
-          <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-6 sticky top-0 z-40">
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-              {t(navigationGroups.flatMap(g => g.items).find(n => n.id === activeTab)?.name || 'Boshqaruv Paneli')}
-            </h2>
-            <div className="flex items-center gap-3">
-              <LanguageSwitcher />
-              <div className="flex items-center bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 focus-within:ring-2 focus-within:ring-blue-500 transition-all group">
-                <Search className="w-4 h-4 text-slate-400 mr-2 group-focus-within:text-blue-500 transition-colors" />
-                <input type="text" placeholder={t('Qidirish...')} className="bg-transparent border-none outline-none text-sm w-48" />
-              </div>
-              <button 
-                onClick={() => setIsScannerOpen(true)}
-                className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl relative transition-all group shadow-sm flex items-center gap-2 px-4"
-              >
-                <QrCode className="w-5 h-5 group-hover:rotate-12 transition-all" />
-                <span className="text-[10px] font-black uppercase tracking-widest">{t('QR Skaner')}</span>
-              </button>
-              <div className="relative">
-                <button 
-                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="p-2.5 text-slate-500 hover:bg-slate-50 rounded-xl relative transition-all"
-                >
-                  <Bell className="w-5 h-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-2 right-2 w-4 h-4 bg-rose-500 rounded-full border-2 border-white text-[8px] flex items-center justify-center text-white font-black animate-pulse">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
-                </button>
-                <NotificationDropdown 
-                  isOpen={isNotificationsOpen} 
-                  onClose={() => setIsNotificationsOpen(false)} 
-                  onUnreadChange={setUnreadCount}
-                />
-              </div>
-            </div>
-          </header>
-        )}
+        {/* ===== TOPBAR (Integrated utilities) ===== */}
+        <Topbar 
+          user={user}
+          activeTabName={activeTabName}
+          isMobile={isMobile}
+          onToggleMobileSidebar={() => setIsMoreOpen(true)}
+          onOpenScanner={() => setIsScannerOpen(true)}
+          unreadCount={unreadCount}
+          onUnreadChange={setUnreadCount}
+        />
 
         {/* ===== SCROLLABLE CONTENT ===== */}
-        <div className={`flex-1 p-3 md:p-6 overflow-y-auto overflow-x-hidden relative min-h-0 custom-scrollbar ${isMobile ? 'pb-24' : 'pb-10'}`}>
+        <div className={`flex-1 p-3 md:p-8 overflow-y-auto overflow-x-hidden relative min-h-0 custom-scrollbar ${isMobile ? 'pb-24' : 'pb-10'}`}>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.15 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <Suspense fallback={pageLoader}>
                 {renderActiveTab()}
@@ -759,32 +584,14 @@ export default function App() {
         </div>
       </main>
 
-      {/* =========== MOBILE FAB (Floating Action Button) =========== */}
-      {isMobile && (isPrivilegedUser || ['Sotuv menejeri', 'Omborchi', 'Ishlab chiqarish ustasi', 'CNC operatori', 'Pardozlovchi', 'Chiqindi operatori', 'Kuryer'].includes(currentRole)) && (
-        <button
-          onClick={() => {
-            const primaryTab =
-              isPrivilegedUser ? 'sales' :
-              currentRole === 'Sotuv menejeri' ? 'sales' :
-              currentRole === 'Omborchi' ? 'sklad1' :
-              currentRole === 'Ishlab chiqarish ustasi' ? 'production' :
-              currentRole === 'CNC operatori' ? 'cnc' :
-              currentRole === 'Pardozlovchi' ? 'finishing' :
-              currentRole === 'Chiqindi operatori' ? 'waste' :
-              currentRole === 'Kuryer' ? 'logistics' :
-              'dashboard';
-            setActiveTab(primaryTab);
-          }}
-          className="fixed bottom-20 right-4 z-50 w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-blue-300 active:scale-90 transition-transform"
-          style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-        >
-          <Plus className="w-7 h-7 text-white" />
-        </button>
+      {/* =========== FLOATING ACTION BUTTON (Desktop/Mobile) =========== */}
+      {(isPrivilegedUser || currentRole !== '') && (
+        <FAB userRole={currentRole} onAction={setActiveTab} />
       )}
 
       {/* =========== MOBILE BOTTOM NAVIGATION =========== */}
       {isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-slate-100 safe-area-bottom shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-100 safe-area-bottom shadow-premium">
           <div className="flex items-center justify-around h-16 px-2">
             {getBottomNavItems().map((item) => {
               const isActive = item.id === '__more__' ? isMoreOpen : activeTab === item.id;
@@ -800,20 +607,19 @@ export default function App() {
                     }
                   }}
                   className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all relative ${
-                    isActive ? 'text-blue-600' : 'text-slate-400'
+                    isActive ? 'text-primary-accent' : 'text-slate-400'
                   }`}
                 >
-                  <div className={`p-1 rounded-lg transition-colors ${isActive ? 'bg-blue-50/50' : 'bg-transparent'}`}>
-                    <item.icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : 'scale-100'}`} />
+                  <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-blue-50/50' : 'bg-transparent'}`}>
+                    <item.icon className={`w-5.5 h-5.5 transition-transform ${isActive ? 'scale-110' : 'scale-100'}`} />
                   </div>
-                  <span className={`text-[9px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-70'}`}>
-                    {item.name}
+                  <span className={`text-[8px] font-black uppercase tracking-widest ${isActive ? 'opacity-100' : 'opacity-70'}`}>
+                    {t(item.name)}
                   </span>
                   {isActive && item.id !== '__more__' && (
                     <motion.div 
-                      layoutId="bottomnav" 
-                      className="absolute -top-[1px] left-1/2 -translate-x-1/2 w-8 h-1 bg-blue-600 rounded-b-full" 
-                      transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                      layoutId="bottom-indicator" 
+                      className="absolute top-0 w-8 h-1 bg-primary-accent rounded-b-lg" 
                     />
                   )}
                 </button>
@@ -823,14 +629,14 @@ export default function App() {
         </nav>
       )}
 
-      {/* =========== MOBILE "MORE" DRAWER (Bottom Sheet) =========== */}
+      {/* =========== MOBILE "MORE" DRAWER =========== */}
       <AnimatePresence>
         {isMobile && isMoreOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-md"
             onClick={() => setIsMoreOpen(false)}
           >
             <motion.div
@@ -839,26 +645,23 @@ export default function App() {
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[75vh] overflow-y-auto safe-area-bottom"
+              className="absolute bottom-0 left-0 right-0 bg-white rounded-t-[40px] max-h-[85vh] overflow-y-auto safe-area-bottom px-4 pb-8"
             >
-              {/* Drag handle */}
-              <div className="flex justify-center py-3">
-                <div className="w-10 h-1 bg-slate-300 rounded-full" />
+              <div className="flex justify-center py-4">
+                <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
               </div>
 
-              {/* User info */}
-              <div className="px-5 pb-4 flex items-center gap-3 border-b border-slate-100">
-                <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <UserIcon className="w-6 h-6 text-blue-600" />
+              <div className="px-5 pb-6 flex items-center gap-4 border-b border-slate-100 mb-6">
+                <div className="w-14 h-14 bg-primary text-white rounded-[22px] flex items-center justify-center shadow-lg">
+                  <UserIcon className="w-7 h-7" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-slate-900 truncate">{user.name}</p>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{currentRole}</p>
+                  <p className="text-lg font-black text-slate-900 truncate leading-none mb-1">{user.name}</p>
+                  <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest">{t(currentRole)}</p>
                 </div>
               </div>
 
-              {/* All navigation items */}
-              <div className="px-4 py-3">
+              <div className="grid grid-cols-1 gap-4">
                 {navigationGroups.map((group) => {
                   const visibleItems = group.items.filter(item => {
                     const isPrivileged = isPrivilegedUser;
@@ -868,11 +671,11 @@ export default function App() {
                   if (visibleItems.length === 0) return null;
 
                   return (
-                    <div key={group.id} className="mb-3">
+                    <div key={group.id} className="space-y-3">
                       {group.title && (
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2 mb-1.5">{group.title}</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-4">{t(group.title)}</p>
                       )}
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-3 gap-3">
                         {visibleItems.map((item) => (
                           <button
                             key={item.id}
@@ -880,14 +683,14 @@ export default function App() {
                               setActiveTab(item.id);
                               setIsMoreOpen(false);
                             }}
-                            className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all ${
+                            className={`flex flex-col items-center gap-2 p-4 rounded-3xl transition-all ${
                               activeTab === item.id
-                                ? 'bg-blue-50 text-blue-600'
+                                ? 'bg-primary-accent text-white shadow-xl shadow-blue-900/10'
                                 : 'bg-slate-50 text-slate-600 active:bg-slate-100'
                             }`}
                           >
-                            <item.icon className="w-5 h-5" />
-                            <span className="text-[10px] font-bold text-center leading-tight">{item.name}</span>
+                            <item.icon className="w-6 h-6" />
+                            <span className="text-[10px] font-bold text-center leading-tight">{t(item.name)}</span>
                           </button>
                         ))}
                       </div>
@@ -896,14 +699,13 @@ export default function App() {
                 })}
               </div>
 
-              {/* Logout */}
-              <div className="px-4 pb-4">
+              <div className="mt-8">
                 <button 
                   onClick={handleLogout}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-600 rounded-2xl font-bold text-sm"
+                  className="w-full flex items-center justify-center gap-3 py-4 bg-rose-50 text-rose-600 rounded-[28px] font-black text-sm transition-all active:scale-[0.98]"
                 >
-                  <LogOut className="w-4 h-4" />
-                  Chiqish
+                  <LogOut className="w-5 h-5" />
+                  {t('Chiqish')}
                 </button>
               </div>
             </motion.div>
