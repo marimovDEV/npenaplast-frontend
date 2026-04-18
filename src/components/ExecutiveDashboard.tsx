@@ -200,31 +200,45 @@ export default function ExecutiveDashboard() {
               </h3>
 
               <div className="space-y-6 relative z-10">
-                 {heuristics.supply_alerts.map((alert: any, i: number) => (
+                 {heuristics.supply_alerts && heuristics.supply_alerts.map((alert: any, i: number) => (
                     <motion.div 
-                      key={i} 
+                      key={alert.id || i} 
                       whileHover={{ x: 5 }}
-                      className="p-5 bg-white/5 rounded-3xl border border-white/10 flex items-start gap-4 group cursor-pointer"
+                      className="p-5 bg-white/5 rounded-3xl border border-white/10 flex flex-col gap-3 group cursor-pointer"
                     >
-                       <div className="p-2 bg-amber-500/20 text-amber-500 rounded-xl">
-                          <AlertOctagon className="w-4 h-4" />
+                       <div className="flex items-center gap-3">
+                         <div className={`p-2 rounded-xl text-white ${alert.status === 'CRITICAL' ? 'bg-rose-500' : 'bg-amber-500'}`}>
+                            <AlertOctagon className="w-4 h-4" />
+                         </div>
+                         <p className={`text-xs font-black uppercase tracking-tight transition-colors ${alert.status === 'CRITICAL' ? 'text-rose-400 group-hover:text-rose-300' : 'text-amber-400 group-hover:text-amber-300'}`}>
+                            {alert.material} ({alert.status})
+                         </p>
                        </div>
-                       <div>
-                          <p className="text-xs font-black text-white group-hover:text-amber-400 transition-colors uppercase tracking-tight">{alert.title}</p>
-                          <p className="text-[10px] font-medium text-slate-400 mt-1 leading-relaxed">{alert.message}</p>
-                       </div>
+                       <p className="text-[10px] font-medium text-slate-300 leading-relaxed pl-11">{alert.message}</p>
                     </motion.div>
                  ))}
 
                  {heuristics.cash_prediction && (
-                    <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-[32px] mt-10">
+                    <div className={`p-6 border rounded-[32px] mt-10 ${heuristics.cash_prediction.risk_level === 'HIGH' ? 'bg-rose-500/10 border-rose-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
                        <div className="flex items-center gap-2 mb-4">
-                          <Zap className="w-4 h-4 text-emerald-400" />
-                          <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-400">{t('Cash Gap Prediction')}</h4>
+                          <Zap className={`w-4 h-4 ${heuristics.cash_prediction.risk_level === 'HIGH' ? 'text-rose-400' : 'text-emerald-400'}`} />
+                          <h4 className={`text-[10px] font-black uppercase tracking-widest ${heuristics.cash_prediction.risk_level === 'HIGH' ? 'text-rose-400' : 'text-emerald-400'}`}>{t('Cash Gap Prediction')}</h4>
                        </div>
-                       <p className="text-sm font-black text-emerald-50">{heuristics.cash_prediction.status}</p>
-                       <div className="mt-4 flex gap-2">
-                          <button className="flex-1 py-2 bg-emerald-500 text-emerald-950 text-[9px] font-black uppercase rounded-xl hover:bg-emerald-400 transition-all">{t('Details')}</button>
+                       <p className="text-sm font-black text-white">{heuristics.cash_prediction.message}</p>
+                       
+                       <div className="mt-4 grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-[10px] text-slate-400 mb-1 font-bold">Kutilayotgan tushum (15 kun)</p>
+                            <p className="text-sm font-black text-emerald-400">{fmt(heuristics.cash_prediction.projected_15d_inflow)} UZS</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-slate-400 mb-1 font-bold">Muddati o'tgan qarzlar</p>
+                            <p className="text-sm font-black text-rose-400">{fmt(heuristics.cash_prediction.overdue)} UZS</p>
+                          </div>
+                       </div>
+
+                       <div className="mt-6 flex gap-2">
+                          <button className={`flex-1 py-2 text-[9px] font-black uppercase rounded-xl transition-all ${heuristics.cash_prediction.risk_level === 'HIGH' ? 'bg-rose-500 text-white hover:bg-rose-400' : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400'}`}>{t(heuristics.cash_prediction.action_label)}</button>
                           <button className="px-3 py-2 bg-white/5 text-white text-[9px] font-black uppercase rounded-xl hover:bg-white/10 transition-all"><Clock className="w-3 h-3" /></button>
                        </div>
                     </div>
