@@ -27,7 +27,8 @@ import {
   QrCode,
   Wallet,
   Calculator as CalculatorIcon,
-  Target
+  Target,
+  Box
 } from 'lucide-react';
 import { User, UserRole } from './types';
 import LanguageSwitcher from './components/LanguageSwitcher';

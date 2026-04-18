@@ -20,7 +20,8 @@ import {
   Clock,
   X,
   User as UserIcon,
-  ChevronRight
+  ChevronRight,
+  Scissors
 } from 'lucide-react';
 import api from '../lib/api';
 import { useI18n } from '../i18n';
