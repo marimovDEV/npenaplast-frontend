@@ -1,7 +1,7 @@
 export type AppLanguage = 'uz' | 'ru';
 
 export const DEFAULT_LANGUAGE: AppLanguage = 'uz';
-export const LANGUAGE_STORAGE_KEY = 'penoplast-language';
+export const LANGUAGE_STORAGE_KEY = 'yuksar-language';
 
 const LOCALE_BY_LANGUAGE: Record<AppLanguage, string> = {
   uz: 'uz-UZ',

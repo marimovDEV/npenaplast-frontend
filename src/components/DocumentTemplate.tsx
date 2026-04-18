@@ -12,7 +12,7 @@ export default function DocumentTemplate({ document, items }: DocumentTemplatePr
       {/* Header */}
       <div className="flex justify-between items-start mb-12">
         <div className="flex-1">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase mb-2">Penoplast ERP</h1>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase mb-2">Yuksar ERP</h1>
           <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Industrial Production Management</p>
           
           <div className="space-y-1">
@@ -105,7 +105,7 @@ export default function DocumentTemplate({ document, items }: DocumentTemplatePr
       
       <div className="mt-12 text-center">
         <p className="text-[8px] text-slate-300 uppercase tracking-[0.5em] font-black italic">
-          Generated automatically by Penoplast ERP System - Secure Industrial Ledger
+          Generated automatically by Yuksar ERP System - Secure Industrial Ledger
         </p>
       </div>
     </div>

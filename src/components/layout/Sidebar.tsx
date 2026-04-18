@@ -67,7 +67,7 @@ export default function Sidebar({
               exit={{ opacity: 0, x: -10 }}
               className="flex-1"
             >
-              <h1 className="font-black text-lg leading-none tracking-tight">Penoplast</h1>
+              <h1 className="font-black text-lg leading-none tracking-tight">Yuksar</h1>
               <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-0.5">Enterprise ERP</p>
             </motion.div>
           )}

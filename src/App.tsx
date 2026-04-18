@@ -363,7 +363,7 @@ export default function App() {
             >
                 <Factory className="text-white w-10 h-10" />
             </motion.div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Penoplast ERP</h1>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Yuksar ERP</h1>
             <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-xl">
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('Sessiya tekshirilmoqda...')}</span>
@@ -388,7 +388,7 @@ export default function App() {
             <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
               <Factory className="text-white w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Penoplast ERP</h1>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Yuksar ERP</h1>
             <p className="text-slate-500 text-sm mt-1">{t('Tizimga kirish')}</p>
           </div>
           

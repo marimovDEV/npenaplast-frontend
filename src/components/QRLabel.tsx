@@ -48,7 +48,7 @@ export default function QRLabel({ batch }: QRLabelProps) {
       </div>
       
       <div className="w-full mt-1 border-t border-slate-100 pt-0.5">
-        <p className="text-[6px] font-black text-center text-slate-500 uppercase tracking-widest">Penoplast ERP System</p>
+        <p className="text-[6px] font-black text-center text-slate-500 uppercase tracking-widest">Yuksar ERP System</p>
       </div>
     </div>
   );
