@@ -24,7 +24,11 @@ import api from '../lib/api';
 import { useI18n } from '../i18n';
 import { uiStore } from '../lib/store';
 
-export default function ExecutiveDashboard() {
+interface ExecutiveDashboardProps {
+  onAction?: (tabId: string) => void;
+}
+
+export default function ExecutiveDashboard({ onAction }: ExecutiveDashboardProps) {
   const { t } = useI18n();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -204,6 +208,7 @@ export default function ExecutiveDashboard() {
                     <motion.div 
                       key={alert.id || i} 
                       whileHover={{ x: 5 }}
+                      onClick={() => onAction?.('purchase-orders')}
                       className="p-5 bg-white/5 rounded-3xl border border-white/10 flex flex-col gap-3 group cursor-pointer"
                     >
                        <div className="flex items-center gap-3">
@@ -238,8 +243,8 @@ export default function ExecutiveDashboard() {
                        </div>
 
                        <div className="mt-6 flex gap-2">
-                          <button className={`flex-1 py-2 text-[9px] font-black uppercase rounded-xl transition-all ${heuristics.cash_prediction.risk_level === 'HIGH' ? 'bg-rose-500 text-white hover:bg-rose-400' : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400'}`}>{t(heuristics.cash_prediction.action_label)}</button>
-                          <button className="px-3 py-2 bg-white/5 text-white text-[9px] font-black uppercase rounded-xl hover:bg-white/10 transition-all"><Clock className="w-3 h-3" /></button>
+                          <button onClick={() => onAction?.('finance')} className={`flex-1 py-2 text-[9px] font-black uppercase rounded-xl transition-all ${heuristics.cash_prediction.risk_level === 'HIGH' ? 'bg-rose-500 text-white hover:bg-rose-400' : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400'}`}>{t(heuristics.cash_prediction.action_label)}</button>
+                          <button onClick={() => onAction?.('debtors')} className="px-3 py-2 bg-white/5 text-white text-[9px] font-black uppercase rounded-xl hover:bg-white/10 transition-all"><Clock className="w-3 h-3" /></button>
                        </div>
                     </div>
                  )}
@@ -299,7 +304,7 @@ export default function ExecutiveDashboard() {
                <h3 className="text-xl font-black tracking-tight">{t('Enterprise Readiness')}</h3>
                <p className="text-xs text-slate-400 leading-relaxed">{t('Barcha hisob-kitoblar Phase 7 mantiqiy auditidan o\'tdi. KPIlar real provodkalarga asoslangan.')}</p>
             </div>
-            <button className="w-full py-4 mt-8 bg-white text-slate-900 rounded-[22px] font-black text-xs uppercase tracking-widest hover:bg-emerald-400 transition-all">
+            <button onClick={() => onAction?.('activity')} className="w-full py-4 mt-8 bg-white text-slate-900 rounded-[22px] font-black text-xs uppercase tracking-widest hover:bg-emerald-400 transition-all">
                {t('Full Audit Report')}
             </button>
          </div>

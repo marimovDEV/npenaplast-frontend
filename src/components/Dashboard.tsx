@@ -133,7 +133,7 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
                   {heuristics?.supply_alerts?.length || 0}
                 </span>
               </h3>
-              <button className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors underline underline-offset-4">{t('History')}</button>
+              <button onClick={() => onAction?.('activity')} className="text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors underline underline-offset-4">{t('History')}</button>
             </div>
 
             <div className="space-y-4">
@@ -153,7 +153,7 @@ export default function Dashboard({ user, onAction }: DashboardProps) {
                        </div>
                     </div>
                     <button 
-                      onClick={() => onAction?.('sklad1')}
+                      onClick={() => onAction?.(alert.action_type === 'ORDER' ? 'purchase-orders' : 'warehouse')}
                       className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg transition-all active:scale-95 ${alert.status === 'CRITICAL' ? 'bg-rose-600 text-white shadow-rose-100' : 'bg-white text-slate-900 border border-slate-200'}`}
                     >
                       {t(alert.action_label)}

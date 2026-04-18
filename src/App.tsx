@@ -336,7 +336,7 @@ export default function App() {
       case 'alerts':
         return <Alerts />;
       case 'exec-dashboard':
-        return <ExecutiveDashboard />;
+        return <ExecutiveDashboard onAction={setActiveTab} />;
       case 'profit-analytics':
         return <ProfitabilityDashboard />;
       case 'recipes':
