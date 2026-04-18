@@ -51,6 +51,7 @@ export default function Production({ user }: { user: User }) {
   
   // Zames Form
   const [selectedRecipeId, setSelectedRecipeId] = useState('');
+  const [selectedStageId, setSelectedStageId] = useState<number | null>(null);
   const [zamesBatchItems, setZamesBatchItems] = useState<{material: number, material_name: string, batch: string, quantity: number}[]>([]);
   const [outputWeight, setOutputWeight] = useState('');
 
@@ -282,6 +283,7 @@ export default function Production({ user }: { user: User }) {
       await api.post('production/zames/', {
         zames_number: zamesNumber,
         recipe: Number(selectedRecipeId),
+        stage_id: selectedStageId,
         items: zamesBatchItems.map(item => ({
           material: item.material,
           batch: batches.find(b => b.batch_number === item.batch)?.id,
@@ -292,6 +294,7 @@ export default function Production({ user }: { user: User }) {
       fetchProductionData();
       setIsZamesModalOpen(false);
       setSelectedRecipeId('');
+      setSelectedStageId(null);
       setZamesBatchItems([]);
     } catch (err) {
       uiStore.showNotification(t("Zames yaratishda xatolik"), "error");
@@ -888,17 +891,42 @@ export default function Production({ user }: { user: User }) {
                   </div>
                   
                   <div className="p-8 space-y-8">
-                     <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Retsept tanlang')}</label>
-                        <select 
-                          value={selectedRecipeId} 
-                          onChange={(e) => handleRecipeChange(e.target.value)} 
-                          required
-                          className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all font-bold"
-                        >
-                           <option value="">{t('Tanlang...')}</option>
-                           {recipes.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-                        </select>
+                     <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Buyurtmani bog\'lang (Ixtiyoriy)')}</label>
+                           <select 
+                              value={selectedStageId || ''} 
+                              onChange={(e) => setSelectedStageId(e.target.value ? Number(e.target.value) : null)} 
+                              className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all font-bold"
+                           >
+                              <option value="">{t('Mustaqil Zames')}</option>
+                              {productionOrders
+                                 .filter(o => o.status !== 'COMPLETED')
+                                 .map(o => (
+                                    <optgroup key={o.id} label={`${o.order_number} - ${o.product_name}`}>
+                                       {o.stages?.filter(s => s.stage_type === 'ZAMES' && s.status !== 'DONE').map(s => (
+                                          <option key={s.id} value={s.id}>
+                                             {o.order_number} (Stage: {s.stage_type_display})
+                                          </option>
+                                       ))}
+                                    </optgroup>
+                                 ))
+                              }
+                           </select>
+                        </div>
+
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Retsept tanlang')}</label>
+                           <select 
+                             value={selectedRecipeId} 
+                             onChange={(e) => handleRecipeChange(e.target.value)} 
+                             required
+                             className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all font-bold"
+                           >
+                              <option value="">{t('Tanlang...')}</option>
+                              {recipes.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                           </select>
+                        </div>
                      </div>
                      
                      {zamesBatchItems.length > 0 && (
