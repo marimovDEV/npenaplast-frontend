@@ -65,11 +65,11 @@ export default function Topbar({
         {/* Search - Desktop Only */}
         {!isMobile && (
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             <input 
               type="text" 
               placeholder={t('Global qidiruv...')} 
-              className="bg-slate-100/50 border border-transparent focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-500/5 rounded-2xl py-2.5 pl-11 pr-4 text-sm w-64 outline-none transition-all font-medium" 
+              className="bg-slate-100/50 border border-transparent focus:bg-white focus:border-indigo-200 focus:ring-4 focus:ring-indigo-500/5 rounded-2xl py-2.5 pl-11 pr-4 text-sm w-64 outline-none transition-all font-medium" 
             />
           </div>
         )}
@@ -81,7 +81,7 @@ export default function Topbar({
         <div className="flex items-center gap-2 border-l border-slate-200 pl-4 ml-2">
            <button 
              onClick={onOpenScanner}
-             className="w-11 h-11 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all group shadow-sm active:scale-90"
+             className="w-11 h-11 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all group shadow-sm active:scale-90"
            >
              <QrCode className="w-5 h-5 group-hover:rotate-12 transition-all" />
            </button>

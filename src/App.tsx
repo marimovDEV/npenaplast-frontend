@@ -277,7 +277,7 @@ export default function App() {
   const pageLoader = (
     <div className="flex min-h-[280px] items-center justify-center">
       <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
         <span className="text-sm font-semibold text-slate-600">Sahifa yuklanmoqda...</span>
       </div>
     </div>
@@ -359,13 +359,13 @@ export default function App() {
                 repeat: Infinity,
                 repeatType: "reverse"
               }}
-              className="w-20 h-20 bg-blue-600 rounded-[32px] flex items-center justify-center mx-auto mb-2 shadow-2xl shadow-blue-200"
+              className="w-20 h-20 bg-indigo-600 rounded-[32px] flex items-center justify-center mx-auto mb-2 shadow-2xl shadow-indigo-200"
             >
                 <Factory className="text-white w-10 h-10" />
             </motion.div>
             <h1 className="text-2xl font-black text-slate-900 tracking-tight">Penoplast ERP</h1>
             <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-2xl border border-slate-100 shadow-xl">
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('Sessiya tekshirilmoqda...')}</span>
             </div>
         </div>
@@ -385,7 +385,7 @@ export default function App() {
             <LanguageSwitcher />
           </div>
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
+            <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
               <Factory className="text-white w-8 h-8" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Penoplast ERP</h1>
@@ -400,7 +400,7 @@ export default function App() {
                 autoComplete="off"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-slate-50/50"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-slate-50/50"
                 placeholder={t('Masalan: admin')}
                 required
               />
@@ -412,7 +412,7 @@ export default function App() {
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all bg-slate-50/50"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-slate-50/50"
                 placeholder="••••••••"
                 required
               />
@@ -426,7 +426,7 @@ export default function App() {
 
             <button 
               type="submit"
-              className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 active:scale-[0.98] transition-all shadow-lg shadow-blue-200 mt-2"
+              className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-lg shadow-indigo-200 mt-2"
             >
               {t('Kirish')}
             </button>

@@ -8,9 +8,9 @@
   --color-surface-container: #ffffff;
   --color-surface-variant: #f1f5f9;
   
-  --color-primary: #1e293b; /* Dark Navy Slate */
-  --color-primary-accent: #2563eb; /* Vibrant Blue */
-  --color-secondary: #0f172a;
+  --color-primary: #0F172A; /* Slate 900 */
+  --color-primary-accent: #6366F1; /* Indigo 500 */
+  --color-secondary: #1E293B; /* Slate 800 */
   --color-tertiary: #f59e0b;
   --color-error: #ef4444;
   

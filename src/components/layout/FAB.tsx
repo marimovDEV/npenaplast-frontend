@@ -24,7 +24,7 @@ export default function FAB({ userRole, onAction }: FABProps) {
   
   const actions = [
     { id: 'sales', name: 'Yangi Sotuv', icon: ShoppingCart, color: 'bg-emerald-500', roles: ['Bosh Admin', 'Admin', 'Sotuv menejeri'] },
-    { id: 'production', name: 'Zames boshlash', icon: Factory, color: 'bg-blue-500', roles: ['Bosh Admin', 'Admin', 'Ishlab chiqarish ustasi'] },
+    { id: 'production', name: 'Zames boshlash', icon: Factory, color: 'bg-indigo-500', roles: ['Bosh Admin', 'Admin', 'Ishlab chiqarish ustasi'] },
     { id: 'sklad1', name: 'Xom ashyo kirim', icon: Database, color: 'bg-amber-500', roles: ['Bosh Admin', 'Admin', 'Omborchi'] },
     { id: 'contracts', name: 'Shartnoma', icon: FileText, color: 'bg-indigo-500', roles: ['Bosh Admin', 'Admin', 'Sotuv menejeri'] },
   ].filter(a => isAdmin || a.roles.includes(userRole));
