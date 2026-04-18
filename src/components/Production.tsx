@@ -313,18 +313,18 @@ export default function Production({ user }: { user: User }) {
   const handleFinishZames = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFinishModalOpen || !outputWeight) return;
-    
+
     setLoading(true);
     try {
       await api.post(`production/zames/${isFinishModalOpen.id}/finish/`, {
         output_weight: Number(outputWeight)
       });
-      uiStore.showNotification(t("Zames yakunlandi"), "success");
+      uiStore.showNotification(t("Zames muvaffaqiyatli yakunlandi"), "success");
       fetchProductionData();
       setIsFinishModalOpen(null);
       setOutputWeight('');
-    } catch (err) {
-      uiStore.showNotification(t("Xatolik"), "error");
+    } catch (err: any) {
+      uiStore.showNotification(t(err.response?.data?.error || "Xatolik"), "error");
     } finally {
       setLoading(false);
     }
@@ -384,133 +384,198 @@ export default function Production({ user }: { user: User }) {
 
       <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm min-h-[500px]">
         {subTab === 'zames' && (
-          <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex justify-between items-end">
+          <div className="space-y-10 animate-in fade-in duration-500">
+            {/* Header with New Action */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Zameslar Jurnali')}</h3>
+                <h3 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                  <FlaskConical className="w-8 h-8 text-blue-600" />
+                  {t('Zameslar Jurnali')}
+                </h3>
                 <p className="text-slate-500 font-medium">{t('Xom ashyoni ko\'pirtirish va partiyalash jarayoni')}</p>
               </div>
               <button 
                 onClick={() => setIsZamesModalOpen(true)}
-                className="bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all group"
+                className="bg-blue-600 text-white px-10 py-4 rounded-[24px] font-black flex items-center gap-3 shadow-2xl shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all group"
               >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+                <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" />
                 <span>{t('Yangi Zames Yaratish')}</span>
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <AnimatePresence mode="popLayout">
-                {zamesy.map(z => (
-                  <motion.div 
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    key={z.id} 
-                    className={`
-                      relative overflow-hidden rounded-[32px] border p-6 transition-all duration-300
-                      ${z.status === 'IN_PROGRESS' ? 'bg-white border-blue-200 shadow-2xl shadow-blue-100 ring-2 ring-blue-500/10' : 
-                        z.status === 'PENDING' ? 'bg-slate-50/50 border-slate-100' : 
-                        'bg-white border-slate-100 opacity-80'}
-                    `}
-                  >
-                    <div className="flex justify-between items-start mb-6">
-                      <div className={`
-                        p-3 rounded-2xl shadow-lg
-                        ${z.status === 'IN_PROGRESS' ? 'bg-blue-600 text-white shadow-blue-200' : 
-                          z.status === 'DONE' ? 'bg-emerald-500 text-white shadow-emerald-100' : 
-                          'bg-white text-slate-400 border border-slate-100'}
-                      `}>
-                        <FlaskConical className="w-6 h-6" />
+            {/* LIVE CONTROLLER: Active Zames Section */}
+            {zamesy.some(z => z.status === 'IN_PROGRESS') && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 bg-blue-600 rounded-full animate-ping" />
+                  <h4 className="text-sm font-black text-blue-600 uppercase tracking-widest">{t('Aktiv Jarayonlar')}</h4>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {zamesy.filter(z => z.status === 'IN_PROGRESS').map(z => (
+                    <motion.div 
+                      key={z.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white rounded-[48px] border-4 border-blue-500/20 p-10 shadow-2xl shadow-blue-100 relative overflow-hidden group"
+                    >
+                      {/* Background Pulse */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+                      
+                      <div className="relative flex flex-col md:flex-row gap-10">
+                        <div className="flex-1 space-y-6">
+                          <div className="flex items-center gap-4">
+                             <div className="p-4 bg-blue-600 rounded-3xl text-white shadow-xl shadow-blue-200">
+                                <FlaskConical className="w-8 h-8 animate-bounce" />
+                             </div>
+                             <div>
+                                <h4 className="text-2xl font-black text-slate-900">{z.zames_number}</h4>
+                                <span className="text-blue-600 font-black text-sm uppercase tracking-widest">{z.recipe_name}</span>
+                             </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-6">
+                            <div className="p-5 bg-slate-50 rounded-[32px] border border-slate-100">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('Kiritilgan Vazn')}</p>
+                              <div className="flex items-center gap-3">
+                                <Weight className="w-6 h-6 text-slate-400" />
+                                <span className="text-xl font-black text-slate-900">{z.input_weight} <span className="text-sm font-bold text-slate-400">kg</span></span>
+                              </div>
+                            </div>
+                            <div className="p-5 bg-blue-50/50 rounded-[32px] border border-blue-100/50">
+                              <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">{t('Davomiyligi')}</p>
+                              <div className="flex items-center gap-3">
+                                <Clock className="w-6 h-6 text-blue-500" />
+                                <span className="text-xl font-black text-blue-900">
+                                  {z.start_time ? Math.floor((new Date().getTime() - new Date(z.start_time).getTime()) / 1000 / 60) : 0} <span className="text-sm font-bold text-blue-400">min</span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col justify-center gap-4 md:w-64">
+                          <button 
+                            onClick={() => setIsFinishModalOpen(z)}
+                            className="bg-emerald-500 text-white p-6 rounded-[32px] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-100 hover:bg-emerald-600 hover:scale-105 active:scale-95 transition-all flex flex-col items-center gap-3"
+                          >
+                            <CheckCircle2 className="w-10 h-10" />
+                            {t('Tugatish')}
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <span className={`
-                          px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border
-                          ${z.status === 'IN_PROGRESS' ? 'bg-blue-50 text-blue-600 border-blue-100 animate-pulse' : 
-                            z.status === 'DONE' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
-                            'bg-slate-100 text-slate-500 border-slate-200'}
+
+                      {/* Progress Bar Container */}
+                      <div className="absolute bottom-0 left-0 right-0 h-2 bg-slate-100">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: "100%" }}
+                          transition={{ duration: 180, ease: "linear" }}
+                          className="h-full bg-blue-600 shadow-[0_0_20px_rgba(37,99,235,0.8)]"
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Zames History Table / Grid */}
+            <div className="space-y-6">
+              <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t('Yaqindagi Zameslar')}</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <AnimatePresence mode="popLayout">
+                  {zamesy
+                    .filter(z => z.status !== 'IN_PROGRESS')
+                    .map(z => (
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      key={z.id} 
+                      className={`
+                        relative overflow-hidden rounded-[40px] border p-6 transition-all duration-300 bg-white group hover:shadow-2xl hover:shadow-slate-200/50 hover:-translate-y-1
+                        ${z.status === 'DONE' ? 'border-emerald-100' : 'border-slate-100'}
+                      `}
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <div className={`
+                          p-4 rounded-3xl shadow-lg transition-transform group-hover:scale-110
+                          ${z.status === 'DONE' ? 'bg-emerald-500 text-white shadow-emerald-100' : 
+                            'bg-slate-100 text-slate-400'}
                         `}>
-                          {z.status === 'PENDING' ? t('Kutilmoqda') : z.status === 'IN_PROGRESS' ? t('Jarayonda') : z.status === 'DONE' ? t('Tayyor') : t('Bekor qilingan')}
-                        </span>
-                        {z.start_time && (
-                          <div className="flex items-center gap-1.5 text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                            <Clock className="w-3 h-3" />
-                            {new Date(z.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          <FlaskConical className="w-6 h-6" />
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <span className={`
+                            px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border
+                            ${z.status === 'DONE' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                              z.status === 'PENDING' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                              'bg-slate-50 text-slate-500 border-slate-200'}
+                          `}>
+                            {z.status === 'PENDING' ? t('Kutilmoqda') : z.status === 'DONE' ? t('Tayyor') : t('Bekor qilingan')}
+                          </span>
+                          <span className="text-[10px] font-black text-slate-400 tracking-tighter uppercase whitespace-nowrap">
+                            {new Date(z.created_at).toLocaleDateString()} • {new Date(z.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 mb-8">
+                        <div>
+                          <h4 className="text-xl font-black text-slate-900 mb-1">{z.zames_number}</h4>
+                          <p className="text-xs font-bold text-blue-600 truncate">{z.recipe_name}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Kirish')}</p>
+                            <span className="text-sm font-black text-slate-900">{z.input_weight} <span className="text-[10px]">kg</span></span>
+                          </div>
+                          <div className={`p-3 rounded-2xl border ${z.status === 'DONE' ? 'bg-emerald-50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}>
+                            <p className={`text-[10px] font-black uppercase tracking-widest mb-1 ${z.status === 'DONE' ? 'text-emerald-500' : 'text-slate-400'}`}>{t('Chiqish')}</p>
+                            <span className={`text-sm font-black ${z.status === 'DONE' ? 'text-emerald-900' : 'text-slate-900'}`}>{z.output_weight || '—'} <span className="text-[10px]">kg</span></span>
+                          </div>
+                        </div>
+
+                        {z.output_weight && z.input_weight > 0 && (
+                          <div className="pt-2">
+                             <div className="flex justify-between items-center text-[10px] font-black uppercase mb-1">
+                                <span className="text-slate-400">{t('Samaradorlik')}</span>
+                                <span className={z.output_weight / z.input_weight < 0.95 ? 'text-red-500' : 'text-emerald-600'}>
+                                   {Math.round((z.output_weight / z.input_weight) * 100)}%
+                                </span>
+                             </div>
+                             <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full rounded-full ${z.output_weight / z.input_weight < 0.95 ? 'bg-red-500' : 'bg-emerald-500'}`}
+                                  style={{ width: `${Math.min((z.output_weight / z.input_weight) * 100, 100)}%` }}
+                                />
+                             </div>
                           </div>
                         )}
                       </div>
-                    </div>
 
-                    <div className="space-y-4 mb-8">
-                      <div>
-                        <h4 className="text-xl font-black text-slate-900 leading-tight mb-1">{z.zames_number}</h4>
-                        <p className="text-sm font-bold text-blue-600">{t('Retsept')}: {z.recipe_name}</p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Kirish')} (Kg)</p>
-                          <div className="flex items-center gap-2">
-                            <Weight className="w-4 h-4 text-slate-400" />
-                            <span className="text-sm font-black text-slate-900">{z.input_weight}</span>
-                          </div>
+                      <div className="flex items-center gap-2 pt-4 border-t border-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[8px] border border-white">
+                          {z.operator_name?.charAt(0)}
                         </div>
-                        <div className="p-3 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
-                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">{t('Chiqish')} (Kg)</p>
-                          <div className="flex items-center gap-2">
-                            <RotateCcw className="w-4 h-4 text-emerald-500" />
-                            <span className="text-sm font-black text-emerald-900">{z.output_weight || '—'}</span>
-                          </div>
-                        </div>
+                        <span>{z.operator_name}</span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                        <UserIcon className="w-3 h-3" />
-                        <span>{t('Operator')}: {z.operator_name}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 relative z-10">
                       {z.status === 'PENDING' && (
                         <button 
                           onClick={() => handleStartZames(z.id)}
-                          className="flex-1 bg-blue-600 text-white py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
+                          className="w-full mt-6 bg-blue-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all flex items-center justify-center gap-2"
                         >
                           <Play className="w-4 h-4 fill-current" />
                           {t('Boshlash')}
                         </button>
                       )}
-                      {z.status === 'IN_PROGRESS' && (
-                        <button 
-                          onClick={() => setIsFinishModalOpen(z)}
-                          className="flex-1 bg-emerald-500 text-white py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all flex items-center justify-center gap-2"
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                          {t('Yakunlash')}
-                        </button>
-                      )}
-                      {z.status === 'DONE' && (
-                        <div className="flex-1 py-3.5 rounded-2xl bg-emerald-50 text-emerald-600 font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 border border-emerald-100 cursor-default">
-                          <CheckCircle2 className="w-4 h-4" />
-                          {t('Yakunlangan')}
-                        </div>
-                      )}
-                    </div>
-
-                    {z.status === 'IN_PROGRESS' && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600/10">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: "100%" }}
-                          transition={{ duration: 120, ease: "linear" }}
-                          className="h-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]"
-                        />
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         )}
@@ -1163,46 +1228,83 @@ export default function Production({ user }: { user: User }) {
 
         {isFinishModalOpen && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsFinishModalOpen(null)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
-              <div className="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200">
-                    <CheckCircle2 className="text-white w-6 h-6" />
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }} 
+              onClick={() => setIsFinishModalOpen(null)} 
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 40 }} 
+              animate={{ opacity: 1, scale: 1, y: 0 }} 
+              exit={{ opacity: 0, scale: 0.9, y: 40 }} 
+              className="relative bg-white w-full max-w-xl rounded-[48px] shadow-3xl border border-slate-100 overflow-hidden"
+            >
+              <div className="p-10 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+                <div className="flex items-center gap-6">
+                  <div className="w-16 h-16 bg-emerald-500 rounded-[24px] flex items-center justify-center shadow-2xl shadow-emerald-200">
+                    <CheckCircle2 className="text-white w-8 h-8" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">{t('Zamesni Yakunlash')}</h3>
-                    <p className="text-xs text-slate-500 font-medium">{t('Haqiqiy chiqish vaznini kiriting')}</p>
+                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('Zamesni Yakunlash')}</h3>
+                    <p className="text-slate-500 font-bold">{t('Jarayonni to\'xtatish va natijani qayd etish')}</p>
                   </div>
                 </div>
-                <button onClick={() => setIsFinishModalOpen(null)} className="p-2 text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
+                <button 
+                  onClick={() => setIsFinishModalOpen(null)} 
+                  className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
+                >
+                  <X className="w-8 h-8" />
+                </button>
               </div>
 
-              <form onSubmit={handleFinishZames} className="p-6 space-y-5">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-500 mb-1 px-1">
-                    <span>{t('Nomi')}: {isFinishModalOpen.zames_number}</span>
-                    <span>{t('Kutilgan')}: {isFinishModalOpen.input_weight} kg</span>
+              <form onSubmit={handleFinishZames} className="p-10 space-y-8">
+                <div className="grid grid-cols-2 gap-6 p-6 bg-slate-50 rounded-[32px] border border-slate-100">
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Zames No')}</p>
+                    <p className="text-lg font-black text-slate-900">{isFinishModalOpen.zames_number}</p>
                   </div>
-                  <div className="relative">
-                    <Weight className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input 
-                      autoFocus
-                      type="number"
-                      required
-                      placeholder={t("Chiqish vazni (kg)...")}
-                      value={outputWeight}
-                      onChange={(e) => setOutputWeight(e.target.value)}
-                      className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-black text-xl text-slate-900 placeholder:font-bold placeholder:text-slate-300"
-                    />
+                  <div className="text-right">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Kutilgan Vazn')}</p>
+                    <p className="text-lg font-black text-blue-600">{isFinishModalOpen.input_weight} kg</p>
                   </div>
-                  <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest ml-1 bg-amber-50 p-2 rounded-lg border border-amber-100/50">{t('Diqqat: Chiqish vazni asosida Sklad №2 ga yarim tayyor mahsulot kirim qilinadi.')}</p>
                 </div>
 
-                <div className="flex gap-3 pt-2">
-                  <button type="button" onClick={() => setIsFinishModalOpen(null)} className="flex-1 px-6 py-3.5 border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
-                  <button type="submit" disabled={loading} className="flex-1 px-6 py-3.5 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-200 active:scale-95 transition-all">
-                    {loading ? t('Saqlanmoqda...') : t('Yakunlash va Saqlash')}
+                <div className="space-y-4">
+                  <label className="text-sm font-black text-slate-900 px-1">{t('Haqiqiy chiqish vazni (Kg)')}</label>
+                  <div className="relative">
+                    <Weight className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400" />
+                    <input 
+                      autoFocus
+                      type="number" 
+                      required 
+                      step="0.01"
+                      placeholder="0.00"
+                      value={outputWeight}
+                      onChange={(e) => setOutputWeight(e.target.value)}
+                      className="w-full pl-16 pr-8 py-6 bg-slate-50 border-2 border-slate-100 rounded-[32px] text-2xl font-black text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-8 focus:ring-blue-500/5 transition-all"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium px-4">
+                    {t('Eslatma: Bu vazn asosida kelajakdagi tannarx va yo\'qotishlar hisoblanadi.')}
+                  </p>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsFinishModalOpen(null)} 
+                    className="flex-1 px-8 py-5 text-slate-500 rounded-3xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-all"
+                  >
+                    {t('Bekor qilish')}
+                  </button>
+                  <button 
+                    type="submit" 
+                    disabled={loading} 
+                    className="flex-[2] px-8 py-5 bg-emerald-500 text-white rounded-[24px] font-black text-sm uppercase tracking-widest shadow-2xl shadow-emerald-200 hover:bg-emerald-600 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                  >
+                    {loading ? t('Yakunlanmoqda...') : t('Jarayonni Tugatish')}
                   </button>
                 </div>
               </form>
