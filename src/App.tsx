@@ -37,6 +37,9 @@ import { authService } from './lib/authService';
 import api from './lib/api';
 import { uiStore } from './lib/store';
 import { useI18n } from './i18n';
+import Sidebar from './components/layout/Sidebar';
+import Topbar from './components/layout/Topbar';
+import FAB from './components/layout/FAB';
 
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const Sklad1 = lazy(() => import('./components/Sklad1'));
