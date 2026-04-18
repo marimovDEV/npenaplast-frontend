@@ -106,46 +106,47 @@ export default function App() {
     });
 
     const initAuth = async () => {
-      const { access } = authService.getTokens();
-      if (access) {
-        try {
-          const response = await api.get('users/me/');
-          const userData = response.data;
-          
-          const parseWarehouses = (data: any) => {
-            let assigned = data.assigned_warehouses || data.assignedWarehouses || [];
-            if (Array.isArray(assigned)) {
-              return assigned.map(Number);
-            }
-            if (typeof assigned === 'string' && assigned === '*') {
-              return ['*'];
-            }
-            return [];
-          };
-
-          const assigned = parseWarehouses(userData);
-          const normalizedRole = userData.effective_role || userData.role_display || userData.role;
-          const finalUser = {
-            ...userData,
-            role: normalizedRole,
-            effective_role: normalizedRole,
-            name: userData.name || userData.full_name || userData.username,
-            assignedWarehouses: assigned
-          };
-
-          const isPrivileged = (['Bosh Admin', 'SuperAdmin', 'Admin', 'SUPERADMIN', 'ADMIN'].includes(normalizedRole) || userData.is_superuser);
-          if (isPrivileged) {
-            finalUser.assignedWarehouses = ['*'];
-          }
-          setUser(finalUser);
-        } catch (err) {
-          console.error("Auth initialization failed:", err);
-          authService.logout();
-          setUser(null);
-        } finally {
+      try {
+        const { access } = authService.getTokens();
+        if (!access || access === 'null' || access === 'undefined' || access.length < 10) {
           setIsCheckingAuth(false);
+          return;
         }
-      } else {
+
+        const response = await api.get('users/me/');
+        const userData = response.data;
+        
+        const parseWarehouses = (data: any) => {
+          let assigned = data.assigned_warehouses || data.assignedWarehouses || [];
+          if (Array.isArray(assigned)) {
+            return assigned.map(Number);
+          }
+          if (typeof assigned === 'string' && assigned === '*') {
+            return ['*'];
+          }
+          return [];
+        };
+
+        const assigned = parseWarehouses(userData);
+        const normalizedRole = userData.effective_role || userData.role_display || userData.role;
+        const finalUser = {
+          ...userData,
+          role: normalizedRole,
+          effective_role: normalizedRole,
+          name: userData.name || userData.full_name || userData.username,
+          assignedWarehouses: assigned
+        };
+
+        const isPrivileged = (['Bosh Admin', 'SuperAdmin', 'Admin', 'SUPERADMIN', 'ADMIN'].includes(normalizedRole) || userData.is_superuser);
+        if (isPrivileged) {
+          finalUser.assignedWarehouses = ['*'];
+        }
+        setUser(finalUser);
+      } catch (err) {
+        console.error("Auth initialization failed:", err);
+        authService.logout();
+        setUser(null);
+      } finally {
         setIsCheckingAuth(false);
       }
     };

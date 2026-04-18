@@ -49,7 +49,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       const refreshToken = localStorage.getItem('refresh_token');
       
-      if (refreshToken && refreshToken !== 'null' && refreshToken !== 'undefined') {
+      if (refreshToken && refreshToken !== 'null' && refreshToken !== 'undefined' && refreshToken.length > 10) {
         try {
           const response = await axios.post(`${API_URL}token/refresh/`, {
             refresh: refreshToken,
@@ -66,14 +66,19 @@ api.interceptors.response.use(
           // Refresh failed — clear everything and go to login
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          window.location.reload();
+          // Only reload if we are not already on a clean state to avoid loops
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/';
+          }
           return Promise.reject(refreshError);
         }
       } else {
-        // No refresh token — clear stale access token and reload
+        // No refresh token — clear stale access token and redirect
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.reload();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/';
+        }
         return Promise.reject(error);
       }
     }
