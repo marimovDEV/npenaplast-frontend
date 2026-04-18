@@ -1,892 +1,320 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  X, 
   Plus, 
-  Search, 
-  Truck, 
-  Box, 
-  FileText,
-  Activity,
-  ArrowRight,
-  Database,
-  QrCode,
-  DollarSign,
-  AlertCircle,
-  TrendingUp,
-  History,
-  Printer,
-  Camera,
+  ArrowRightLeft, 
+  QrCode, 
+  Database, 
+  AlertTriangle, 
+  CheckCircle2, 
+  TrendingUp, 
+  History, 
+  Search,
+  Filter,
+  MoreVertical,
+  ChevronRight,
   Package,
-  Trash2,
-  Calendar,
-  User
+  ArrowUpRight,
+  Table as TableIcon,
+  LayoutGrid
 } from 'lucide-react';
 import api from '../lib/api';
-import { RawMaterial } from '../types';
-import { uiStore } from '../lib/store';
-import { motion, AnimatePresence } from 'motion/react';
-import QRLabel from './QRLabel';
-import DocumentTemplate from './DocumentTemplate';
-import MobileCard from './common/MobileCard';
 import { useI18n } from '../i18n';
+import QRScanner from './QRScanner';
+import { motion, AnimatePresence } from 'motion/react';
 
-const ScannerModal = lazy(() => import('./ScannerModal'));
+interface StockItem {
+  id: number;
+  material_name: string;
+  material_unit: string;
+  quantity: number;
+  available_quantity: number;
+  reserved_quantity: number;
+  min_level: number;
+  total_value: number;
+  status: 'OK' | 'LOW' | 'CRITICAL';
+  updated_at: string;
+}
 
-export default function Sklad1({ user }: { user: any }) {
-  const { locale, t } = useI18n();
-  const assignedWarehouses = (user.assignedWarehouses || user.assigned_warehouses || []).map(String);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [materials, setMaterials] = useState<RawMaterial[]>([]);
-  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const [isPrintingDocument, setIsPrintingDocument] = useState<any>(null);
-  const [isPrintingLabel, setIsPrintingLabel] = useState<any>(null);
-  const [selectedBatch, setSelectedBatch] = useState<RawMaterial | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<'INVENTORY' | 'DOCUMENTS'>('INVENTORY');
-  const [documents, setDocuments] = useState<any[]>([]);
-  
-  // Receive Form State
-  const [invoiceNumber, setInvoiceNumber] = useState('');
-  const [supplierId, setSupplierId] = useState('');
-  const [receiveItems, setReceiveItems] = useState([
-    { productId: '', quantity: '', price: '' }
-  ]);
-  const [currency, setCurrency] = useState('UZS');
-  
-  // Transfer Form State
-  const [transferQty, setTransferQty] = useState('');
-  const [targetShop, setTargetShop] = useState('ZAMES'); // ZAMES, CNC, etc.
-
-  const [products, setProducts] = useState<any[]>([]);
-  const [suppliers, setSuppliers] = useState<any[]>([]);
+export default function Sklad1() {
+  const { t } = useI18n();
+  const [stocks, setStocks] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [warehouseId, setWarehouseId] = useState<number | null>(null);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
 
-  const fetchData = async () => {
+  const fetchStocks = async () => {
     try {
-      setLoading(true);
-      const wRes = await api.get('warehouses/?name=Sklad №1');
-      if (wRes.data.length > 0) {
-        const wid = wRes.data[0].id;
-        setWarehouseId(wid);
-        
-        // Fetch raw material batches for Sklad 1
-        const batchRes = await api.get('batches/');
-        setMaterials(batchRes.data.map((b: any) => ({
-          id: b.id,
-          batchNumber: b.batch_number,
-          supplier: b.supplier_name,
-          date: new Date(b.date).toLocaleDateString(locale),
-          quantity_kg: b.quantity_kg,
-          remaining_quantity: b.remaining_quantity,
-          reserved_quantity: b.reserved_quantity,
-          responsiblePerson: b.responsible_user_name || t('Tizim'),
-          status: b.status,
-          code: b.material_sku || 'RM-SKU',
-          name: t(b.material_name || "Noma'lum mahsulot"),
-          productId: b.material,
-          qr_code: b.qr_code
-        })));
-
-        // Fetch documents for Sklad 1
-        const docRes = await api.get('documents/', { params: { from_warehouse: wid, to_warehouse: wid } });
-        setDocuments(docRes.data);
-      }
-      
-      const pRes = await api.get('products/?type=RAW');
-      setProducts(pRes.data);
-      
-      const sRes = await api.get('suppliers/');
-      setSuppliers(sRes.data);
-      if (sRes.data.length > 0) setSupplierId(sRes.data[0].id);
-
-      if (pRes.data.length > 0) {
-        setReceiveItems([{ productId: pRes.data[0].id, quantity: '', price: '' }]);
-      }
+      const res = await api.get('stocks/', { params: { warehouse_name: 'Sklad №1' } });
+      setStocks(res.data);
     } catch (err) {
-      console.error("Failed to fetch Sklad 1 data", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDocumentAction = async (id: number, action: 'confirm' | 'cancel' | 'complete' | 'receive') => {
-    try {
-      setLoading(true);
-      await api.post(`documents/${id}/${action}/`);
-      uiStore.showNotification(t('Hujjat') + ' ' + t(action) + ' ' + t('qilindi'), "success");
-      fetchData();
-    } catch (err) {
-      uiStore.showNotification(t("Xatolik") + ": " + (err as any).message, "error");
+      console.error("Failed to fetch stocks", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
-  }, [locale]);
-
-  useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    fetchStocks();
   }, []);
 
-  const handleReceive = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!warehouseId) return;
-
-    setLoading(true);
-    try {
-      const totalAmount = receiveItems.reduce((acc, item) => acc + (Number(item.price) * Number(item.quantity)), 0);
-      
-      const res = await api.post('documents/', {
-        number: invoiceNumber || `INV-IN-${Date.now()}`,
-        type: 'HISOB_FAKTURA_KIRIM',
-        to_warehouse: warehouseId,
-        supplier: supplierId,
-        currency,
-        total_amount: totalAmount,
-        items: receiveItems.map(item => ({ 
-            product: Number(item.productId), 
-            quantity: Number(item.quantity),
-            price_at_moment: Number(item.price)
-        }))
-      });
-      
-      uiStore.showNotification(t("Kirim muvaffaqiyatli bajarildi"), "success");
-      fetchData();
-      setIsReceiveModalOpen(false);
-      
-      // Prompt to print document
-      setIsPrintingDocument(res.data);
-      resetReceiveForm();
-    } catch (err) {
-      uiStore.showNotification(t("Xatolik") + ": " + (err as any).message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleTransfer = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedBatch || !warehouseId) return;
-
-    setLoading(true);
-    try {
-      // Create Internal Waybill (ICHKI_NAKLADNOY)
-      // Note: The backend consume_material_fifo logic in complete_document
-      // will handle the actual batch deduction based on FIFO.
-      await api.post('documents/', {
-        number: `TRF-${Date.now()}`,
-        type: 'ICHKI_YUK_XATI',
-        from_warehouse: warehouseId,
-        to_warehouse: warehouseId, 
-        notes: `${targetShop} ${t('sexiga uzatish')}`,
-        items: [{ 
-            product: (selectedBatch as any).productId, 
-            quantity: Number(transferQty)
-        }]
-      });
-
-      uiStore.showNotification(t(`${targetShop} sexiga uzatildi`), "success");
-      fetchData();
-      setIsTransferModalOpen(false);
-      setTransferQty('');
-    } catch (err) {
-      uiStore.showNotification(t("Xatolik") + ": " + (err as any).message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetReceiveForm = () => {
-    setInvoiceNumber('');
-    setSupplierId(suppliers.length > 0 ? suppliers[0].id : '');
-    if (products.length > 0) {
-      setReceiveItems([{ productId: products[0].id, quantity: '', price: '' }]);
-    }
-  };
-
-  const addReceiveItem = () => {
-    if (products.length > 0) {
-      setReceiveItems([...receiveItems, { productId: products[0].id, quantity: '', price: '' }]);
-    }
-  };
-
-  const updateReceiveItem = (index: number, field: string, value: string) => {
-    const newItems = [...receiveItems];
-    (newItems[index] as any)[field] = value;
-    setReceiveItems(newItems);
-  };
-
-  const removeReceiveItem = (index: number) => {
-    if (receiveItems.length > 1) {
-      setReceiveItems(receiveItems.filter((_, i) => i !== index));
-    }
-  };
-
-  const filteredMaterials = materials.filter(m => 
-    (m as any).name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.batchNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.supplier.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStocks = stocks.filter(s => 
+    s.material_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totals = {
-    total: materials.reduce((acc, current) => acc + (current as any).remaining_quantity, 0),
-    eps: materials.filter(m => (m as any).name?.toLowerCase().includes('eps')).reduce((acc, m) => acc + (m as any).remaining_quantity, 0),
-    kley: materials.filter(m => (m as any).name?.toLowerCase().includes('kley')).reduce((acc, m) => acc + (m as any).remaining_quantity, 0),
-  };
+  const totalInventoryValue = stocks.reduce((acc, s) => acc + s.total_value, 0);
+  const criticalItemsCount = stocks.filter(s => s.status === 'CRITICAL').length;
+  const lowItemsCount = stocks.filter(s => s.status === 'LOW').length;
 
-  if (!assignedWarehouses.includes('*') && !assignedWarehouses.includes('sklad1') && !assignedWarehouses.includes('1')) {
-     return <div className="p-10 text-center font-bold text-slate-400 italic">{t('Ruxsat mavjud emas')}</div>;
-  }
+  const renderEmptyState = () => (
+    <div className="flex flex-col items-center justify-center py-24 px-6 text-center animate-slide-up bg-white rounded-[48px] border border-slate-100 shadow-card">
+      <div className="w-32 h-32 bg-slate-50 rounded-[40px] flex items-center justify-center mb-8 relative">
+        <Package className="w-14 h-14 text-slate-300" />
+        <div className="absolute -top-2 -right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white border-4 border-white shadow-lg">
+          <Plus className="w-5 h-5" />
+        </div>
+      </div>
+      <h3 className="text-2xl font-black text-slate-900 mb-3">{t('Ombor bo\'sh')}</h3>
+      <p className="text-slate-500 text-sm max-w-sm mb-10 leading-relaxed font-medium">
+        {t('Hozircha Sklad №1 da xom-ashyo ma\'lumotlari mavjud emas. Ishni boshlash uchun birinchi kirimni amalga oshiring.')}
+      </p>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <button className="bg-primary text-white px-10 py-5 rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+          <Plus className="w-4 h-4" />
+          {t('Yangi Kirim')}
+        </button>
+        <button onClick={() => setIsScannerOpen(true)} className="bg-slate-900 text-white px-10 py-5 rounded-3xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-slate-900/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+          <QrCode className="w-4 h-4" />
+          {t('QR Skaner')}
+        </button>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Header & Main Actions */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div className="space-y-8 animate-slide-up pb-20">
+      
+      {/* HEADER ACTIONS */}
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-xl shadow-indigo-100">
-              <Database className="w-6 h-6" />
-            </div>
-            {t('Sklad №1 (Xom Ashyo)')}
-          </h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">{t('Nomenklatura, partiyalar va ishlab chiqarishga uzatish')}</p>
+          <div className="flex items-center gap-3 mb-2">
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t('Sklad №1')}</h2>
+            <span className="bg-slate-100 text-slate-500 text-[10px] font-black px-3 py-1 rounded-full border border-slate-200 uppercase tracking-widest">{t('Xom-ashyo')}</span>
+          </div>
+          <p className="text-slate-500 text-sm font-medium">{t('Real vaqtdagi qoldiqlar va materiallar boshqaruvi')}</p>
         </div>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <button className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-primary text-white px-6 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-105 transition-all active:scale-95">
+            <Plus className="w-4 h-4" />
+            <span>{t('Kirim')}</span>
+          </button>
+          <button className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-slate-200 hover:scale-105 transition-all active:scale-95">
+            <ArrowRightLeft className="w-4 h-4" />
+            <span>{t('Berish')}</span>
+          </button>
           <button 
             onClick={() => setIsScannerOpen(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all"
+            className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-900 px-6 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-sm hover:bg-slate-50 transition-all active:scale-95"
           >
-            <Camera className="w-4 h-4" />
-            <span>{t('QR Skaynerlash')}</span>
-          </button>
-          <button 
-            onClick={() => setIsReceiveModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 active:scale-95 transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{t('Kirim (Faktura)')}</span>
+            <QrCode className="w-4 h-4" />
+            <span>{t('QR')}</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-all duration-700 opacity-50" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="bg-blue-600 w-12 h-12 rounded-[18px] flex items-center justify-center text-white shadow-lg shadow-blue-100">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('Umumiy Qoldiq')}</p>
-              <p className="text-2xl font-black text-slate-900 tracking-tight">{totals.total.toLocaleString()} <span className="text-xs text-slate-400">kg</span></p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-50 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-all duration-700 opacity-50" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="bg-rose-500 w-12 h-12 rounded-[18px] flex items-center justify-center text-white shadow-lg shadow-rose-100">
-              <Box className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('EPS Granula')}</p>
-              <p className="text-2xl font-black text-slate-900 tracking-tight">{totals.eps.toLocaleString()} <span className="text-xs text-slate-400">kg</span></p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-all duration-700 opacity-50" />
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="bg-emerald-500 w-12 h-12 rounded-[18px] flex items-center justify-center text-white shadow-lg shadow-emerald-100">
-              <AlertCircle className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('Kam Qolgan')}</p>
-              <p className="text-2xl font-black text-slate-900 tracking-tight">2 <span className="text-xs text-slate-400">{t('turi')}</span></p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-[22px] w-full sm:w-fit overflow-x-auto">
-        <button 
-          onClick={() => setActiveTab('INVENTORY')}
-          className={`px-8 py-3 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all ${
-            activeTab === 'INVENTORY' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
-          }`}
-        >
-          {t('Ombor Qoldig\'i')}
-        </button>
-        <button 
-          onClick={() => setActiveTab('DOCUMENTS')}
-          className={`px-8 py-3 rounded-[18px] text-[11px] font-black uppercase tracking-widest transition-all ${
-            activeTab === 'DOCUMENTS' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'
-          }`}
-        >
-          {t('Hujjatlar & Buyruqlar')}
-        </button>
-      </div>
-
-      {activeTab === 'INVENTORY' && (
-        <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4">
-          <div className="p-6 border-b border-slate-50 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input 
-                type="text" 
-                placeholder={t('Material yoki partiya qidirish') + "..."} 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all text-sm font-medium"
-              />
-            </div>
-          </div>
-
-          <div className="min-h-[400px]">
-            {isMobile ? (
-              <div className="p-3 space-y-1 animate-slide-up">
-                {filteredMaterials.map((m) => {
-                  const available = (m as any).remaining_quantity - ((m as any).reserved_quantity || 0);
-                  return (
-                    <MobileCard
-                      key={m.id}
-                      title={(m as any).name}
-                      subtitle={m.code}
-                      icon={Database}
-                      iconBg="bg-blue-50"
-                      iconColor="text-blue-600"
-                      status={{
-                        label: m.status === 'IN_STOCK' ? t('Omborda') : t('Tugatilgan'),
-                        variant: m.status === 'IN_STOCK' ? 'success' : 'error'
-                      }}
-                      rightElement={
-                        <span className="text-[10px] font-mono font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                          {m.batchNumber}
-                        </span>
-                      }
-                      footer={
-                        <div className="flex items-center justify-between w-full">
-                           <div className="flex gap-4">
-                              <div className="flex flex-col">
-                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('Reserved')}</span>
-                                <span className="text-xs font-black text-amber-500 leading-none">{((m as any).reserved_quantity || 0).toLocaleString()} kg</span>
-                              </div>
-                              <div className="flex flex-col border-l border-slate-100 pl-4">
-                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('Mavjud')}</span>
-                                <span className="text-xs font-black text-slate-900 leading-none">{available.toLocaleString()} kg</span>
-                              </div>
-                           </div>
-                           <div className="flex gap-2">
-                              <button 
-                                onClick={() => setIsPrintingLabel(m)}
-                                className="touch-target w-10 h-10 bg-slate-50 text-slate-400 rounded-xl"
-                              >
-                                <Printer className="w-4.5 h-4.5" />
-                              </button>
-                              {available > 0 && (
-                                <button 
-                                  onClick={() => { setSelectedBatch(m); setIsTransferModalOpen(true); }}
-                                  className="touch-target w-10 h-10 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-100"
-                                >
-                                  <Activity className="w-4.5 h-4.5" />
-                                </button>
-                              )}
-                           </div>
-                        </div>
-                      }
-                    />
-                  );
-                })}
+      {stocks.length > 0 && (
+        <>
+          {/* SMART KPIs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white p-7 rounded-[40px] border border-slate-100 shadow-card flex items-center gap-6">
+              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center">
+                <TrendingUp className="w-8 h-8" />
               </div>
-            ) : (
-            <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-slate-50/50">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Material / Kod')}</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Partiya ID')}</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Reserved')} (kg)</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Mavjud')} (Available)</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">{t('Holati')}</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Amallar')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {filteredMaterials.map((m) => {
-                  const available = (m as any).remaining_quantity - ((m as any).reserved_quantity || 0);
-                  return (
-                    <tr key={m.id} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="px-8 py-6">
-                        <div>
-                          <p className="font-black text-slate-900 leading-none mb-1 text-sm">{(m as any).name}</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{m.code}</p>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6">
-                        <span className="text-xs font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg border border-blue-100 font-mono">{m.batchNumber}</span>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <p className={`text-xs font-black ${(m as any).reserved_quantity > 0 ? 'text-amber-500' : 'text-slate-300'}`}>
-                          {((m as any).reserved_quantity || 0).toLocaleString()}
-                        </p>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <div className="flex flex-col items-end">
-                          <p className="text-sm font-black text-slate-900">{available.toLocaleString()} kg</p>
-                          <p className="text-[10px] font-bold text-slate-300">{(m as any).remaining_quantity.toLocaleString()} {t('jami')}</p>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                          m.status === 'IN_STOCK' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
-                        }`}>
-                          {m.status === 'IN_STOCK' ? t('Omborda') : t('Tugatilgan')}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => setIsPrintingLabel(m)}
-                            className="p-2.5 text-slate-400 hover:text-blue-600 bg-white border border-slate-100 rounded-xl transition-all shadow-sm group-hover:scale-110"
-                          >
-                            <Printer className="w-4 h-4" />
-                          </button>
-                          {available > 0 && (
-                            <button 
-                              onClick={() => { setSelectedBatch(m); setIsTransferModalOpen(true); }}
-                              className="p-3 text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 rounded-2xl transition-all shadow-sm border border-blue-100"
-                            >
-                              <Activity className="w-5 h-5" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'DOCUMENTS' && (
-        <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4">
-          <div className="min-h-[400px]">
-            {isMobile ? (
-              <div className="space-y-3 p-4">
-                {documents.map((doc) => (
-                  <div key={doc.id} className="rounded-[28px] border border-slate-100 bg-white p-4 shadow-sm">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-sm font-black text-slate-900 break-words">{doc.number}</p>
-                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{t(doc.type)}</p>
-                      </div>
-                      <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                        doc.status === 'DONE' ? 'bg-emerald-50 text-emerald-600' :
-                        doc.status === 'CANCELLED' ? 'bg-rose-50 text-rose-600' :
-                        doc.status === 'CREATED' ? 'bg-blue-50 text-blue-600' :
-                        'bg-amber-50 text-amber-600'
-                      }`}>
-                        {t(doc.status)}
-                      </span>
-                    </div>
-                    <div className="mt-4 rounded-2xl bg-slate-50 p-3 text-xs font-bold text-slate-600">
-                      <span>{t(doc.from_entity_name || '---')}</span>
-                      <span className="mx-2 text-slate-300">{'->'}</span>
-                      <span>{t(doc.to_entity_name || '---')}</span>
-                    </div>
-                    <div className="mt-3 flex items-center justify-between gap-3">
-                      <p className="text-[10px] font-black uppercase text-slate-400">{new Date(doc.created_at).toLocaleDateString()}</p>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => setIsPrintingDocument(doc)} className="rounded-xl border border-slate-100 bg-white p-2 text-slate-400 shadow-sm transition-all">
-                          <Printer className="w-4 h-4" />
-                        </button>
-                        {(doc.status === 'CREATED' || doc.status === 'CONFIRMED') && (
-                          <button 
-                            onClick={() => handleDocumentAction(doc.id, doc.status === 'CREATED' ? 'confirm' : 'complete')}
-                            className="rounded-xl bg-blue-600 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-white"
-                          >
-                            {doc.status === 'CREATED' ? t('Tasdiqlash') : t('Yakunlash')}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Ombor Qiymati')}</p>
+                <h4 className="text-xl font-black text-slate-900 tracking-tight">{totalInventoryValue.toLocaleString()} UZS</h4>
               </div>
-            ) : (
-            <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-slate-50/50">
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Hujjat № / Turi')}</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-left">{t('Qayerdan / Qayerga')}</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">{t('Sanasi')}</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-center">{t('Holati')}</th>
-                  <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">{t('Amallar')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {documents.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-8 py-6">
-                      <div className="flex items-start gap-3">
-                        <div className={`mt-1 w-2 h-2 rounded-full ${
-                          doc.type.includes('KIRIM') ? 'bg-blue-500' : 'bg-amber-500'
-                        }`} />
-                        <div>
-                          <p className="font-black text-slate-900 text-sm">{doc.number}</p>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t(doc.type)}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                       <div className="flex items-center gap-2 text-xs font-bold text-slate-600">
-                          <span>{t(doc.from_entity_name || '---')}</span>
-                          <ArrowRight className="w-3 h-3 text-slate-300" />
-                          <span>{t(doc.to_entity_name || '---')}</span>
-                       </div>
-                    </td>
-                    <td className="px-8 py-6 text-center">
-                      <p className="text-[10px] font-black text-slate-500 uppercase">{new Date(doc.created_at).toLocaleDateString()}</p>
-                    </td>
-                    <td className="px-8 py-6 text-center">
-                      <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                        doc.status === 'DONE' ? 'bg-emerald-50 text-emerald-600' :
-                        doc.status === 'CANCELLED' ? 'bg-rose-50 text-rose-600' :
-                        doc.status === 'CREATED' ? 'bg-blue-50 text-blue-600' :
-                        'bg-amber-50 text-amber-600'
-                      }`}>
-                        {t(doc.status)}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                       <div className="flex items-center justify-end gap-2">
-                          <button onClick={() => setIsPrintingDocument(doc)} className="p-2 text-slate-400 hover:text-blue-600 bg-white border border-slate-100 rounded-xl transition-all shadow-sm">
-                             <Printer className="w-4 h-4" />
-                          </button>
-                          {doc.status === 'CREATED' && ['Admin', 'Bosh Admin'].includes(user.effective_role || user.role_display || user.role) && (
-                            <button 
-                              onClick={() => handleDocumentAction(doc.id, 'confirm')}
-                              className="px-3 py-1.5 bg-blue-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-blue-100"
-                            >
-                              {t('Tasdiqlash')}
-                            </button>
-                          )}
-                          {doc.status === 'CONFIRMED' && (
-                            <button 
-                              onClick={() => handleDocumentAction(doc.id, 'complete')}
-                              className="px-3 py-1.5 bg-emerald-600 text-white rounded-xl font-black text-[9px] uppercase tracking-widest shadow-lg shadow-emerald-100"
-                            >
-                              {t('Yakunlash')}
-                            </button>
-                          )}
-                          {(doc.status === 'CREATED' || doc.status === 'CONFIRMED') && (
-                            <button 
-                              onClick={() => handleDocumentAction(doc.id, 'cancel')}
-                              className="px-3 py-1.5 border border-rose-100 text-rose-500 hover:bg-rose-50 rounded-xl font-black text-[9px] uppercase tracking-widest"
-                            >
-                              {t('Bekor')}
-                            </button>
-                          )}
-                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
             </div>
-            )}
+
+            <div className="bg-white p-7 rounded-[40px] border border-slate-100 shadow-card flex items-center gap-6">
+              <div className={`w-16 h-16 ${criticalItemsCount > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'} rounded-3xl flex items-center justify-center`}>
+                {criticalItemsCount > 0 ? <AlertTriangle className="w-8 h-8" /> : <CheckCircle2 className="w-8 h-8" />}
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Holat Monitoringi')}</p>
+                <h4 className="text-xl font-black text-slate-900 tracking-tight">
+                  {criticalItemsCount > 0 ? `${criticalItemsCount} ${t('ta tanqislik')}` : t('Hamma produkt OK')}
+                </h4>
+              </div>
+            </div>
+
+            <div className="bg-white p-7 rounded-[40px] border border-slate-100 shadow-card flex items-center gap-6">
+              <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center">
+                <Database className="w-8 h-8" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Material Turlari')}</p>
+                <h4 className="text-xl font-black text-slate-900 tracking-tight">{stocks.length} {t('tur')}</h4>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Kirim Modal */}
-      <AnimatePresence>
-        {isReceiveModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={() => setIsReceiveModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{scale:0.95, opacity:0, y:20}} animate={{scale:1, opacity:1, y:0}} exit={{scale:0.95, opacity:0, y:20}} className="relative bg-white w-full max-w-xl rounded-[28px] md:rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto">
-               <div className="p-8 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-blue-600 rounded-[22px] flex items-center justify-center text-white shadow-xl shadow-blue-100">
-                      <FileText className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-slate-900 tracking-tight">{t('Yangi Kirim (Faktura)')}</h3>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-0.5">{t('Xom ashyo qabul qilish')}</p>
-                    </div>
-                  </div>
-                  <button onClick={() => setIsReceiveModalOpen(false)} className="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all">
-                    <X className="w-6 h-6" />
-                  </button>
-               </div>
-
-               <form onSubmit={handleReceive} className="p-5 md:p-8 space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Faktura №')}</label>
-                      <input required value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} placeholder={t('m-n: F-12345')} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Yetkazib beruvchi')}</label>
-                      <div className="relative">
-                        <Truck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <select 
-                          required 
-                          value={supplierId} 
-                          onChange={e => setSupplierId(e.target.value)} 
-                          className="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold appearance-none"
-                        >
-                          {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Mahsulotlar Ro\'yxati')}</label>
-                      <button 
-                        type="button" 
-                        onClick={addReceiveItem}
-                        className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-1 hover:text-blue-700"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        {t('Mahsulot qo\'shish')}
+          {/* TABLE / CONTENT SECTION */}
+          <div className="bg-white rounded-[48px] border border-slate-100 shadow-card overflow-hidden">
+             {/* Toolbar */}
+             <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="relative w-full md:w-96">
+                   <input 
+                    type="text" 
+                    placeholder={t('Material qidirish...')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                   />
+                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                </div>
+                
+                <div className="flex items-center gap-3">
+                   <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                      <button onClick={() => setViewMode('table')} className={`p-2 rounded-lg transition-all ${viewMode === 'table' ? 'bg-white shadow-sm text-primary' : 'text-slate-400'}`}>
+                        <TableIcon className="w-5 h-5" />
                       </button>
-                    </div>
-                    
-                    {receiveItems.map((item, index) => (
-                      <div key={index} className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100 space-y-4 relative group/item">
-                        {receiveItems.length > 1 && (
-                          <button 
-                            type="button" 
-                            onClick={() => removeReceiveItem(index)}
-                            className="absolute top-4 right-4 p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        )}
-                        
-                        <div className="space-y-2">
-                          <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t('Mahsulot nomi')}</label>
-                          <select 
-                            value={item.productId} 
-                            onChange={e => updateReceiveItem(index, 'productId', e.target.value)}
-                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all font-bold text-sm appearance-none"
-                          >
-                            {products.map(p => <option key={p.id} value={p.id}>{p.name} ({p.code})</option>)}
-                          </select>
-                        </div>
+                      <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-primary' : 'text-slate-400'}`}>
+                        <LayoutGrid className="w-5 h-5" />
+                      </button>
+                   </div>
+                   <button className="p-4 bg-slate-50 text-slate-400 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-all">
+                      <Filter className="w-5 h-5" />
+                   </button>
+                </div>
+             </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t('Miqdor')} (kg)</label>
-                            <input 
-                              type="number" 
-                              required 
-                              value={item.quantity} 
-                              onChange={e => updateReceiveItem(index, 'quantity', e.target.value)}
-                              placeholder="0.00" 
-                              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all font-bold text-sm" 
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t('Narx (1kg uchun)')}</label>
-                            <div className="relative">
-                              <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-300" />
-                              <input 
-                                type="number" 
-                                required 
-                                value={item.price} 
-                                onChange={e => updateReceiveItem(index, 'price', e.target.value)}
-                                placeholder="0.00" 
-                                className="w-full pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all font-bold text-sm" 
-                              />
+             {/* Functional Table */}
+             <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                   <thead>
+                      <tr className="bg-slate-50/50">
+                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('Material')}</th>
+                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('Jami Qoldiq')}</th>
+                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('Available')}</th>
+                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('Reserved')}</th>
+                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('Qiymati')}</th>
+                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">{t('Holat')}</th>
+                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">{t('Amallar')}</th>
+                      </tr>
+                   </thead>
+                   <tbody className="divide-y divide-slate-50">
+                      {filteredStocks.map((stock) => (
+                        <tr key={stock.id} className="hover:bg-slate-50/80 transition-all group cursor-pointer">
+                          <td className="px-8 py-6">
+                            <div className="flex items-center gap-4">
+                               <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-xs">
+                                  {stock.material_name.charAt(0).toUpperCase()}
+                               </div>
+                               <div>
+                                  <p className="text-sm font-black text-slate-900 mb-0.5">{stock.material_name}</p>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase">{stock.material_unit}</p>
+                               </div>
                             </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <button type="button" onClick={() => setIsReceiveModalOpen(false)} className="flex-1 py-4 border border-slate-200 text-slate-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all">{t('Bekor qilish')}</button>
-                    <button type="submit" className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">{t('Muvaffaqiyatli Saqlash')}</button>
-                  </div>
-               </form>
-            </motion.div>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                            <span className="text-sm font-black text-slate-900">{stock.quantity.toLocaleString()}</span>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                            <span className="text-sm font-black text-emerald-600">{stock.available_quantity.toLocaleString()}</span>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                            <span className="text-sm font-black text-slate-400">{stock.reserved_quantity.toLocaleString()}</span>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                             <p className="text-xs font-black text-slate-700">{stock.total_value.toLocaleString()} UZS</p>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                             <div className="flex flex-col items-center gap-2">
+                                <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter ${
+                                  stock.status === 'CRITICAL' ? 'bg-rose-50 text-rose-500 border border-rose-100' : 
+                                  stock.status === 'LOW' ? 'bg-amber-50 text-amber-500 border border-amber-100' : 
+                                  'bg-emerald-50 text-emerald-500 border border-emerald-100'
+                                }`}>
+                                  {t(stock.status)}
+                                </span>
+                                <div className="w-16 h-1 bg-slate-100 rounded-full overflow-hidden">
+                                   <div className={`h-full ${stock.status === 'CRITICAL' ? 'bg-rose-500' : stock.status === 'LOW' ? 'bg-amber-500' : 'bg-emerald-500'}`} 
+                                        style={{ width: `${Math.min(100, (stock.quantity / (stock.min_level || 100)) * 50)}%` }} />
+                                </div>
+                             </div>
+                          </td>
+                          <td className="px-8 py-6 text-right">
+                             <button className="p-2 text-slate-400 hover:text-primary transition-colors">
+                                <ChevronRight className="w-5 h-5" />
+                             </button>
+                          </td>
+                        </tr>
+                      ))}
+                   </tbody>
+                </table>
+             </div>
           </div>
-        )}
-      </AnimatePresence>
+        </>
+      )}
 
-      {/* Transfer Modal */}
-      <AnimatePresence>
-        {isTransferModalOpen && selectedBatch && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={() => setIsTransferModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{scale:0.95, opacity:0, y:20}} animate={{scale:1, opacity:1, y:0}} exit={{scale:0.95, opacity:0, y:20}} className="relative bg-white w-full max-w-md rounded-[28px] md:rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden text-center">
-               <div className="p-5 md:p-10">
-                  <div className="w-20 h-20 bg-indigo-50 rounded-[30px] flex items-center justify-center text-indigo-600 mx-auto mb-6">
-                    <Activity className="w-10 h-10" />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">{t('Sexga Berish')}</h3>
-                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t('Ichki Nakladnoy yaratish')}</p>
-                  
-                  <div className="mt-8 p-6 bg-slate-50 rounded-[32px] border border-slate-100 text-left space-y-4">
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Partiya ID')}</p>
-                      <p className="text-sm font-black text-blue-600">{selectedBatch.batchNumber}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('Material')}</p>
-                      <p className="text-sm font-black text-slate-900">{t((selectedBatch as any).name)}</p>
-                    </div>
-                  </div>
+      {stocks.length === 0 && !loading && renderEmptyState()}
 
-                  <form onSubmit={handleTransfer} className="mt-8 space-y-5">
-                    <div className="space-y-2 text-left">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Yo\'naltirilgan sex')}</label>
-                       <select value={targetShop} onChange={e => setTargetShop(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold appearance-none text-sm">
-                          <option value="ZAMES">Zames ({t('Qorishma')})</option>
-                          <option value="CNC">CNC ({t('Kesish')})</option>
-                          <option value="FINISHING">{t('Pardozlash')}</option>
-                       </select>
-                    </div>
-                    <div className="space-y-2 text-left">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('Miqdor')} (kg)</label>
-                       <div className="relative">
-                          <ArrowRight className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                          <input type="number" required value={transferQty} onChange={e => setTransferQty(e.target.value)} placeholder="0.00" className="w-full pl-11 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-bold" />
-                       </div>
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <button type="button" onClick={() => setIsTransferModalOpen(false)} className="flex-1 py-4 border border-slate-200 text-slate-500 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 transition-all">{t('Bekor')}</button>
-                        <button type="submit" className="flex-1 py-4 bg-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all">{t('Tasdiqlash')}</button>
-                    </div>
-                  </form>
-               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Scanner Modal */}
+      {/* QR SCANNER MODAL */}
       <AnimatePresence>
         {isScannerOpen && (
-          <Suspense fallback={null}>
-            <ScannerModal 
-              onScan={(batch) => {
-                setSelectedBatch(batch);
-                setIsTransferModalOpen(true);
-                setIsScannerOpen(false);
-              }}
-              onClose={() => setIsScannerOpen(false)}
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsScannerOpen(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
             />
-          </Suspense>
-        )}
-      </AnimatePresence>
-
-      {/* Label Print Modal */}
-      <AnimatePresence>
-        {isPrintingLabel && (
-          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={() => setIsPrintingLabel(null)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{scale:0.95, opacity:0, y:20}} animate={{scale:1, opacity:1, y:0}} exit={{scale:0.95, opacity:0, y:20}} className="relative bg-white w-full max-w-lg rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden">
-               <div className="p-8 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
-                  <h3 className="text-xl font-black text-slate-900 tracking-tight">QR Yorliqni Chiqarish</h3>
-                  <button onClick={() => setIsPrintingLabel(null)} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-                    <X className="w-6 h-6" />
-                  </button>
-               </div>
-               
-               <div className="p-12 flex flex-col items-center justify-center space-y-8 min-h-[300px]">
-                  <div className="p-4 bg-white shadow-xl rounded-xl border border-slate-100">
-                    <QRLabel batch={isPrintingLabel} />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-[40px] shadow-3xl overflow-hidden p-8"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                    <QrCode className="w-5 h-5" />
                   </div>
-                  
-                  <div className="text-center space-y-2">
-                    <p className="text-sm font-black text-slate-900">Yorliq chop etishga tayyor</p>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">O'lcham: 40mm x 25mm</p>
-                  </div>
+                  {t('Sklad QR Skaner')}
+                </h3>
+                <button 
+                  onClick={() => setIsScannerOpen(false)}
+                  className="p-3 bg-slate-100 text-slate-500 rounded-2xl hover:bg-slate-200 transition-colors"
+                >
+                  <Plus className="w-5 h-5 rotate-45" />
+                </button>
+              </div>
+              
+              <div className="mb-10 aspect-square rounded-[40px] bg-slate-900 overflow-hidden relative border-8 border-slate-100">
+                <QRScanner onScan={(data) => {
+                  console.log("Scanned:", data);
+                  setIsScannerOpen(false);
+                }} />
+                {/* Visual Scanner Overlay */}
+                <div className="absolute inset-0 border-[40px] border-slate-900/40 pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-emerald-500/50 rounded-3xl pointer-events-none animate-pulse" />
+              </div>
 
-                  <button 
-                    onClick={() => window.print()}
-                    className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all flex items-center justify-center gap-3"
-                  >
-                    <Printer className="w-5 h-5" />
-                    Chop etish (Print)
-                  </button>
-               </div>
+              <div className="space-y-4">
+                 <p className="text-xs font-bold text-slate-500 text-center uppercase tracking-widest">{t('Birkitilgan QR kodni kamera qarshisiga tuting')}</p>
+                 <div className="flex gap-3">
+                    <button className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest">{t('Manual Search')}</button>
+                    <button onClick={() => setIsScannerOpen(false)} className="flex-1 py-4 bg-slate-100 text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest">{t('Yopish')}</button>
+                 </div>
+              </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* Document Print Modal */}
-      <AnimatePresence>
-        {isPrintingDocument && (
-          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-            <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={() => setIsPrintingDocument(null)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{scale:0.95, opacity:0, y:20}} animate={{scale:1, opacity:1, y:0}} exit={{scale:0.95, opacity:0, y:20}} className="relative bg-white w-full max-w-6xl h-[90vh] rounded-[28px] md:rounded-[40px] shadow-2xl border border-slate-100 overflow-hidden flex flex-col">
-               <div className="p-5 md:p-8 border-b border-slate-50 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h3 className="text-xl font-black text-slate-900 tracking-tight">Rasmiy Hujjat (PDF/Print)</h3>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{isPrintingDocument.number}</p>
-                  </div>
-                  <div className="flex items-center gap-3 md:gap-4">
-                    <button 
-                      onClick={() => window.print()}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all flex items-center gap-2"
-                    >
-                      <Printer className="w-4 h-4" />
-                      Chop etish
-                    </button>
-                    <button onClick={() => setIsPrintingDocument(null)} className="p-2 text-slate-400 hover:text-slate-600 transition-colors">
-                      <X className="w-6 h-6" />
-                    </button>
-                  </div>
-               </div>
-               
-               <div className="flex-1 overflow-y-auto p-4 md:p-12 bg-slate-100/50">
-                  <DocumentTemplate 
-                    document={isPrintingDocument} 
-                    items={isPrintingDocument.items || []} 
-                  />
-               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* Style for printing only specific elements */}
-      <style>{`
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          #printable-area, #printable-area * {
-            visibility: visible;
-          }
-          .no-print {
-            display: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
