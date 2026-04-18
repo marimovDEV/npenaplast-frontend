@@ -1113,8 +1113,6 @@ export default function Production({ user }: { user: User }) {
            </div>
         )}
       </AnimatePresence>
-    </div>
-    </div>
     </>
   );
 }
